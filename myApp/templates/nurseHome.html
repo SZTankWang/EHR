@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>WeCare</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" type="text/css" href="/static/nurseHome.css">
+</head>
+<style>
+	.nav-link:hover{cursor: pointer;}
+</style>
+<body>
+	<div id="header-wrapper">
+		<nav class="navbar navbar-expand-lg navbar-dark justify-content-between" style="background-color: #2D79D6;">
+			<div class="d-flex justify-content-start">
+				<span class="navbar-brand mb-0 h1">WeCare</span>
+				<div class="navbar-nav">
+					<a class="nav-main nav-item nav-link active disabled" href="#">Home</a>
+					<a class="nav-main nav-item nav-link" href="#">All appointments</a>
+				</div>
+			</div>
+			<div class="d-flex justify-content-end">
+				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right: 1em;">
+					<div class="input-group">
+						<input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="search-input" placeholder="department, doctor, patient">
+							<div class="input-group-append">
+							<span class="input-group-text" id="inputGroup-sizing-sm">
+								<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+									<path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+									<path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+								</svg>
+							</span>
+						</div>
+					</div>
+				</form>
+				<div class="navbar-nav">
+			  	<a class="nav-item nav-link" href="/public">User</a>
+			  	<a class="nav-item nav-link" href="/logout">Logout</a>
+				</div>
+			</div>
+		</nav>
+	</div>
+
+	<div id="content-wrapper" style="padding:1em;">
+		<div id="content-header-wrapper">
+			<nav class="nav nav-tabs">
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link active disabled" id="pendingApp">Pending applications</div>
+				</div>
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link" id="todayAppt">Today's appointments</div>
+				</div>
+				<form class="ml-auto form-inline" action="/goCreateAppt" method="GET">
+					<div class="form-group">
+						<button class="btn btn-primary" type="submit">Create New Appointment</button>
+					</div>
+				</form>
+			</nav>
+		</div>
+		<div class='table' id="table-container" style="padding-top:0.5em;">
+			<table id="main-table" style="width:100%;">
+			  <thead>
+			    <tr>
+			      <th scope="col">Application ID</th>
+						<th scope="col">Date</th>
+						<th scope="col">Time</th>
+						<th scope="col">Doctor</th>
+						<th scope="col">Patient</th>
+						<th scope="col">Symptoms</th>
+						<th scope="col"></th>
+			    </tr>
+			  </thead>
+			  <tbody></tbody>
+				<tfoot>
+					<th scope="col">Application ID</th>
+					<th scope="col">Date</th>
+					<th scope="col">Time</th>
+					<th scope="col">Doctor</th>
+					<th scope="col">Patient</th>
+					<th scope="col">Symptoms</th>
+					<th scope="col"></th>
+				</tfoot>
+			</table>
+		</div>
+
+		<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="applicationLabel">Appointment Application</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+						<div class="container-fluid">
+					    <div class="row">
+					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID1">1</span></div>
+					      <div class="col-md-3"><span><b>Date: </b></span><span id="date1">2020-11-11</span></div>
+								<div class="col-md-2"><span><b>Time: </b></span><span id="time1">11:00</span></div>
+					    </div>
+					    <div class="row">
+					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor1">Alice</span></div>
+					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient1">Bob</span></div>
+					    </div>
+					    <div class="row">
+					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms1">Headache, cough</span></div>
+					    </div>
+					  </div>
+						<hr>
+						<form action="">
+		          <div class="form-group">
+		            <label for="comments" class="col-form-label">Comments (required if you reject the application)</label>
+		            <textarea class="form-control" id="comments" name="comments"></textarea>
+		          </div>
+							<button type="submit" class="btn btn-primary">Approve</button>
+			        <button type="submit" class="btn btn-secondary">Reject</button>
+		        </form>
+		      </div>
+		      <!-- <div class="modal-footer">
+		        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="approveApp()">Approve</button>
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="rejectApp()">Reject</button>
+		      </div> -->
+		    </div>
+		  </div>
+		</div>
+
+		<div class="modal fade" id="appointment" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="appointment" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="appointmentLabel">Appointment</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+						<div class="container-fluid">
+					    <div class="row">
+					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID2">1</span></div>
+					      <div class="col-md-3"><span><b>Date: </b></span><span id="date2">2020-11-11</span></div>
+								<div class="col-md-2"><span><b>Time: </b></span><span id="time2">11:00</span></div>
+					    </div>
+					    <div class="row">
+					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor2">Alice</span></div>
+					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient2">Bob</span></div>
+					    </div>
+					    <div class="row">
+					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms2">Headache, cough</span></div>
+					    </div>
+					  </div>
+						<hr>
+						<form>
+							<h5>Pre-examination</h5>
+							<div class="form-group row">
+		            <label for="bodyTemperature" class="col-3 col-form-label"><b>Body temperature:</b></label>
+								<div class="col-2">
+			            <input type="number" step="0.01" class="form-control-plaintext" id="bodyTemperature" name="bodyTemperature" value="36.7" readonly>
+								</div>
+								<label for="bodyTemperature" class="form-control-label">&#8451;</label>
+							</div>
+							<div class="form-group row">
+								<label for="pulseRate" class="col-3 col-form-label"><b>Pulse rate:</b></label>
+								<div class="col-2">
+		            	<input type="number" step="0.01" class="form-control" id="pulseRate" name="pulseRate" value="">
+								</div>
+								<label for="pulseRate" class="form-control-label">BPM</label>
+							</div>
+							<div class="form-group row">
+								<label for="bloodPressure" class="col-3 col-form-label"><b>Blood pressure:</b></label>
+								<div class="col-2">
+		            	<input type="number" step="0.01" class="form-control" id="bloodPressure" name="bloodPressure" valur="">
+								</div>
+								<label for="bloodPressure" class="form-control-label">mmHg</label>
+							</div>
+							<button type="submit" class="btn btn-primary">Edit</button>
+		        </form>
+						<hr>
+						<h5>Diagnosis</h5>
+					  <p id="diagnosis">Cold</p>
+						<hr>
+						<h5>Prescription</h5>
+					  <p id="diagnosis">hot water</p>
+						<hr>
+						<form>
+		          <div class="form-group">
+		            <h5>Lab report</h5>
+								<div class="custom-file">
+								  <input type="file" class="custom-file-input" id="labRepot">
+								  <label class="custom-file-label" for="labRepot">Choose file</label>
+								</div>
+		          </div>
+							<button type="submit" class="btn btn-primary">Upload</button>
+		        </form>
+		      </div>
+		      <div class="modal-footer">
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<div class="modal fade" id="createAppt" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="appointment" aria-hidden="true">
+		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="createApptLabel">Create Appointment</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true">&times;</span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+						<form>
+							<div class="form-group row">
+		            <label for="bodyTemperature" class="col-3 col-form-label"><b>Date</b></label>
+								<div class="col-2">
+			            <input type="datetime" class="form-control" id="createDate" name="date">
+								</div>
+							</div>
+							<div class="form-group row">
+								<label for="pulseRate" class="col-3 col-form-label"><b>Pulse rate:</b></label>
+								<div class="col-2">
+		            	<input type="number" step="0.01" class="form-control" id="pulseRate" name="pulseRate" value="">
+								</div>
+								<label for="pulseRate" class="form-control-label">BPM</label>
+							</div>
+							<div class="form-group row">
+								<label for="bloodPressure" class="col-3 col-form-label"><b>Blood pressure:</b></label>
+								<div class="col-2">
+		            	<input type="number" step="0.01" class="form-control" id="bloodPressure" name="bloodPressure" valur="">
+								</div>
+								<label for="bloodPressure" class="form-control-label">mmHg</label>
+							</div>
+							<button type="submit" class="btn btn-primary">Edit</button>
+		        </form>
+						<form>
+							<div class="container-fluid">
+						    <div class="row">
+						      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID3">1</span></div>
+						      <div class="col-md-3"><span><b>Date: </b></span><span id="date3">2020-11-11</span></div>
+									<div class="col-md-2"><span><b>Time: </b></span><span id="time3">11:00</span></div>
+						    </div>
+						    <div class="row">
+						      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor3">Alice</span></div>
+						      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient3">Bob</span></div>
+						    </div>
+								<hr>
+						    <div class="row">
+						      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms3">Headache, cough</span></div>
+						    </div>
+					  	</div>
+							<button type="submit" class="btn btn-primary">Edit</button>
+						</form>
+		      </div>
+		      <div class="modal-footer">
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+
+	</div>
+
+
+	<script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	<!-- <script crossorigin="anonymous" integrity="sha512-WNLxfP/8cVYL9sj8Jnp6et0BkubLP31jhTG9vhL/F5uEZmg5wEzKoXp1kJslzPQWwPT1eyMiSxlKCgzHLOTOTQ==" src="https://lib.baomitu.com/jquery/3.5.1/jquery.js"></script> -->
+	<script type="text/javascript" src="/static/index.js"></script>
+	<script type="text/javascript" language="javascript">
+		$(document).ready(function() {
+				// var myTable = $("table").DataTable({
+				// 	processing: true,
+				// 	serverSide: true,
+				// 	ajax: {
+			  //       url: '/pendingApps',
+			  //       type: 'POST'
+			  //   }
+				// });
+				var tableData = [{'appID': '1', 'date': '2020-11-11', 'time': '11:00', doctor:'A', patient: 'B', symptoms: 'Cough'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'ad', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: 'wfages'},{'appID': '2', 'date': '2020-09-12', 'time': '12:00', doctor:'rwter', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-10-12', 'time': '12:00', doctor:'kgjfh', patient: 'C', symptoms: 'nd'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'bfc', patient: 'frewg', symptoms: '/'},{'appID': '2', 'date': '2020-01-12', 'time': '12:00', doctor:'e56y', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'szdfg', patient: 'jfhdg', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'wefr', patient: 'myj', symptoms: '/'}];
+
+				// init table
+				var myTable = $("#main-table").DataTable({
+					"data" : tableData,
+	        "columns" : [
+	            { "data" : "appID", "title": "Application ID" },
+	            { "data" : "date", "title": "Date" },
+	            { "data" : "time", "title": "Time" },
+	            { "data" : "doctor", "title": "Doctor" },
+	            { "data" : "patient", "title": "Patient" },
+	            { "data" : "symptoms", "title": "Symptoms" },
+	            { "data" : "", "title": "" }
+	        ],
+					"columnDefs": [{
+	            "targets": -1,
+							"orderable": false,
+							"searchable": false,
+	            "data": null,
+	            "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>'
+	        	}]
+				});
+
+				// $("#application").modal();
+	      // $('#application').on('shown.bs.modal', function() {
+	      //    $('#myInput').focus();
+	      // });
+
+				// show modal
+				$('#main-table tbody').on( 'click', 'button', function () {
+	        var data = myTable.row( $(this).parents('tr') ).data();
+					if ($(".nav-table.active").text() == "Pending applications") {
+						var code = "1";
+					} else {
+						var code = "2";
+					}
+					$("#appID"+code).text(data['appID']);
+					$("#date"+code).text(data['date']);
+					$("#time"+code).text(data['time']);
+					$("#doctor"+code).text(data['doctor']);
+					$("#patient"+code).text(data['patient']);
+					$("#symptoms"+code).text(data['symptoms']);
+		    } );
+
+				// switch content
+				$("#pendingApp").on('click', function(){
+					var tableData = [{'appID': '1', 'date': '2020-11-11', 'time': '11:00', doctor:'A', patient: 'B', symptoms: 'Cough'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'ad', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: 'wfages'},{'appID': '2', 'date': '2020-09-12', 'time': '12:00', doctor:'rwter', patient: 'C', symptoms: '/'}];
+					myTable.clear().draw();
+					myTable.rows.add(tableData);
+					myTable.columns.adjust().draw();
+					$(".modal-button").each(function(){
+						$(this).attr('data-target','#application');
+					});
+					jQuery.ajax({
+						url: "http://localhost:5000/pendingApp",
+						type: 'GET',
+						success: function(data){
+							displayApps("pendingApp", data);
+						}
+					});
+				});
+
+				$("#todayAppt").on('click', function(){
+					var tableData = [{'appID': '2', 'date': '2020-10-12', 'time': '12:00', doctor:'kgjfh', patient: 'C', symptoms: 'nd'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'bfc', patient: 'frewg', symptoms: '/'},{'appID': '2', 'date': '2020-01-12', 'time': '12:00', doctor:'e56y', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'szdfg', patient: 'jfhdg', symptoms: '/'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'wefr', patient: 'myj', symptoms: '/'}];
+					myTable.clear().draw();
+					myTable.rows.add(tableData);
+					myTable.columns.adjust().draw();
+					$(".modal-button").each(function(){
+						$(this).attr('data-target','#appointment');
+					});
+					jQuery.ajax({
+						url: "http://localhost:5000/todayAppt",
+						type: 'GET',
+						success: function(data){
+							displayApps("todayAppt", data);
+						}
+					});
+				});
+
+				//-----------------createAppt------------------
+
+				//--------------------form--------------------
+				$("form").on("submit", function(event){
+					event.preventDefault();
+					var id = $(this).attr('id');
+					var data = $(this).serializeArray();
+
+					jQuery.ajax({
+						url: "http://localhost:5000/pendingApp",
+						type: 'POST',
+						data: data,
+						success: function(res){
+							displayApps(res);
+						}
+					})
+				});
+
+
+				//-----------------style------------------
+				// main navigation
+				$(".nav-main").on("click", function(event) {
+						event.preventDefault();
+						var clickedItem = $(this);
+						$(".nav-main").each( function() {
+							if ($(this).hasClass("active disabled")) {
+								$(this).removeClass("active disabled");
+							}
+						});
+						clickedItem.addClass("active disabled");
+				});
+
+				// table navigation
+				$(".nav-table").on("click", function(event) {
+						event.preventDefault();
+						var clickedItem = $(this);
+						$(".nav-table").each( function() {
+								if ($(this).hasClass("active disabled")) {
+									$(this).removeClass("active disabled");
+								}
+						});
+						clickedItem.addClass("active disabled");
+				});
+		});
+
+	</script>
+</body>
+</html>

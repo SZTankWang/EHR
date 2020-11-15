@@ -1,0 +1,462 @@
+/*body{
+	background-image: url(https://source.unsplash.com/C9XxB96hEEM/1600x900);
+	background-position: 50% 0%;
+	background-size: 60% 60%;
+	background-repeat: no-repeat;
+}*/
+
+:root{
+	font-family: Helvetica;
+	font-size:14px;
+}
+#user-link-wrapper{
+	display: flex;
+	flex-direction: row;
+	padding-right:4px;
+}
+
+#background-container{
+	display: flex;
+	height:30vh;
+	background-image: url(https://source.unsplash.com/C9XxB96hEEM/1600x900);
+	background-position: 50% 15%;
+	background-repeat: no-repeat;
+	background-size: 1600px 500px;
+}
+
+#search-bar-container{
+	width:50vw;
+	position:fixed;
+	top:33%;
+	left:25%;
+}
+
+#do-search{
+	background-color: white;
+	border:1px solid #AEB6BF ;
+}
+
+/*#search-btn-container{
+	border: 1px solid red ;
+}*/
+#function-container{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+/*	align-items: center;
+*/	/*border:1px solid red;*/
+	position:fixed;
+	top:50%;
+	left:10%;
+	width:80vw;
+	min-height:30vh;
+
+}
+
+.function{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+/*	border:1px solid blue;
+*/	height:80%;
+	width:fit-content;
+	justify-content: space-evenly;
+	padding-top: 3px;
+}
+#info-container{
+	width:30%;
+	height:40vh;
+	border:1px solid #AEB6BF;
+	border-radius: 3px;
+  -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+    transition: all 250ms cubic-bezier(.02, .01, .47, 1);
+}
+
+.my-card{
+	width:15vw;
+	height: 20vh;
+	border:1px solid #AEB6BF;
+	border-radius: 3px;
+	margin-top: 5px;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	flex-direction: column;
+	margin:1vw;
+	  -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+    transition: all 250ms cubic-bezier(.02, .01, .47, 1);
+}
+
+.my-card:hover{
+    box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15);
+    transform: translate(0,-5px);
+    transition-delay: 0s;
+ 	cursor:pointer;
+}
+
+#info-container:hover{
+	box-shadow:0 16px 32px 0 rgba(48, 55, 66, 0.15);
+	transform: translate(0,-5px);
+	transition-delay: 0s;
+}
+
+.content-wrapper{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	min-height: fit-content;
+/*	border: 1px solid red;
+*/}
+
+.function-title{
+	font-family: Helvetica;
+	font-size: 1em;
+	font-weight:bolder;
+}
+
+#outer-container{
+	min-height: 80%;
+/*	border:1px solid blue;
+*/	margin-bottom: 5%;
+}
+
+
+#info-container{
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	height:fit-content;
+}
+
+.recent{
+/*	border:1px solid red;
+*/	width:23vw;
+	height: 8vh;
+	margin-top: 1%;
+	background: #F2F2F2;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	font-weight: lighter;
+}
+
+
+.time{
+	width:fit-content;
+	height:35%;
+/*	border:1px solid red;
+*/	font-size:0.1rem;
+}
+
+.info{
+	display: flex;
+	flex-direction: row;
+	min-width: 95%;
+	height:45%;
+/*	border: 1px solid red;
+*/	margin-bottom: 3%;
+}
+
+.info-content{
+	width:25%;
+/*	border:1px solid blue;
+*/	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: Helvetica;
+	color:black;
+	background: #F2F2F2;
+}
+
+.info-content:nth-child(4){
+/*	margin-left: 3%;*/
+/*	background: #448E05;*/
+	margin-right:3%;
+	color:white;
+	border-radius: 3px;
+}
+#appointment-btn-wrapper{
+	margin-bottom: 3%;
+}
+
+#title2{
+	margin-bottom:5%;
+}
+
+/*下面是登录页部分*/
+body{
+	background-color: rgb(211,244,255);
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto;
+	overflow: hidden;
+}
+
+#login-bg{
+	min-height: 100vh;
+	min-width: 50vw;
+	background-image: url(/static/homepage_bg.svg);
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	margin-right:17%;
+}
+
+#login-form-container{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	height: 65vh;
+	width:25vw;
+/*	background:white;
+*/}
+
+#login-title{
+	font-family: Helvetica;
+	font-size: 3vh;
+	color:#2D79D6;
+	margin-top:14%;
+/*	margin-bottom: 0;
+*/}
+
+#login-field{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height:75%;
+	width:100%;
+	padding: 2%;
+	background:white;
+/*	border:1px solid red;
+*/}
+
+#login-form-mode-bar{
+	width:100%;
+	height:fit-content;
+	border-bottom: 1px  solid #DBDFE3;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	color:#808B96 ;
+}
+
+
+
+.mode{
+	font-family: Helvetica;
+	font-size: 0.5rem;
+	margin-left:3%;
+	width:fit-content;
+/*	margin-top: 2%;*/
+	padding-top:2%;
+	padding-bottom:1%;
+	padding-left: 2%;
+	padding-right: 2%;
+	text-align: center;
+}
+
+.mode:hover{
+	color:#2D79D6;
+	cursor: pointer;
+}
+
+#login-form{
+	margin-top:-14%;
+}
+
+#login-btn-wrapper{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content:center;
+
+}
+
+#doLogin{
+	background:rgb(0,123,255);
+/*	outline:none;
+*/	border:none;
+	width:fit-content;
+	height:fit-content;
+/*	padding: 2% 1% 1% 0;
+*/	border-radius: 3px;
+	color:white;
+	font-size: 1.2rem;
+/*	height:;
+*/}
+
+#doLogin:hover{
+	cursor:pointer;
+}
+
+#patient-register-form{
+	margin-bottom: 6%;
+}
+
+.login-input{
+	margin-left: 10%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap:wrap;
+	justify-content: space-between;
+
+}
+
+.register-input{
+	margin-left: 10%;
+	padding-top:2%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap:wrap;
+	justify-content: space-between;
+}
+
+#login-input-pass{
+	margin-top:5%;
+}
+#login-username{
+	margin-left:21%;
+}
+
+label{
+/*	float:left;
+*/	font-size:2vh;
+	margin-top: 3%;
+	margin-left:3%;
+	font-weight: lighter;
+}
+
+input{
+/*	margin-left:9%;
+*/	margin-right:10%;
+	width:50%;
+	border:0;
+	border-bottom: 1px solid #797979;
+	outline-style: none;
+	transition:border-bottom 1s;
+/*	transition:border-width 0.8s;
+*/}
+
+input:hover{
+	border-bottom:1px solid #2D79D6;
+}
+
+input:focus{
+	border-bottom:2px solid #2D79D6;
+/*	border-width: 3px;
+*/}
+
+#option-container{
+	max-width:100%;
+	height:fit-content;
+	display:flex;
+	flex-direction: row;
+	justify-content: space-between;
+/*	border:1px solid red;
+*/	font-size:0.1rem;
+	padding: 2%;
+}
+
+/*登录按钮选择部分*/
+#choice-view-container{
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	width:100%;
+	height:fit-content;
+	font-size:0.3rem;
+	margin-bottom: 40%;
+	margin-top: 15%;
+/*	border:1px solid blue;
+*/}
+
+#choice-btn-outer-container{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	height:25vh;
+	width:100%;
+/*	background: red;
+*/}
+
+.choice-btn-container{
+/*	border:1px solid red;
+*//*	margin-left:3%;
+*/	
+/*	background: blue;
+*/	display:flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center; 
+	transition: 0.5s;
+}
+
+.choice-btn-container:hover{
+    box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15);
+    transform: translate(0,-5px);
+    transition-delay: 0s;
+ 	cursor:pointer;
+
+}
+
+.choice-description{
+	font-size:0.1rem;
+	color:#2D79D6;
+}
+
+#choice-header-wrapper{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	color:#2D79D6;
+}
+
+#doctor-background{
+	background-image: url("/static/doctor.svg");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	width:6vw;
+	height:10vh;
+}
+
+#staff-background{
+	background-image: url("/static/nurse.svg");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	width:6vw;
+	height:10vh;
+}
+
+#patient-background{
+	background-image: url("/static/patient.svg");
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	width:6vw;
+	height:10vh;
+
+}
+
+#patient-register-btn-wrapper{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content:center;
+	margin-bottom:12%;
+}
+
+#doRegister{
+	background:rgb(0,123,255);
+/*	outline:none;
+*/	border:none;
+	width:fit-content;
+	height:2.5vh;
+	border-radius: 3px;
+	color:white;
+	}

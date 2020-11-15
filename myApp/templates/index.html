@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>WeCare</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="/static/patientHome.css">
+</head>
+<body>
+
+	<nav class="navbar navbar-light" style="background-color: #2D79D6;">
+	  <!-- Navbar content -->
+	  <span class="navbar-brand mb-0 h1" style="color:white;">WeCare</span>
+
+	  <div id="user-link-wrapper">
+		  <a href="/login" class="navbar-link navbar-right" style="color:white;">Login</a>
+
+	  </div>
+	</nav>
+	<div id="content-container">
+		<div id="background-container">
+			<div id="search-bar-container">
+				<div class="input-group input-group-lg">
+					  <input type="text" class="form-control" placeholder="search for hospitals, doctors" >
+					  <div class="input-group-append" id='serach-btn-container'>
+					    <button class="btn btn-light" type="button" id="do-search">
+				    	<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+					  <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+					  <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+					</svg>
+					</button>
+					  </div>
+				</div>
+			</div>
+		</div>
+		<div id="function-container">
+			<div class='function'id="card-container">
+				<div class="my-card" id="appointment">
+					<div class="content-wrapper">
+						<svg t="1603421949165" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2372" width="80" height="80"><path d="M284.687309 461.887772H76.587153v404.71577h208.100156V461.887772zM18.770468 932.072495l986.459064-0.036839v61.654075H18.770468v-61.617236z m928.699684-470.184723H739.433441v404.71577c110.370516 0 97.665172-0.074701 208.032618-0.074702l0.004093-404.641068zM323.174801 91.846664v774.755854h377.639142V92.002206l-377.639142-0.155542z m416.237151 0.192381l-0.050142 308.232514h265.867722v61.616213h-19.344542l0.077771 404.641068h19.266771v42.308511l-986.459064 0.078794v-42.312603H38.066914l-0.081864-404.71577H18.770468v-61.616213h265.845209l0.049119-308.232514-19.260631-0.074701V30.310269h493.189623v61.654075l-19.181836 0.074701z" fill="#2D79D6" p-id="2373"></path><path d="M862.653588 712.431515h46.244138V824.179398h-46.244138V712.431515z m-84.758237 0h46.241068V824.179398H777.895351V712.431515z m-578.004141 0h46.240045V824.179398h-46.240045V712.431515z m-84.786889 0h46.236975V824.179398h-46.236975V712.431515z m84.786889-200.49189h46.240045v154.213983h-46.240045V511.939625z m-84.786889 0h46.236975v154.213983h-46.236975V511.939625z m747.549267-0.036839h46.244138v154.212959h-46.244138V511.902786z m-84.758237 0h46.241068v154.212959H777.895351V511.902786zM592.918799 712.431515h53.947572V824.179398h-53.947572V712.431515z m0-200.49189h53.947572v154.17612h-53.947572V511.939625zM377.130559 712.431515h53.947572V824.179398h-53.947572V712.431515z m0-200.49189h53.947572v154.17612h-53.947572V511.939625z m107.89412 200.49189h53.946549V824.179398h-53.946549V712.431515z m0-200.49189h53.946549v154.17612h-53.946549V511.939625zM469.637255 145.794236h84.72242v92.481113h92.506696v88.707167h-92.506696v88.506599h-84.72242v-88.506599h-92.514882v-88.707167h92.514882z" fill="#2D79D6" p-id="2374">	</path>
+						</svg>
+					</div>
+					<div class="content-wrapper">
+						<p class="function-title">make an appointment</p>
+					</div>
+				</div>
+				<div class="my-card" id="file">
+						<div class="content-wrapper">
+							<svg t="1603438089347" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3196" width="80" height="80"><path d="M808.96 365.056v-47.104a46.592 46.592 0 0 0-45.056-48.128h-271.36v-44.032a46.592 46.592 0 0 0-45.056-48.128H220.672a46.592 46.592 0 0 0-45.056 48.128v581.12L256 413.184a46.592 46.592 0 0 1 45.056-48.128z m-33.792 481.28h-563.2l76.8-397.312a46.592 46.592 0 0 1 45.056-48.128h520.704a46.592 46.592 0 0 1 45.056 48.128L819.2 798.208a46.592 46.592 0 0 1-44.032 48.128z" fill="#2D79D6" p-id="3197"></path></svg></svg>
+						</div>
+						<div class="content-wrapper">
+							<p class="function-title">personal records</p>
+						</div>
+				</div>
+				<div class="my-card" id="chat">
+					<div class="content-wrapper">
+						<svg t="1603438341692" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4013" width="70" height="70"><path d="M919.192216 976.840649a42.620541 42.620541 0 0 1-21.919135-6.088649l-185.094919-110.675027A560.95827 560.95827 0 0 1 512 896.249081c-274.681081 0-498.162162-192.982486-498.162162-430.190703C13.837838 228.850162 237.318919 35.867676 512 35.867676S1010.162162 228.850162 1010.162162 466.058378c0 104.64173-42.952649 203.637622-121.66227 281.821406l70.379243 168.683243c7.195676 17.269622 2.601514 37.251459-11.374703 49.567135-8.025946 7.084973-18.127568 10.710486-28.312216 10.710487z m-203.277838-208.45319c7.610811 0 15.193946 2.048 21.919136 6.088649l91.108324 54.438054-31.494919-75.443892a43.699892 43.699892 0 0 1 11.623784-49.816216c74.170811-64.345946 115.020108-148.729081 115.020108-237.595676C924.090811 276.756757 739.217297 122.713946 512 122.713946S99.909189 276.756757 99.909189 466.058378c0 189.301622 184.873514 343.344432 412.090811 343.344433 65.785081 0 128.719568-12.647784 187.142919-37.583568 5.369081-2.297081 11.07027-3.431784 16.771459-3.431784zM260.953946 470.154378a56.32 56.32 0 0 1 56.347676-56.015567 56.347676 56.347676 0 0 1 55.794162 56.596757c0 31.135135-24.908108 56.430703-55.794162 56.569081A56.32 56.32 0 0 1 260.981622 471.316757v-1.134703z m186.478703 0c0 31.965405 25.710703 57.897514 57.399351 57.897514a57.648432 57.648432 0 0 0 57.371676-57.897514 57.648432 57.648432 0 0 0-57.371676-57.897513 57.648432 57.648432 0 0 0-57.399351 57.897513z m186.506378 0a56.32 56.32 0 0 1 56.347676-56.015567 56.347676 56.347676 0 0 1 55.794162 56.596757c0 31.135135-24.908108 56.430703-55.794162 56.569081a56.32 56.32 0 0 1-56.347676-56.015568v-1.134703z"fill="#2D79D6" p-id="4014"></path></svg>
+					</div>
+					<div class="content-wrapper">
+						<p class="function-title">online consultation</p>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/static/index.js"></script>
+</body>
+</html>
