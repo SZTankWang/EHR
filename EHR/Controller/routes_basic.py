@@ -165,20 +165,18 @@ def goToHospitalList():
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
 
-	hospital = request.args.get('hospital')
-	print("hospital:", hospital)
+	partial_hpt_name = request.args.get('hospital')
+	print("hospital:", partial_hpt_name)
+	search_name = "%{}%".format(partial_hpt_name)
 
-	#这里不需要page count, 直接根据传来字符串查询即可
-	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
-	rawHospitals = Hospital.query.offset(n_offset).limit(page_count)
-	hospital_ids = [res.id for res in rawHospitals]
-	hospital_names = [res.name for res in rawHospitals]
-	# return data
+	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).all()
+
 	return make_response(jsonify(
-		[{"id":hospital_ids[i],
-		  "name": hospital_names[i],
-		  'n_tot_record': n_tot_records,
-		  'n_tot_page': n_tot_page} for i in range(page_count)]), 200)
+		[{"id":rawHospitals[i].id,
+		  "name": rawHospitals[i].name,
+		  'phone': rawHospitals[i].phone,
+		  'address': rawHospitals[i].address,
+		  'description': rawHospitals[i].description} for i in range(len(rawHospitals))]), 200)
 
 @app.route('/goToHospital',methods=['GET'])
 def goToHospital():
