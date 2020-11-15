@@ -19,9 +19,9 @@ db = SQLAlchemy(app)
 db.create_all()
 db.session.commit()
 
-from myApp.model import models
+from app.model import models
 
-from myApp.Controller import routes_basic
+from app.Controller import routes_basic
 # except:
 # 	app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:1234@127.0.0.1/wecare"
 # 	db = SQLAlchemy(app)
