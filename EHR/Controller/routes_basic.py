@@ -109,7 +109,13 @@ def logout():
 @login_required
 def loadHomePage():
 	# return render_template(f'{current_user.role.value}Home.html')
-	return render_template('patientHome.html')
+	if current_user.role.value == "patient":
+		return render_template('patientHome.html')
+	if current_user.role.value == "nurse":
+		print("nurse")
+		return render_template('nurseHome.html')
+	if current_user.role.value == "doctor":
+		pass
 
 
 #--------------------get hospital list data---------------------
