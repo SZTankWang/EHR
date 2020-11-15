@@ -4,8 +4,8 @@ from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 from numpy.lib.function_base import select
 from werkzeug.security import check_password_hash, generate_password_hash
-from myApp import app, db, login
-from myApp.model.models import *
+from EHR import app, db, login
+from EHR.model.models import *
 import math
 import datetime
 
@@ -162,9 +162,11 @@ def page_helper(db_obj):
 def goToHospitalList():
 	return render_template('hospitalListPage.html')
 
-@app.route('/searchHostpital', methods=['GET'])
+@app.route('/searchHospital', methods=['GET'])
 def searchHospital():
+	hospital = request.args.get('hospital')
 
+	#这里不需要page count, 直接根据传来字符串查询即可
 	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
 	rawHospitals = Hospital.query.offset(n_offset).limit(page_count)
 	hospital_ids = [res.id for res in rawHospitals]
@@ -175,6 +177,11 @@ def searchHospital():
 		  "name": hospital_names[i],
 		  'n_tot_record': n_tot_records,
 		  'n_tot_page': n_tot_page} for i in range(page_count)]), 200)
+
+@app.route('/goToHospital',methods=['GET'])
+def goToHospital():
+	hospitalID = request.args.get('hospitalID')
+	return "success"
 
 @app.route('/nurseHome', methods=['GET'])
 def nurseHome():

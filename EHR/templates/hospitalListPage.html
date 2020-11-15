@@ -151,7 +151,7 @@
 				console.log(hospital);
 				$.ajax({
 					url:"http://localhost:5000/searchHospital",
-					data:hospital,
+					data:{'hospital':hospital},
 					success:function(data){
 						console.log(搜索成功);
 						renderHospital(data);
@@ -218,10 +218,24 @@
 			$('#card-container').empty();
 			var i;
 			for(i=0;i<length;i++){
-				var card = '<div class="hospital-card"><div class="hospital-card-left"><div class="picture-holder"></div><div class="hospital-info"><div class="hospital-name">'+data[i]['name']+'</div><div class="hospital-addr">'+data[i]['address']+'</div></div></div><div class="hospital-card-right"><button type="button" class="btn btn-primary">预约就诊</button></div></div>';
+				var card = '<div class="hospital-card"><div class="hospital-card-left"><div class="picture-holder"></div><div class="hospital-info"><div class="hospital-name">'+data[i]['name']+'</div><div class="hospital-addr">'+data[i]['address']+'</div></div></div><div class="hospital-card-right"><button type="button" class="btn btn-primary selectHospital" id='+data[i]['id']+' onclick=goToHospital()>预约就诊</button></div></div>';
 				$('#card-container').append(card);
 			}
 
+		}
+
+		function goToHospital(){
+			$('.selectHospital').click(function(){
+				console.log($(this).attr('id'));
+				var hospitalID = $(this).attr('id');
+				$.ajax({
+					url:'http://localhost:5000/goToHospital',
+					data:{'hospitalID':hospitalID},
+					success:function(data){
+						console.log(data);
+					}
+				})
+			})
 		}
 
 		function goToHomePage(){

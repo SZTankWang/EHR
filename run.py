@@ -1,4 +1,4 @@
-from myApp import app
+from EHR import app
 
 
 if __name__ == '__main__':
