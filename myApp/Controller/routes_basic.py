@@ -5,7 +5,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from numpy.lib.function_base import select
 from werkzeug.security import check_password_hash, generate_password_hash
 from myApp import app, db, login
-from myApp.model import models
+from myApp.model.models import *
 import math
 import datetime
 
@@ -109,7 +109,13 @@ def logout():
 @login_required
 def loadHomePage():
 	# return render_template(f'{current_user.role.value}Home.html')
-	return render_template('patientHome.html')
+	if current_user.role.value == "patient":
+		return render_template('patientHome.html')
+	if current_user.role.value == "nurse":
+		print("nurse")
+		return render_template('nurseHome.html')
+	if current_user.role.value == "doctor":
+		pass
 
 
 #--------------------get hospital list data---------------------
