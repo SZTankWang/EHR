@@ -164,7 +164,9 @@ def goToHospitalList():
 
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
+
 	hospital = request.args.get('hospital')
+	print("hospital:", hospital)
 
 	#这里不需要page count, 直接根据传来字符串查询即可
 	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
@@ -206,7 +208,13 @@ def todayAppt():
 	# unclear question. Do you wanna check "my dept." appt?
 	pass
 
-# @app.route('/viewAppt', methods=['POST'])
-# def viewAppt():
-# 	appid = request.form['appID']
+@app.route('/viewAppt', methods=['POST'])
+def viewAppt():
+	appid = request.form['appID']
+
+@app.route('/availSlot', methods=['POST', 'GET'])
+def availSlot():
+	doctorID = request.form['doctorID']
+	today = datetime.datetime.today()
+	Application.query.filter(Application)
 	

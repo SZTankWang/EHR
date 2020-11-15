@@ -86,8 +86,6 @@ def gen_user_data():
         elif u.role=='admin':
             new = Admin(id=id_list[i])
 
-
-
         db.session.add(new)
     db.session.commit()
 
