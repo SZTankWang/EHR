@@ -61,7 +61,7 @@
 			<table id="main-table" style="width:100%;">
 			  <thead>
 			    <tr>
-			      <th scope="col">Application ID</th>
+			      <th scope="col" style="width:5em;">Application ID</th>
 						<th scope="col">Date</th>
 						<th scope="col">Time</th>
 						<th scope="col">Doctor</th>
@@ -72,7 +72,7 @@
 			  </thead>
 			  <tbody></tbody>
 				<tfoot>
-					<th scope="col">Application ID</th>
+					<th scope="col" style="width:5em;">Application ID</th>
 					<th scope="col">Date</th>
 					<th scope="col">Time</th>
 					<th scope="col">Doctor</th>
@@ -84,7 +84,7 @@
 		</div>
 
 		<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
-		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		  <div class="modal-dialog modal-dialog-scrollable modal-lg">
 		    <div class="modal-content">
 		      <div class="modal-header">
 		        <h5 class="modal-title" id="applicationLabel">Appointment Application</h5>
@@ -108,13 +108,13 @@
 					    </div>
 					  </div>
 						<hr>
-						<form action="">
+						<form id="processApp">
 		          <div class="form-group">
 		            <label for="comments" class="col-form-label">Comments (required if you reject the application)</label>
 		            <textarea class="form-control" id="comments" name="comments"></textarea>
 		          </div>
-							<button type="submit" class="btn btn-primary">Approve</button>
-			        <button type="submit" class="btn btn-secondary">Reject</button>
+							<input type="submit" class="btn btn-primary" name="action" value="Approve" />
+			        <input type="submit" class="btn btn-secondary" name="action" value="Reject" />
 		        </form>
 		      </div>
 		      <!-- <div class="modal-footer">
@@ -126,7 +126,7 @@
 		</div>
 
 		<div class="modal fade" id="appointment" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="appointment" aria-hidden="true">
-		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
 		    <div class="modal-content">
 		      <div class="modal-header">
 		        <h5 class="modal-title" id="appointmentLabel">Appointment</h5>
@@ -179,12 +179,41 @@
 						<h5>Diagnosis</h5>
 					  <p id="diagnosis">Cold</p>
 						<hr>
-						<h5>Prescription</h5>
-					  <p id="diagnosis">hot water</p>
+						<h5>
+							Prescriptions
+							<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#prescriptions" aria-expanded="false" aria-controls="prescriptions">Show</button>
+						</h5>
+						<div id="prescriptions" class="collapse">
+							<div class="card card-body"> <!--one card-->
+								<h5 class="mb-0">
+									<button class="btn btn-link" data-toggle="collapse" data-target="#pre1" aria-expanded="true" aria-controls="pre1">
+										medicine 1
+									</button>
+								</h5>
+								<div id="pre1" class="collapse" aria-labelledby="heading1" data-parent="#prescriptions">
+									<div class="card-body">Dose</div>
+								</div>
+							</div>
+						</div>
 						<hr>
+						<h5>
+							Lab reports
+							<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReports" aria-expanded="false" aria-controls="labReports">Show</button>
+						</h5>
+						<div id="labReports" class="collapse">
+							<div class="card card-body">
+								<h5 class="mb-0">
+									<button class="btn btn-link" data-toggle="collapse" data-target="#lab1" aria-expanded="true" aria-controls="lab1">
+										report 1
+									</button>
+								</h5>
+								<div id="lab1" class="collapse" aria-labelledby="lab1" data-parent="#labReports">
+									<div class="card-body">details</div>
+								</div>
+							</div>
+						</div>
 						<form>
 		          <div class="form-group">
-		            <h5>Lab report</h5>
 								<div class="custom-file">
 								  <input type="file" class="custom-file-input" id="labRepot">
 								  <label class="custom-file-label" for="labRepot">Choose file</label>
@@ -243,7 +272,7 @@
 	      //    $('#myInput').focus();
 	      // });
 
-				// show modal
+				// -----------show modal-----------
 				$('#main-table tbody').on( 'click', 'button', function () {
 	        var data = myTable.row( $(this).parents('tr') ).data();
 					if ($(".nav-table.active").text() == "Pending applications") {
@@ -257,9 +286,28 @@
 					$("#doctor"+code).text(data['doctor']);
 					$("#patient"+code).text(data['patient']);
 					$("#symptoms"+code).text(data['symptoms']);
+					// if (code == "2"){
+					// 	jQuery.ajax({
+					// 		url: "http://localhost:5000/viewAppt",
+					// 		type: 'POST',
+					// 		data: {"appID": data['appID']},
+					// 		success: function(res){
+					// 			$("bodyTemperature").text(res.preExam.bodyTemperature);
+					// 			$("pulseRate").text(res.preExam.pulseRate);
+					// 			$("bloodPressure").text(res.preExam.bloodPressure);
+					// 			$("diagnosis").text(res.diagnosis);
+					// 			for (let i=0; i < res.prescripitions.length; i++) {
+					// 				$("prescriptions").append()
+					// 			}
+					// 			for (let i=0; i < res.labReports.length; i++){
+					//
+					// 			}
+					// 		}
+					// 	});
+					// }
 		    } );
 
-				// switch content
+				// ----------switch content-------------
 				$("#pendingApp").on('click', function(){
 					jQuery.ajax({
 						url: "http://localhost:5000/pendingApp",
@@ -268,25 +316,25 @@
 							myTable.clear().draw();
 							myTable.rows.add(res);
 							myTable.columns.adjust().draw();
+							$(".modal-button").each(function(){
+								$(this).attr('data-target','#application');
+							});
 						}
-					});
-					$(".modal-button").each(function(){
-						$(this).attr('data-target','#application');
 					});
 				});
 
 				$("#todayAppt").on('click', function(){
 					jQuery.ajax({
-						url: "http://localhost:5000/todayAppt",
+						url: "http://localhost:5000/pendingApp",
 						type: 'GET',
 						success: function(res){
 							myTable.clear().draw();
 							myTable.rows.add(res);
 							myTable.columns.adjust().draw();
+							$(".modal-button").each(function(){
+								$(this).attr('data-target','#appointment');
+							});
 						}
-					});
-					$(".modal-button").each(function(){
-						$(this).attr('data-target','#appointment');
 					});
 				});
 
@@ -296,19 +344,26 @@
 				});
 
 				//--------------------form--------------------
-				$("form").on("submit", function(event){
+				$(":submit").on("click", function(event){
 					event.preventDefault();
-					var id = $(this).attr('id');
-					var data = $(this).serializeArray();
-
-					jQuery.ajax({
-						url: "http://localhost:5000/pendingApp",
-						type: 'POST',
-						data: data,
-						success: function(res){
-							displayApps(res);
-						}
-					})
+					var appID = $("#appID1").text();
+					var action = $(this).val();
+					var data = $(this).parent().serializeArray();
+					data = jsonify(data);
+					if (action == "Reject" && !data.comments) {
+						alert("Comments is required to reject the application.");
+					} else {
+						data.appID = appID;
+						data.action = action;
+						jQuery.ajax({
+							url: "http://localhost:5000/approveApp",
+							type: 'POST',
+							data: data,
+							success: function(res){
+								setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 1000);
+							}
+						})
+					}
 				});
 
 
@@ -337,6 +392,15 @@
 						clickedItem.addClass("active disabled");
 				});
 		});
+
+		//-----jsonify----
+		function jsonify(data){
+			var obj = {};
+			for(var i=0;i<data.length;i++){
+				obj[data[i].name]=data[i].value;
+			}
+			return obj;
+		}
 
 	</script>
 </body>
