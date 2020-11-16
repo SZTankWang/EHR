@@ -143,12 +143,16 @@ def hospitalData():
 		  "name": hospital_names[i],
 		  "address": hospital_addresses[i],
 		  "phone": hospital_phones[i],
-		  'n_tot_record': n_tot_records,
+		  'n_tot_records': n_tot_records,
 		  'n_tot_page': n_tot_page} for i in range(page_count)]), 200)
 
 def page_helper(db_obj):
-	curr_page = int(request.form['currPage'])
-	page_size = int(request.form['pageSize'])
+	try:
+		curr_page = int(request.form['currPage'])
+		page_size = int(request.form['pageSize'])
+	except:
+		curr_page = int(request.args.get('currPage'))
+		page_size = int(request.args.get('pageSize'))
 
 	n_offset = (curr_page-1) * page_size + 1
 	n_tot_records = db_obj.query.count()
@@ -164,19 +168,22 @@ def goToHospitalList():
 
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
-
+	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
 	partial_hpt_name = request.args.get('hospital')
 	print("hospital:", partial_hpt_name)
 	search_name = "%{}%".format(partial_hpt_name)
 
-	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).all()
+	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).offset(n_offset).limit(page_count).all()
+	print(rawHospitals)
 
 	return make_response(jsonify(
 		[{"id":rawHospitals[i].id,
 		  "name": rawHospitals[i].name,
 		  'phone': rawHospitals[i].phone,
 		  'address': rawHospitals[i].address,
-		  'description': rawHospitals[i].description} for i in range(len(rawHospitals))]), 200)
+		  'description': rawHospitals[i].description,
+		  'n_tot_page': n_tot_page,
+		  'n_tot_records': n_tot_records} for i in range(len(rawHospitals))]), 200)
 
 @app.route('/goToHospital',methods=['GET'])
 def goToHospital():
