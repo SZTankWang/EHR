@@ -145,15 +145,20 @@
 		})
 
 		//搜索医院
+		//需要带上分页 重置当前页
 		function searchHospital(){
 			var hospital = $('#search-input').val();
 			if(hospital != ''){
 				console.log(hospital);
 				$.ajax({
 					url:"http://localhost:5000/searchHospital",
-					data:{'hospital':hospital},
+					data:{'hospital':hospital,'currPage':1,'pageSize':$('#pageSize').val()},
 					success:function(data){
-						console.log(搜索成功);
+						console.log(data);
+						//分页样式设置
+						//设定第一页为active
+						$('#currPage').val(1);
+
 						renderHospital(data);
 					}
 				})
@@ -161,6 +166,10 @@
 
 
 
+		}
+
+		function setPageNum(){
+			// $('.')
 		}
 
 		//切换选中的页面按钮
