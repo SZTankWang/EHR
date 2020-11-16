@@ -1,3 +1,6 @@
+import collections
+from datetime import timedelta
+from itertools import count
 from operator import and_, methodcaller, ne
 from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response
 from flask_login.utils import logout_user
@@ -28,7 +31,7 @@ def register():
 	if current_user.is_authenticated:
 		return redirect(url_for('loadHomePage'))
 	id = request.form['id']
-	print(User.query.filter_by(id=id).first() != None)
+
 	if User.query.filter_by(id=id).first() != None:
 		return make_response(jsonify({'ret': 'You already registered!'}))
 	role = request.form['role']
@@ -132,7 +135,7 @@ def hospitalData():
 	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
 
 	rawHospitals = Hospital.query.offset(n_offset).limit(page_count)
-	print(rawHospitals)
+
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
 	hospital_addresses = [res.address for res in rawHospitals]
@@ -143,12 +146,16 @@ def hospitalData():
 		  "name": hospital_names[i],
 		  "address": hospital_addresses[i],
 		  "phone": hospital_phones[i],
-		  'n_tot_record': n_tot_records,
+		  'n_tot_records': n_tot_records,
 		  'n_tot_page': n_tot_page} for i in range(page_count)]), 200)
 
 def page_helper(db_obj):
-	curr_page = int(request.form['currPage'])
-	page_size = int(request.form['pageSize'])
+	try:
+		curr_page = int(request.form['currPage'])
+		page_size = int(request.form['pageSize'])
+	except:
+		curr_page = int(request.args.get('currPage'))
+		page_size = int(request.args.get('pageSize'))
 
 	n_offset = (curr_page-1) * page_size + 1
 	n_tot_records = db_obj.query.count()
@@ -164,19 +171,22 @@ def goToHospitalList():
 
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
-
+	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
 	partial_hpt_name = request.args.get('hospital')
-	print("hospital:", partial_hpt_name)
+
 	search_name = "%{}%".format(partial_hpt_name)
 
-	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).all()
+	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).offset(n_offset).limit(page_count).all()
+
 
 	return make_response(jsonify(
 		[{"id":rawHospitals[i].id,
 		  "name": rawHospitals[i].name,
 		  'phone': rawHospitals[i].phone,
 		  'address': rawHospitals[i].address,
-		  'description': rawHospitals[i].description} for i in range(len(rawHospitals))]), 200)
+		  'description': rawHospitals[i].description,
+		  'n_tot_page': n_tot_page,
+		  'n_tot_records': n_tot_records} for i in range(len(rawHospitals))]), 200)
 
 @app.route('/goToHospital',methods=['GET'])
 def goToHospital():
@@ -199,21 +209,25 @@ def nurseHome():
 
 @app.route('/pendingApp', methods=['GET', 'POST'])
 def pendingApp():
-	if request.method == 'POST':
-		print("Here to get data")
-		pending_appt = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
-													Application.status==StatusEnum.pending)).limit(6).all()
-		return make_response(jsonify(
-					[{"appID": pending_appt[i].id,
-					"date": pending_appt[i].app_timestamp,
-					"doctor": pending_appt[i].doctor_id,
-					"patient": pending_appt[i].patient_id,
-					"symptoms": pending_appt[i].symptoms} for i in range(len(pending_appt))]), 200)
+
+
+	pending_appt = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
+												Application.status==StatusEnum.pending)).limit(6).all()
+	return make_response(jsonify(
+				[{"appID": pending_appt[i].id,
+				"date": pending_appt[i].app_timestamp,
+				"doctor": pending_appt[i].doctor_id,
+				"patient": pending_appt[i].patient_id,
+				"symptoms": pending_appt[i].symptoms} for i in range(len(pending_appt))]), 200)
 
 @app.route('/todayAppt', methods=['GET', 'POST'])
 def todayAppt():
-	# unclear question. Do you wanna check "my dept." appt?
-	pass
+	userID = current_user.id
+	# dept. of current nurse
+	deptID = Nurse.query.filter_by(userID=Nurse.id).with_entities('department_id')
+	print(deptID)
+
+	# today_appt_list = Application.query.
 
 @app.route('/viewAppt', methods=['POST'])
 def viewAppt():
@@ -221,6 +235,35 @@ def viewAppt():
 
 @app.route('/availSlot', methods=['POST', 'GET'])
 def availSlot():
-	doctorID = request.form['doctorID']
-	today = datetime.datetime.today()
-	Application.query.filter(Application)
+	# doctorID = request.args.get('doctorID')
+	doctorID = '46768069'
+	today = datetime.date.today()
+	avail_7d_slots = Time_slot.query.filter(
+					# future 7 days
+					Time_slot.slot_date>=today,
+					Time_slot.slot_date<=today+timedelta(days=100),
+					Time_slot.doctor_id==doctorID,
+					Time_slot.n_total>Time_slot.n_booked
+	).order_by(Time_slot.slot_date).all()
+	avail_slots_list =[{'date': v.slot_date,
+				'time_seg_id': v.slot_seg_id,
+				'n_left_slot': v.n_total-v.n_booked} for v in avail_7d_slots]
+
+	counter=0
+	daily_AMPM_slots = collections.defaultdict(int)
+	response = []
+	cur_day = today
+
+	for d in range(7):
+		cur_day = today + timedelta(days=d)
+		cur_res = {'date': cur_day, 'morning':0, 'afternoon': 0}
+		while counter<len(avail_slots_list) and avail_slots_list[counter]['date'] == cur_day:
+			short = avail_slots_list[counter]
+			cur_res['morning'] += 1 if short['time_seg_id']<=3 else 0
+			cur_res['afternoon'] += 1 if short['time_seg_id']>3 else 0
+			counter += 1
+
+		response.append(cur_res)
+	return make_response(
+		jsonify(response),200
+	)
