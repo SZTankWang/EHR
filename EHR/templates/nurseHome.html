@@ -242,7 +242,7 @@
 				// init table
 				var myTable;
 				jQuery.ajax({
-					url: "http://localhost:5000/pendingApp",
+					url: "http://localhost:5000/nursePendingApp",
 					type: 'GET',
 					success: function(res){
 						myTable = $("#main-table").DataTable({
@@ -254,14 +254,15 @@
 			            { "data" : "doctor", "title": "Doctor" },
 			            { "data" : "patient", "title": "Patient" },
 			            { "data" : "symptoms", "title": "Symptoms" },
-			            { "data" : "", "title": "", "render": (data, type, row, meta) => `<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>` }
+			            { "data" : "", "title": "" }
+									// , "render": (data, type, row, meta) => `<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>`
 			        ],
 							"columnDefs": [{
 			            "targets": -1,
 									"orderable": false,
 									"searchable": false,
 			            "data": null
-			            // "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>'
+			            "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>'
 			        }]
 						});
 					}
@@ -310,7 +311,7 @@
 				// ----------switch content-------------
 				$("#pendingApp").on('click', function(){
 					jQuery.ajax({
-						url: "http://localhost:5000/pendingApp",
+						url: "http://localhost:5000/nursePendingApp",
 						type: 'GET',
 						success: function(res){
 							myTable.clear().draw();
@@ -325,7 +326,7 @@
 
 				$("#todayAppt").on('click', function(){
 					jQuery.ajax({
-						url: "http://localhost:5000/pendingApp",
+						url: "http://localhost:5000/nurseTodayAppt",
 						type: 'GET',
 						success: function(res){
 							myTable.clear().draw();
@@ -340,7 +341,7 @@
 
 				//-----------------go to createAppt page------------------
 				$("#goCreateAppt").on("click", function(event) {
-					setTimeout("window.location.replace('http://localhost:5000/goCreateAppt')", 1000);
+					setTimeout("window.location.replace('http://localhost:5000/nurseGoCreateAppt')", 1000);
 				});
 
 				//--------------------form--------------------
@@ -356,7 +357,7 @@
 						data.appID = appID;
 						data.action = action;
 						jQuery.ajax({
-							url: "http://localhost:5000/approveApp",
+							url: "http://localhost:5000/nurseProcessApp",
 							type: 'POST',
 							data: data,
 							success: function(res){

@@ -116,7 +116,7 @@
 				$("#status span").removeClass("visible");
 				$("#status span").addClass("invisible");
 				jQuery.ajax({
-					url: "http://localhost:5000/getDepartmentsUponNurse",
+					url: "http://localhost:5000/getDepartmentsForNurse",
 					type: 'GET',
 					success: function(res){
 						for (let i=0; i < res.length; i++) {
@@ -129,7 +129,7 @@
 				$("#department").on("change", function(){
 					var deptID = $(this).children(":selected").value();
 					jQuery.ajax({
-						url: "http://localhost:5000/getDoctorsUponDepartment",
+						url: "http://localhost:5000/nurseGetDoctorsForDepartment",
 						type: 'POST',
 						data: {'deptID': deptID},
 						success: function(res){
@@ -145,7 +145,7 @@
 				$("#doctor").on("change", function(){
 					var doctorID = $(this).children(":selected").data();
 					jQuery.ajax({
-						url: "http://localhost:5000/getSlotsUponDoctor",
+						url: "http://localhost:5000/nurseGetSlotsForDoctor",
 						type: 'POST',
 						data: {'doctorID': doctorID},
 						success: function(res){
@@ -163,7 +163,7 @@
 					var data = $(this).serializeArray();
 					console.log(data);
 					jQuery.ajax({
-						url: "http://localhost:5000/createAppt",
+						url: "http://localhost:5000/nurseCreateAppt",
 						type: 'POST',
 						data: data,
 						success: function(res){
@@ -174,7 +174,7 @@
 							}
 							$("#status span").removeClass("invisible");
 							$("#status span").addClass("visible");
-							setTimeout("window.location.replace('http://localhost:5000/goCreateAppt')", 1000);
+							setTimeout("window.location.replace('http://localhost:5000/nurseGoCreateAppt')", 1000);
 						}
 					});
 				});
