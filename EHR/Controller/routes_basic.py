@@ -185,8 +185,8 @@ def goToHospital():
 
 
 '''
-医院列表页 
-返回template, 医院科室信息 
+医院列表页
+返回template, 医院科室信息
 '''
 @app.route('/department',methods=['GET'])
 def department():
@@ -224,4 +224,3 @@ def availSlot():
 	doctorID = request.form['doctorID']
 	today = datetime.datetime.today()
 	Application.query.filter(Application)
-	
