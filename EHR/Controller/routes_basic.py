@@ -183,6 +183,15 @@ def goToHospital():
 	hospitalID = request.args.get('hospitalID')
 	return "success"
 
+
+'''
+医院列表页 
+返回template, 医院科室信息 
+'''
+@app.route('/department',methods=['GET'])
+def department():
+	return render_template('patientDepartment.html')
+
 @app.route('/nurseHome', methods=['GET'])
 def nurseHome():
 	return render_template('nurseHome_save.html')
