@@ -31,7 +31,7 @@ def register():
 	if current_user.is_authenticated:
 		return redirect(url_for('loadHomePage'))
 	id = request.form['id']
-	print(User.query.filter_by(id=id).first() != None)
+
 	if User.query.filter_by(id=id).first() != None:
 		return make_response(jsonify({'ret': 'You already registered!'}))
 	role = request.form['role']
@@ -135,7 +135,7 @@ def hospitalData():
 	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
 
 	rawHospitals = Hospital.query.offset(n_offset).limit(page_count)
-	print(rawHospitals)
+
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
 	hospital_addresses = [res.address for res in rawHospitals]
@@ -173,11 +173,11 @@ def goToHospitalList():
 def searchHospital():
 	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
 	partial_hpt_name = request.args.get('hospital')
-	print("hospital:", partial_hpt_name)
+	
 	search_name = "%{}%".format(partial_hpt_name)
 
 	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).offset(n_offset).limit(page_count).all()
-	print(rawHospitals)
+
 
 	return make_response(jsonify(
 		[{"id":rawHospitals[i].id,
@@ -209,21 +209,25 @@ def nurseHome():
 
 @app.route('/pendingApp', methods=['GET', 'POST'])
 def pendingApp():
-	if request.method == 'POST':
-		print("Here to get data")
-		pending_appt = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
-													Application.status==StatusEnum.pending)).limit(6).all()
-		return make_response(jsonify(
-					[{"appID": pending_appt[i].id,
-					"date": pending_appt[i].app_timestamp,
-					"doctor": pending_appt[i].doctor_id,
-					"patient": pending_appt[i].patient_id,
-					"symptoms": pending_appt[i].symptoms} for i in range(len(pending_appt))]), 200)
+	
+		
+	pending_appt = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
+												Application.status==StatusEnum.pending)).limit(6).all()
+	return make_response(jsonify(
+				[{"appID": pending_appt[i].id,
+				"date": pending_appt[i].app_timestamp,
+				"doctor": pending_appt[i].doctor_id,
+				"patient": pending_appt[i].patient_id,
+				"symptoms": pending_appt[i].symptoms} for i in range(len(pending_appt))]), 200)
 
 @app.route('/todayAppt', methods=['GET', 'POST'])
 def todayAppt():
-	# unclear question. Do you wanna check "my dept." appt?
-	pass
+	userID = current_user.id 
+	# dept. of current nurse
+	deptID = Nurse.query.filter_by(userID=Nurse.id).with_entities('department_id')
+	print(deptID)
+
+	# today_appt_list = Application.query.
 
 @app.route('/viewAppt', methods=['POST'])
 def viewAppt():
