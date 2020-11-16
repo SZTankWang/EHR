@@ -1,3 +1,6 @@
+import collections
+from datetime import timedelta
+from itertools import count
 from operator import and_, methodcaller, ne
 from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response
 from flask_login.utils import logout_user
@@ -228,7 +231,35 @@ def viewAppt():
 
 @app.route('/availSlot', methods=['POST', 'GET'])
 def availSlot():
-	doctorID = request.form['doctorID']
-	today = datetime.datetime.today()
-	Application.query.filter(Application)
+	# doctorID = request.args.get('doctorID')
+	doctorID = '46768069'
+	today = datetime.date.today()
+	avail_7d_slots = Time_slot.query.filter(
+					# future 7 days
+					Time_slot.slot_date>=today,
+					Time_slot.slot_date<=today+timedelta(days=100),
+					Time_slot.doctor_id==doctorID,
+					Time_slot.n_total>Time_slot.n_booked
+	).order_by(Time_slot.slot_date).all()
+	avail_slots_list =[{'date': v.slot_date,
+				'time_seg_id': v.slot_seg_id,
+				'n_left_slot': v.n_total-v.n_booked} for v in avail_7d_slots]
 	
+	counter=0
+	daily_AMPM_slots = collections.defaultdict(int)
+	response = []
+	cur_day = today
+
+	for d in range(7):
+		cur_day = today + timedelta(days=d)
+		cur_res = {'date': cur_day, 'morning':0, 'afternoon': 0}
+		while counter<len(avail_slots_list) and avail_slots_list[counter]['date'] == cur_day:
+			short = avail_slots_list[counter]
+			cur_res['morning'] += 1 if short['time_seg_id']<=3 else 0
+			cur_res['afternoon'] += 1 if short['time_seg_id']>3 else 0
+			counter += 1
+
+		response.append(cur_res)
+	return make_response(
+		jsonify(response),200
+	)

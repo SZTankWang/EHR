@@ -2,7 +2,7 @@ from datetime import date, timedelta
 import sys
 from sys import path_importer_cache
 from typing import DefaultDict, List
-sys.path.append("/Users/qing/School_Study/2020_Fall/SE/project/")
+sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
 from EHR.model.models import *
 from EHR import db 
 import random
@@ -21,8 +21,7 @@ TIME_SLOT_START_DATE = '2020-11-30'
 def gen_hospital_data():
 
 
-    hospital_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/project/SE_Fall2020_EHR/utilities/hospital_info.csv")
-    hospital_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/project/SE_Fall2020_EHR/utilities/hospital_info.csv")
+    hospital_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/hospital_info.csv")
     name_list, address_list = hospital_df["name"].tolist(), hospital_df["address"].tolist()
     phone_list = ['{:8}'.format(random.randint(10000000,99999999)) for _ in range(N_RECORD)]
     start_index = Hospital.query.count()
@@ -46,13 +45,13 @@ def get_dept_list():
             # if para.next_sibling.name == 'ul':
             #     print(para.next_sibling)
             #     print()
-    dept_df = pd.DataFrame({'dept_name': list(name_descp.keys()), 'dept_description':list(name_descp.values())})
+    # dept_df = pd.DataFrame({'dept_name': list(name_descp.keys()), 'dept_description':list(name_descp.values())})
     # dept_df.to_csv("/Users/qing/School_Study/2020_Fall/SE/project/SE_Fall2020_EHR/utilities/dept_info.csv")
     return name_descp
 
 def gen_user_data():
     #  hospital info   
-    user_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/project/SE_Fall2020_EHR/utilities/user_info.csv")
+    user_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/user_info.csv")
     id_list = list(set(['{:8}'.format(random.randint(10000000,99999999)) for _ in range(N_RECORD)  ]))
     roles = ['doctor', 'nurse', 'patient']
     role_list = [roles[i%len(roles)] for i in range(N_RECORD)]
@@ -90,7 +89,7 @@ def gen_user_data():
     db.session.commit()
 
 def gen_dept_data():    
-    name_desc_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/project/SE_Fall2020_EHR/utilities/dept_info.csv")
+    name_desc_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/dept_info.csv")
     dept_phones = ["{:8}".format(random.randint(10000000,99999999)) for _ in range(len(name_desc_df))]
     name_list = name_desc_df['dept_name'].tolist()
     desp_list = name_desc_df['dept_description'].tolist()
@@ -104,14 +103,13 @@ def gen_dept_data():
 
 
 def gen_time_seg():
-    office_hour_s = 900
+    office_hour_s = 80000
     # doctor_id_list = get_single_column(Doctor, Doctor.id)
     
     for i in range(17-9):
-        office_hour_s += 100
-        ts = Time_segment(t_seg_id=1+i,
-                       t_seg_starttime="{:04}".format(office_hour_s))
-        print(ts)
+        office_hour_s += 10000
+        ts = Time_segment(
+                       t_seg_starttime="{:06}".format(office_hour_s))
         db.session.add(ts)
     db.session.commit()
 
@@ -192,9 +190,9 @@ def main():
     # gen_hospital_data()
     # gen_dept_data()
     # gen_user_data()
-    # gen_time_seg()
-    # gen_time_slot()
-    # gen_appt()
+    gen_time_seg()
+    gen_time_slot()
+    gen_appt()
 
-# main()
+main()
     
