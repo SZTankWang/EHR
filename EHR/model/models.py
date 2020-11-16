@@ -10,7 +10,6 @@ from sqlalchemy import Enum
 @login.user_loader
 def load_user(id):
     return User.query.get(id)
-
 class Hospital(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
 	name = db.Column(db.String(100), nullable=False)
@@ -137,21 +136,31 @@ class Patient(db.Model):
 	def __repr__(self):
 		return f'Patient < id: {self.id} >'
 
+class Time_segment(db.Model):
+	t_seg_id = db.Column(db.Integer(), primary_key=True)
+	t_seg_starttime = db.Column(db.Time(), nullable=False)
+	
+	def __repr__(self):
+		return f'Time_segment < t_seg_id: {self.t_seg_id}, t_seg_starttime: {self.t_seg_starttime} >'
+	
+
 class Time_slot(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
 	slot_date = db.Column(db.Date(), nullable=False)
-	slot_start_time = db.Column(db.Time(), nullable=False)
 	n_total = db.Column(db.Integer(), nullable=False)
 	n_booked = db.Column(db.Integer())
+
 	#foreign key
+	slot_seg_id = db.Column(db.Integer(), db.ForeignKey('time_segment.t_seg_id'), nullable=False)
 	doctor_id = db.Column(db.String(100), \
 		db.ForeignKey('doctor.id'), nullable=False)
+
 	#one-to-many relationship
 	applications = db.relationship('Application', backref='time_slot', lazy=True)
 
 	def __repr__(self):
 		return f'Time_slot < id: {self.id}, slot_date: {self.slot_date}, \
-			slot_time: {self.slot_start_time}, n_total: {self.n_total}, n_booked: {self.n_booked}, \
+			slot_seg_id: {self.slot_seg_id}, n_total: {self.n_total}, n_booked: {self.n_booked}, \
 				doctor_id: {self.doctor_id} >'
 
 class StatusEnum(enum.Enum):
@@ -166,6 +175,7 @@ class Application(db.Model):
 	symptoms = db.Column(db.Text())
 	status = db.Column(db.Enum(StatusEnum), nullable=False)
 	reject_reason = db.Column(db.Text())
+	date = db.Column(db.Date(), nullable=False)
 
 	#foreign key
 	time_slot_id = db.Column(db.Integer(), \

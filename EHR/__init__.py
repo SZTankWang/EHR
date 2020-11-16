@@ -8,7 +8,7 @@ app = Flask(__name__)
 # dialect + connector
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "secretkey"
-# CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True)
 login = LoginManager(app)
 login.login_view = 'login' # force user to login
 login.login_message = "Please login first"
