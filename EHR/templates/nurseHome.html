@@ -210,40 +210,32 @@
 	<script type="text/javascript" src="/static/index.js"></script>
 	<script type="text/javascript" language="javascript">
 		$(document).ready(function() {
-				// var myTable = $("table").DataTable({
-				// 	processing: true,
-				// 	serverSide: true,
-				// 	ajax: {
-			  //       url: '/pendingApps',
-			  //       type: 'POST'
-			  //   }
-				// });
-				var tableData = [{'appID': '1', 'date': '2020-11-11', 'time': '11:00', doctor:'A', patient: 'B', symptoms: 'Cough'},{'appID': '2', 'date': '2020-11-12', 'time': '12:00', doctor:'A', patient: 'C', symptoms: '/'}];
-
 				// init table
-				var myTable = $("#main-table").DataTable({
-					// "data": tableData,
-					"processing": true,
-					"serverSide": true,
-					"ajax": {
-			        url: 'http://localhost:5000/pendingApp',
-			    },
-	        "columns" : [
-	            { "data" : "appID", "title": "Application ID" },
-	            { "data" : "date", "title": "Date" },
-	            { "data" : "time", "title": "Time" },
-	            { "data" : "doctor", "title": "Doctor" },
-	            { "data" : "patient", "title": "Patient" },
-	            { "data" : "symptoms", "title": "Symptoms" },
-	            { "data" : "", "title": "" }
-	        ],
-					"columnDefs": [{
-	            "targets": -1,
-							"orderable": false,
-							"searchable": false,
-	            "data": null,
-	            "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>'
-	        	}]
+				var myTable;
+				jQuery.ajax({
+					url: "http://localhost:5000/pendingApp",
+					type: 'GET',
+					success: function(res){
+						myTable = $("#main-table").DataTable({
+							"data": res,
+			        "columns" : [
+			            { "data" : "appID", "title": "Application ID" },
+			            { "data" : "date", "title": "Date" },
+			            { "data" : "time", "title": "Time" },
+			            { "data" : "doctor", "title": "Doctor" },
+			            { "data" : "patient", "title": "Patient" },
+			            { "data" : "symptoms", "title": "Symptoms" },
+			            { "data" : "", "title": "", "render": (data, type, row, meta) => `<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>` }
+			        ],
+							"columnDefs": [{
+			            "targets": -1,
+									"orderable": false,
+									"searchable": false,
+			            "data": null
+			            // "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>'
+			        }]
+						});
+					}
 				});
 
 				// $("#application").modal();
@@ -269,9 +261,6 @@
 
 				// switch content
 				$("#pendingApp").on('click', function(){
-					$(".modal-button").each(function(){
-						$(this).attr('data-target','#application');
-					});
 					jQuery.ajax({
 						url: "http://localhost:5000/pendingApp",
 						type: 'GET',
@@ -281,12 +270,12 @@
 							myTable.columns.adjust().draw();
 						}
 					});
+					$(".modal-button").each(function(){
+						$(this).attr('data-target','#application');
+					});
 				});
 
 				$("#todayAppt").on('click', function(){
-					$(".modal-button").each(function(){
-						$(this).attr('data-target','#appointment');
-					});
 					jQuery.ajax({
 						url: "http://localhost:5000/todayAppt",
 						type: 'GET',
@@ -295,6 +284,9 @@
 							myTable.rows.add(res);
 							myTable.columns.adjust().draw();
 						}
+					});
+					$(".modal-button").each(function(){
+						$(this).attr('data-target','#appointment');
 					});
 				});
 

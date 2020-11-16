@@ -115,7 +115,6 @@ def loadHomePage():
 	if current_user.role.value == "patient":
 		return render_template('patientHome.html')
 	if current_user.role.value == "nurse":
-		print("nurse")
 		return render_template('nurseHome.html')
 	if current_user.role.value == "doctor":
 		pass
@@ -209,16 +208,15 @@ def nurseHome():
 
 @app.route('/pendingApp', methods=['GET', 'POST'])
 def pendingApp():
-
-
-	pending_appt = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
+	pending_app = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
 												Application.status==StatusEnum.pending)).limit(6).all()
 	return make_response(jsonify(
-				[{"appID": pending_appt[i].id,
-				"date": pending_appt[i].app_timestamp,
-				"doctor": pending_appt[i].doctor_id,
-				"patient": pending_appt[i].patient_id,
-				"symptoms": pending_appt[i].symptoms} for i in range(len(pending_appt))]), 200)
+				[{"appID": pending_app[i].id,
+				"date": pending_app[i].app_timestamp.strftime("%Y-%m-%d"),
+				"time": pending_app[i].app_timestamp.strftime("%H:%M"),
+				"doctor": pending_app[i].doctor_id,
+				"patient": pending_app[i].patient_id,
+				"symptoms": pending_app[i].symptoms} for i in range(len(pending_app))]), 200)
 
 @app.route('/todayAppt', methods=['GET', 'POST'])
 def todayAppt():
