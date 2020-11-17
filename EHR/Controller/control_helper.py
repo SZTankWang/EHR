@@ -39,9 +39,13 @@ def slot2time(slot_id:int):
 
 	return slot_date, seg_start_t	
 
-def id2name(this_id:int)->String:
+id_name_map = None
+def load_id2name_map():
+	global id_name_map
 	id_name_map = {u.id: u.first_name + " "+u.last_name \
 					for u in User.query.all()}
+	
+def id2name(this_id:int)->String:
 	# person = User.query.filter(User.id==this_id).first()
 	person_name = id_name_map[this_id]
 	return person_name

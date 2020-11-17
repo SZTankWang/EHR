@@ -240,9 +240,9 @@ routes: nursePendingApp, nurseTodayAppt
 @app.route('/nursePendingApp', methods=['GET', 'POST'])
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = helper.futureday_slotid(period=14)
+	next7d_slotid = helper.futureday_slotid(period=7)
 	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
-	
+	helper.load_id2name_map()
 	def response_generator(i):
 		slot_id = pending_app[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
