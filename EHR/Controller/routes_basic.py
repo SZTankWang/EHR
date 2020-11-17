@@ -226,22 +226,25 @@ def doctorAvailSlot():
 #---------------------------nurse--------------------------------
 #---------------------------nurse--------------------------------
 # page 1
-@app.route('/nurseHome', methods=['GET'])
+@app.route('/nurseHome', methods=['GET', 'POST'])
+@login_required
 def nurseHome():
 	return render_template('nurseHome.html')
 # page 2
-@app.route('/nuserAllAppt', methods=['GET'])
+@app.route('/nurseAllAppt', methods=['GET', 'POST'])
+@login_required
 def nurseAllAppt():
-	render_template('nurseAllAppt.html')
+	return render_template('nurseAllAppt.html')
 
 '''
 page 1: nurseHome
 routes: nursePendingApp, nurseTodayAppt
 '''
 @app.route('/nursePendingApp', methods=['GET', 'POST'])
+@login_required
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = helper.day2slotid(period=7)
+	next7d_slotid = helper.day2slotid(period=14)
 	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
 
 	helper.load_id2name_map()
@@ -254,10 +257,7 @@ def nursePendingApp():
 			"doctor": helper.id2name(pending_app[i].doctor_id),
 			"patient": helper.id2name(pending_app[i].patient_id),
 			"symptoms": pending_app[i].symptoms}
-	start = time()
 	ret = [response_generator(i) for i in range(len(pending_app)) ]
-	end = time()
-	print(end-start)
 	return make_response(jsonify(ret), 200)
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
@@ -267,7 +267,7 @@ def nurseTodayAppt():
 	# nurseID = "44116022"    # a nurseID that returns something,
 	# 						for testing purpose, set the 'period' to 20
 	# department ID of current nurse
-	today_depts_appts = helper.nurse_dept_appts(nurseID, period=0)
+	today_depts_appts = helper.nurse_dept_appts(nurseID, period=20)
 
 	helper.load_id2name_map()
 	def response_generator(i):
@@ -284,28 +284,54 @@ def nurseTodayAppt():
 				[response_generator(i) for i in range(len(today_depts_appts)) ]), 200)
 
 @app.route('/nurseFutureAppt', methods=['GET'])
+@login_required
 def nurseFutureAppt():
 	nurseID = current_user.get_id()
 	# nurseID = "44116022" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
-	future_7d_appts = helper.nurse_dept_appts(nurseID, period=7)
+	future_7d_appts = helper.nurse_dept_appts(nurseID, period=30)
 
 	helper.load_id2name_map()
 	def response_generator(i):
 		slot_id = future_7d_appts[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
 		return {"appID": future_7d_appts[i].id,
-			"date": slot_date.strftime("%Y-%m-%d"),
+			"date": slot_date.strftime("%Y-%m-%dR"),
 			"time": seg_start_t.strftime("%H:%M"),
 			"doctor": helper.id2name(future_7d_appts[i].doctor_id),
 			"patient": helper.id2name(future_7d_appts[i].patient_id),
 			"symptoms": future_7d_appts[i].symptoms}
-
 	return make_response(jsonify(
 				[response_generator(i) for i in range(len(future_7d_appts)) ]), 200)
 
+# @app.route('nurseProcessApp')
+
+# page 3 Create Appt
+@app.route('/nurseGoCreateAppt', methods=['GET', 'POST'])
+@login_required
+def nurseGoCreateAppt():
+	return render_template('nurseCreateAppt.html')
+
+
+# page 4 View Appt
+@app.route('/nurseGoViewAppt/<string:appID>', methods=['GET', 'POST'])
+@login_required
+def nurseGoViewAppt(appID):
+	appt_res = Application.query.filter(Application.id==appID).first()
+	slot_date, seg_start_t = helper.slot2time(appt_res.time_slot_id)
+
+	helper.load_id2name_map()
+	return render_template('nurseViewAppt.html',
+		appID=appID,
+		date=slot_date.strftime("%Y-%m-%d"),
+		time=seg_start_t.strftime("%H:%M"),
+		doctor=helper.id2name(appt_res.doctor_id),
+		patient=helper.id2name(appt_res.patient_id),
+		symptoms=appt_res.symptoms,
+		comments=appt_res.reject_reason)
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
+@login_required
 def viewAppt():
 	appid = request.form['appID']
 	# appid = 83
@@ -320,8 +346,7 @@ def viewAppt():
 			"time": seg_start_t.strftime("%H:%M"),
 			"doctor": helper.id2name(appt_res.doctor_id),
 			"patient": helper.id2name(appt_res.patient_id),
-			"symptoms": appt_res.symptoms}
+			"symptoms": appt_res.symptoms,
+			"comments": appt_res.reject_reason}
 		)
 	)
-
-# @app.route('nurseProcessApp')

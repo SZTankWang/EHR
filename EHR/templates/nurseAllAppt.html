@@ -10,15 +10,22 @@
 </head>
 <style>
 	.nav-link:hover{cursor: pointer;}
+	#overlay{position:absolute; top:0%; left:0%; width: 100vw; height:100vh; background-color: rgba(0,0,0,0.1); z-index: 2;}
 </style>
 <body>
+	<div id="overlay" class="">
+		<div class="w-100 d-flex justify-content-center align-items-center">
+			<div class="spinner-border" role="status"></div>
+		</div>
+	</div>
+
 	<div id="header-wrapper">
 		<nav class="navbar navbar-expand-lg navbar-dark justify-content-between" style="background-color: #2D79D6;">
 			<div class="d-flex justify-content-start">
 				<span class="navbar-brand mb-0 h1">WeCare</span>
 				<div class="navbar-nav">
-					<a class="nav-main nav-item nav-link active disabled" href="/nurseHome">Home</a>
-					<a class="nav-main nav-item nav-link" href="/nurseAllAppt">All appointments</a>
+					<a class="nav-main nav-item nav-link" href="/nurseHome">Home</a>
+					<a class="nav-main nav-item nav-link active disabled" href="/nurseAllAppt">All appointments</a>
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
@@ -47,10 +54,10 @@
 		<div id="content-header-wrapper">
 			<nav class="nav nav-tabs">
 				<div class="nav-item">
-					<div class="content-header nav-table nav-link active disabled" id="onGoingApp">Ongoing appointments</div>
+					<div class="content-header nav-table nav-link" id="onGoingAppt">Ongoing appointments</div>
 				</div>
 				<div class="nav-item">
-					<div class="content-header nav-table nav-link" id="futureAppt">Future appointments</div>
+					<div class="content-header nav-table nav-link active disabled" id="futureAppt">Future appointments</div>
 				</div>
 				<div class="nav-item">
 					<div class="content-header nav-table nav-link" id="pastAppt">Past appointments</div>
@@ -59,10 +66,11 @@
 					<div class="content-header nav-table nav-link" id="rejectedApp">Rejected applications</div>
 				</div>
 				<div class="ml-auto">
-					<button class="btn btn-primary" id="goCreateAppt">Create New Appointment</button>
+					<a class="btn btn-primary" id="goCreateAppt" href="/nurseGoCreateAppt">Create New Appointment</a>
 				</div>
 			</nav>
 		</div>
+
 		<div class='table' id="table-container" style="padding-top:0.5em;">
 			<table id="main-table" style="width:100%;">
 			  <thead>
@@ -89,6 +97,7 @@
 			</table>
 		</div>
 
+		<!-- modal1 -->
 		<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
 		  <div class="modal-dialog modal-dialog-scrollable modal-lg">
 		    <div class="modal-content">
@@ -101,27 +110,21 @@
 		      <div class="modal-body">
 						<div class="container-fluid">
 					    <div class="row">
-					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID1">1</span></div>
-					      <div class="col-md-3"><span><b>Date: </b></span><span id="date1">2020-11-11</span></div>
-								<div class="col-md-2"><span><b>Time: </b></span><span id="time1">11:00</span></div>
+					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID1"></span></div>
+					      <div class="col-md-3"><span><b>Date: </b></span><span id="date1"></span></div>
+								<div class="col-md-2"><span><b>Time: </b></span><span id="time1"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor1">Alice</span></div>
-					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient1">Bob</span></div>
+					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor1"></span></div>
+					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient1"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms1">Headache, cough</span></div>
+					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms1"></span></div>
+					    </div>
+							<div class="row">
+					      <div class="col"><span><b>Comments: </b></span><span id="comments1"></span></div>
 					    </div>
 					  </div>
-						<hr>
-						<form id="processApp">
-		          <div class="form-group">
-		            <label for="comments" class="col-form-label">Comments (required if you reject the application)</label>
-		            <textarea class="form-control" id="comments" name="comments"></textarea>
-		          </div>
-							<input type="submit" class="btn btn-primary" name="action" value="Approve" />
-			        <input type="submit" class="btn btn-secondary" name="action" value="Reject" />
-		        </form>
 		      </div>
 		      <!-- <div class="modal-footer">
 		        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="approveApp()">Approve</button>
@@ -131,6 +134,7 @@
 		  </div>
 		</div>
 
+		<!-- modal2 -->
 		<div class="modal fade" id="appointment" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="appointment" aria-hidden="true">
 		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
 		    <div class="modal-content">
@@ -143,16 +147,19 @@
 		      <div class="modal-body">
 						<div class="container-fluid">
 					    <div class="row">
-					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID2">1</span></div>
-					      <div class="col-md-3"><span><b>Date: </b></span><span id="date2">2020-11-11</span></div>
-								<div class="col-md-2"><span><b>Time: </b></span><span id="time2">11:00</span></div>
+					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID2"></span></div>
+					      <div class="col-md-3"><span><b>Date: </b></span><span id="date2"></span></div>
+								<div class="col-md-2"><span><b>Time: </b></span><span id="time2"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor2">Alice</span></div>
-					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient2">Bob</span></div>
+					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor2"></span></div>
+					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient2"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms2">Headache, cough</span></div>
+					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms2"></span></div>
+					    </div>
+							<div class="row">
+					      <div class="col"><span><b>Comments: </b></span><span id="comments2"></span></div>
 					    </div>
 					  </div>
 						<hr>
@@ -183,7 +190,7 @@
 		        </form>
 						<hr>
 						<h5>Diagnosis</h5>
-					  <p id="diagnosis">Cold</p>
+					  <p id="diagnosis"></p>
 						<hr>
 						<h5>
 							Prescriptions

@@ -63,14 +63,9 @@ $(document).ready(function() {
           }
           $("#status span").removeClass("invisible");
           $("#status span").addClass("visible");
-          setTimeout("window.location.replace('http://localhost:5000/nurseGoCreateAppt')", 1000);
+          setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 300);
         }
       });
-    });
-
-    //-----------------direct------------------
-    $("#goBack").on("click", function(event) {
-      setTimeout("window.location.replace('http://localhost:5000/loadHomePage')", 1000);
     });
 
     //-----------------style------------------

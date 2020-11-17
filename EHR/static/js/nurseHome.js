@@ -25,6 +25,10 @@ $(document).ready(function() {
               "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#application">View</button>'
           }]
         });
+        $("#overlay").addClass("d-none");
+      },
+      error: function(err) {
+        console.log(err);
       }
     });
 
@@ -33,47 +37,30 @@ $(document).ready(function() {
     //    $('#myInput').focus();
     // });
 
-    // -----------show modal-----------
+    // -----------table click-----------
     $('#main-table tbody').on( 'click', 'button', function () {
       var data = myTable.row( $(this).parents('tr') ).data();
       if ($(".nav-table.active").text() == "Pending applications") {
-        var code = "1";
+        $("#appID").text(data['appID']);
+        $("#date").text(data['date']);
+        $("#time").text(data['time']);
+        $("#doctor").text(data['doctor']);
+        $("#patient").text(data['patient']);
+        $("#symptoms").text(data['symptoms']);
       } else {
-        var code = "2";
+        var appID = data['appID'];
+        window.location.replace("http://localhost:5000/nurseGoViewAppt/" + appID);
       }
-      $("#appID"+code).text(data['appID']);
-      $("#date"+code).text(data['date']);
-      $("#time"+code).text(data['time']);
-      $("#doctor"+code).text(data['doctor']);
-      $("#patient"+code).text(data['patient']);
-      $("#symptoms"+code).text(data['symptoms']);
-      // if (code == "2"){
-      // 	$.ajax({
-      // 		url: "http://localhost:5000/viewAppt",
-      // 		type: 'POST',
-      // 		data: {"appID": data['appID']},
-      // 		success: function(res){
-      // 			$("bodyTemperature").text(res.preExam.bodyTemperature);
-      // 			$("pulseRate").text(res.preExam.pulseRate);
-      // 			$("bloodPressure").text(res.preExam.bloodPressure);
-      // 			$("diagnosis").text(res.diagnosis);
-      // 			for (let i=0; i < res.prescripitions.length; i++) {
-      // 				$("prescriptions").append()
-      // 			}
-      // 			for (let i=0; i < res.labReports.length; i++){
-      //
-      // 			}
-      // 		}
-      // 	});
-      // }
     } );
 
     // ----------switch table content-------------
     $("#pendingApp").on('click', function(){
+      $("#overlay").removeClass("d-none");
       updateTable('PendingApp');
     });
 
     $("#todayAppt").on('click', function(){
+      $("#overlay").removeClass("d-none");
       updateTable('TodayAppt');
     });
 
@@ -92,24 +79,23 @@ $(document).ready(function() {
           $(".modal-button").each(function(){
             $(this).attr('data-target',btnTarget);
           });
+          $("#overlay").addClass("d-none");
+        },
+        error: function(err) {
+          console.log(err);
         }
       });
     }
 
-    //-----------------go to createAppt page------------------
-    $("#goCreateAppt").on("click", function(event) {
-      setTimeout("window.location.replace('http://localhost:5000/nurseGoCreateAppt')", 1000);
-    });
-
-    //--------------------form--------------------
-    $(":submit").on("click", function(event){
+    //--------------------forms--------------------
+    $(".processAppSubmit").on("click", function(event){
       event.preventDefault();
       var appID = $("#appID1").text();
       var action = $(this).val();
       var data = $(this).parent().serializeArray();
       data = jsonify(data);
       if (action == "Reject" && !data.comments) {
-        alert("Comments is required to reject the application.");
+        alert("Please write comments before rejecting the application.");
       } else {
         data.appID = appID;
         data.action = action;
@@ -119,6 +105,9 @@ $(document).ready(function() {
           data: data,
           success: function(res){
             setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 1000);
+          },
+          error: function(err) {
+            console.log(err);
           }
         })
       }
@@ -128,7 +117,6 @@ $(document).ready(function() {
     //-----------------style------------------
     // main navigation
     $(".nav-main").on("click", function(event) {
-        event.preventDefault();
         var clickedItem = $(this);
         $(".nav-main").each( function() {
           if ($(this).hasClass("active disabled")) {
@@ -140,7 +128,6 @@ $(document).ready(function() {
 
     // table navigation
     $(".nav-table").on("click", function(event) {
-        event.preventDefault();
         var clickedItem = $(this);
         $(".nav-table").each( function() {
             if ($(this).hasClass("active disabled")) {
@@ -158,4 +145,14 @@ function jsonify(data){
     obj[data[i].name]=data[i].value;
   }
   return obj;
+}
+
+function newPrescriptionCard(index, idAndMedicine, dose, comments){
+  var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#pre" + index + "' aria-expanded='true' aria-controls='pre" + index + "'>" + idAndMedicine + "</button> </h5> <div id='pre" + index + "' class='collapse' aria-labelledby='pre" + index + "' data-parent='#prescriptions'> <div class='card-body'>" + dose + "</div> <div class='card-body'>" + comments + "</div> </div> </div>";
+  return card
+}
+
+function newLabReportCard(index, idAndType, id, comments){
+  var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#lab" + index + "' aria-expanded='true' aria-controls='lab" + index + "'>" + idAndType + "</button> </h5> <div id='lab" + index + "' class='collapse' aria-labelledby='lab" + index + "' data-parent='#labReports'> <div class='card-body'>" + id + "</div> <div class='card-body'>" + comments + "</div> </div> </div>";
+  return card
 }

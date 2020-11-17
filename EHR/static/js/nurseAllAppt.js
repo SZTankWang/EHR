@@ -2,7 +2,7 @@ $(document).ready(function() {
     // init table
     var myTable;
     $.ajax({
-      url: "http://localhost:5000/nurseOnGoingApp",
+      url: "http://localhost:5000/nurseFutureAppt",
       type: 'GET',
       success: function(res){
         myTable = $("#main-table").DataTable({
@@ -25,6 +25,10 @@ $(document).ready(function() {
               "defaultContent": '<button type="button" class="modal-button btn btn-outline-primary" data-toggle="modal" data-target="#appointment">View</button>'
           }]
         });
+        $("#overlay").addClass("d-none");
+      },
+      error: function(err) {
+        console.log(err);
       }
     });
 
@@ -47,7 +51,8 @@ $(document).ready(function() {
       $("#doctor"+code).text(data['doctor']);
       $("#patient"+code).text(data['patient']);
       $("#symptoms"+code).text(data['symptoms']);
-      // if (code == "2"){
+      $("#comments"+code).text(data['comments']);
+      if (code == "2"){
       // 	$.ajax({
       // 		url: "http://localhost:5000/viewAppt",
       // 		type: 'POST',
@@ -65,24 +70,28 @@ $(document).ready(function() {
       // 			}
       // 		}
       // 	});
-      // }
+      }
     } );
 
     // ----------switch table content-------------
-    $("#onGoingApp").on('click', function(){
-      updateTable('OnGoingApp');
+    $("#onGoingAppt").on('click', function(){
+      $("#overlay").removeClass("d-none");
+      updateTable('OnGoingAppt');
     });
 
     $("#futureAppt").on('click', function(){
+      $("#overlay").removeClass("d-none");
       updateTable('FutureAppt');
     });
 
     $("#pastAppt").on('click', function(){
+      $("#overlay").removeClass("d-none");
       var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
       updateTable('PastAppt', dateRange);
     });
 
     $("#rejectedApp").on('click', function(){
+      $("#overlay").removeClass("d-none");
       var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
       updateTable('RejectedApp', dateRange);
     });
@@ -97,12 +106,17 @@ $(document).ready(function() {
         type: type,
         data: data,
         success: function(res){
+          console.log(res);
           myTable.clear().draw();
           myTable.rows.add(res);
           myTable.columns.adjust().draw();
           $(".modal-button").each(function(){
             $(this).attr('data-target',btnTarget);
           });
+          $("#overlay").addClass("d-none");
+        },
+        error: function(err) {
+          console.log(err);
         }
       });
     }
@@ -124,21 +138,18 @@ $(document).ready(function() {
           type: 'POST',
           data: data,
           success: function(res){
-            setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 1000);
+            setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 300);
+          },
+          error: function(err) {
+            console.log(err);
           }
         })
       }
     });
 
-    //-----------------go to createAppt page------------------
-    $("#goCreateAppt").on("click", function(event) {
-      setTimeout("window.location.replace('http://localhost:5000/nurseGoCreateAppt')", 1000);
-    });
-
     //-----------------style------------------
     // main navigation
     $(".nav-main").on("click", function(event) {
-        event.preventDefault();
         var clickedItem = $(this);
         $(".nav-main").each( function() {
           if ($(this).hasClass("active disabled")) {
@@ -150,7 +161,6 @@ $(document).ready(function() {
 
     // table navigation
     $(".nav-table").on("click", function(event) {
-        event.preventDefault();
         var clickedItem = $(this);
         $(".nav-table").each( function() {
             if ($(this).hasClass("active disabled")) {
