@@ -6,6 +6,7 @@ from flask import Flask, render_template, redirect, url_for, request, json, json
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 from numpy.lib.function_base import select
+from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import app, db, login
 from EHR.model.models import *
@@ -177,7 +178,6 @@ def searchHospital():
 
 	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).offset(n_offset).limit(page_count).all()
 
-
 	return make_response(jsonify(
 		[{"id":rawHospitals[i].id,
 		  "name": rawHospitals[i].name,
@@ -192,7 +192,6 @@ def goToHospital():
 	hospitalID = request.args.get('hospitalID')
 	return "success"
 
-
 '''
 医院列表页
 返回template, 医院科室信息
@@ -206,17 +205,35 @@ def nurseHome():
 	return render_template('nurseHome_save.html')
 	# return redirect(url_for('pendingApp'))
 
+@app.route('/nuserAllAppt', methods=['GET'])
+def nurseAllAppt():
+	render_template('nurseAllAppt.html')
+
 @app.route('/nursePendingApp', methods=['GET', 'POST'])
-def pendingApp():
-	pending_app = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
-												Application.status==StatusEnum.pending)).limit(6).all()
+def nursePendingApp():
+	# look up Time_slot table for next 7 days time_slot id
+	next7d_slotid = [ res.id for res in (Time_slot.query.filter(Time_slot.slot_date<=datetime.date.today()+ timedelta(days=7),
+										  Time_slot.slot_date>=datetime.date.today()).all())]
+
+	pending_app = Application.query.filter(Application.id.in_(next7d_slotid)).all()
+	def response_generator(i):
+		slot_id = pending_app[i].time_slot_id
+		slot_date, seg_start_t = slot2time(slot_id)
+		return {"appID": pending_app[i].id,
+			"date": slot_date.strftime("%Y-%m-%d"),
+			"time": seg_start_t.strftime("%H:%M:%S"),
+			"doctor": pending_app[i].doctor_id,
+			"patient": pending_app[i].patient_id,
+			"symptoms": pending_app[i].symptoms}
+
 	return make_response(jsonify(
-				[{"appID": pending_app[i].id,
-				"date": pending_app[i].app_timestamp.strftime("%Y-%m-%d"),
-				"time": pending_app[i].app_timestamp.strftime("%H:%M"),
-				"doctor": pending_app[i].doctor_id,
-				"patient": pending_app[i].patient_id,
-				"symptoms": pending_app[i].symptoms} for i in range(len(pending_app))]), 200)
+				[response_generator(i) for i in range(len(pending_app)) ]), 200)
+
+def slot2time(slot_id:int):
+	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
+	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id
+	seg_start_t = Time_segment.query.filter(Time_segment.t_seg_id==seg_id).first().t_seg_starttime
+	return slot_date, seg_start_t
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 def todayAppt():
@@ -224,15 +241,17 @@ def todayAppt():
 	# dept. of current nurse
 	deptID = Nurse.query.filter_by(userID=Nurse.id).with_entities('department_id')
 	print(deptID)
+	pass
 
 	# today_appt_list = Application.query.
 
 @app.route('/nurseViewAppt', methods=['POST'])
 def viewAppt():
 	appid = request.form['appID']
+	pass
 
-@app.route('/availSlot', methods=['POST', 'GET'])
-def availSlot():
+@app.route('/doctorAvailSlot', methods=['POST', 'GET'])
+def doctorAvailSlot():
 	# doctorID = request.args.get('doctorID')
 	doctorID = '46768069'
 	today = datetime.date.today()
@@ -248,7 +267,6 @@ def availSlot():
 				'n_left_slot': v.n_total-v.n_booked} for v in avail_7d_slots]
 
 	counter=0
-	daily_AMPM_slots = collections.defaultdict(int)
 	response = []
 	cur_day = today
 

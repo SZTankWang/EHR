@@ -9,9 +9,8 @@
 </head>
 <body>
 	<form id="pagination-counter" style="display: none;">
-		<input id="currPage" name='currPage'value=1></input>
-		<input id="pageSize" name='pageSize' value=10></input>
-		<input id="pageCount" name='pageCount' value=5></input>
+		<input id="hospitalID" name='hospitalID'value=1></input>
+		<input id="currdept" name='currdept' value=10></input>
 	</form>
 	<nav class="navbar navbar-light" style="background-color: #2D79D6;">
 	  <!-- Navbar content -->
@@ -62,11 +61,11 @@
 		<div id="department-info-container">
 			<div id="department-list-container">
 				<div class="list-group">
-				  <button type="button" class="list-group-item list-group-item-action active ">新冠筛查</button>
-				  <button type="button" class="list-group-item list-group-item-action">综合门诊</button>
-				  <button type="button" class="list-group-item list-group-item-action">发热门诊</button>
-				  <button type="button" class="list-group-item list-group-item-action">消化门诊</button>
-				  <button type="button" class="list-group-item list-group-item-action">心血管内科</button>
+				  <button type="button" class="list-group-item list-group-item-action active hospital-btn">新冠筛查</button>
+				  <button type="button" class="list-group-item list-group-item-action hospital-btn">综合门诊</button>
+				  <button type="button" class="list-group-item list-group-item-action hospital-btn">发热门诊</button>
+				  <button type="button" class="list-group-item list-group-item-action hospital-btn">消化门诊</button>
+				  <button type="button" class="list-group-item list-group-item-action hospital-btn">心血管内科</button>
 				</div>				
 			</div>
 			<div id="card-list">
@@ -188,6 +187,34 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 
 	<script type="text/javascript">
+		
+
+		/*监听 点击科室 切换科室
+		*/
+		//去除点击前active 的按钮样式, 点击的元素添加样式
+		$('.hospital-btn').click(function(){
+			console.log('click');
+			$(this).parent().children('.hospital-btn').each(function(){
+				if($(this).hasClass('active')){
+					$(this).removeClass('active');
+				}
+
+
+			})
+			$(this).addClass('active');
+			console.log($(this).text());
+			var dept = $(this).text();
+			var hospitalID = 
+			// ajax请求
+			$.ajax({
+				url:"http://localhost:5000/loadDoctorByDept",
+				data:{''}
+
+			})
+
+		})
+
+		
 	</script>
 </body>
 </html>
