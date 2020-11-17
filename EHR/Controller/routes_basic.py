@@ -206,7 +206,7 @@ def nurseHome():
 	return render_template('nurseHome_save.html')
 	# return redirect(url_for('pendingApp'))
 
-@app.route('/pendingApp', methods=['GET', 'POST'])
+@app.route('/nursePendingApp', methods=['GET', 'POST'])
 def pendingApp():
 	pending_app = Application.query.filter(and_(Application.app_timestamp>=datetime.datetime.now(),
 												Application.status==StatusEnum.pending)).limit(6).all()
@@ -218,7 +218,7 @@ def pendingApp():
 				"patient": pending_app[i].patient_id,
 				"symptoms": pending_app[i].symptoms} for i in range(len(pending_app))]), 200)
 
-@app.route('/todayAppt', methods=['GET', 'POST'])
+@app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 def todayAppt():
 	userID = current_user.id
 	# dept. of current nurse
@@ -227,7 +227,7 @@ def todayAppt():
 
 	# today_appt_list = Application.query.
 
-@app.route('/viewAppt', methods=['POST'])
+@app.route('/nurseViewAppt', methods=['POST'])
 def viewAppt():
 	appid = request.form['appID']
 

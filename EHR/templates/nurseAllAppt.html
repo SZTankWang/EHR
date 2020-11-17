@@ -22,7 +22,7 @@
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
-				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right:1em;">
+				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right: 1em;">
 					<div class="input-group">
 						<input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="search-input" placeholder="department, doctor, patient">
 							<div class="input-group-append">
@@ -47,10 +47,16 @@
 		<div id="content-header-wrapper">
 			<nav class="nav nav-tabs">
 				<div class="nav-item">
-					<div class="content-header nav-table nav-link active disabled" id="pendingApp">Pending applications</div>
+					<div class="content-header nav-table nav-link active disabled" id="onGoingApp">Ongoing appointments</div>
 				</div>
 				<div class="nav-item">
-					<div class="content-header nav-table nav-link" id="todayAppt">Today's appointments</div>
+					<div class="content-header nav-table nav-link" id="futureAppt">Future appointments</div>
+				</div>
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link" id="pastAppt">Past appointments</div>
+				</div>
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link" id="rejectedApp">Rejected applications</div>
 				</div>
 				<div class="ml-auto">
 					<button class="btn btn-primary" id="goCreateAppt">Create New Appointment</button>
@@ -235,7 +241,7 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="/static/js/nurseHome.js"></script>
+	<script type="text/javascript" src="/static/js/nurseAllAppt.js"></script>
 	<script type="text/javascript" src="/static/index.js"></script>
 </body>
 </html>
