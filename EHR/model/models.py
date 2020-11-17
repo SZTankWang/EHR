@@ -190,7 +190,7 @@ class Application(db.Model):
 	medical_record = db.relationship('Medical_record', backref='application', uselist=False ,lazy=True)
 
 	def __repr__(self):
-		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, \
+		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, date:{self.date}, \
 			status: {self.status}, time_slot_id: {self.time_slot_id}, approver_id: {self.approver_id}, \
 				doctor_id: {self.doctor_id}, patient_id: {self.patient_id} >'
 
