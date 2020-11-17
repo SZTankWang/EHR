@@ -9,7 +9,7 @@ from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import app, db, login
 from EHR.model.models import *
-from EHR.Controller import control_helper as helper
+# from EHR.Controller import control_helper as helper
 import math
 import datetime
 
@@ -34,7 +34,7 @@ def register():
 	id = request.form['id']
 
 	if User.query.filter_by(id=id).first() != None:
-		return make_response(jsonify({'ret': 'You already registered!'}))
+		return make_response(jsonify({'ret':1,'message':'You already registered!'}))
 	role = request.form['role']
 	first_name = request.form['firstName']
 	last_name = request.form['lastName']
@@ -60,10 +60,10 @@ def register():
 			nurse = Nurse(id=id, department_id = department)
 			db.session.add(nurse)
 		db.session.commit()
-		return make_response(jsonify({"ret":0}), 200)
+		return make_response(jsonify({"ret":0, 'message':""}), 200)
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':"error"}))
+		return make_response(jsonify({'ret':1, 'message':"error"}))
 
 
 #--------------------Login---------------------

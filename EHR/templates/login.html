@@ -86,18 +86,17 @@
 		}
 
 		function goRegister(){
-		// console.log('点击注册');
+			console.log('切换至注册');
+			document.getElementById('go-login').style.background="white";
+			document.getElementById('go-login').style.color="#BCC3CA";
+			document.getElementById('go-register').style.background="#2D79D6";
+			document.getElementById('go-register').style.color="white";
 			if($('.form').attr('id')=='login-form'){
-				console.log('切换至注册');
-				document.getElementById('go-login').style.background="white";
-				document.getElementById('go-login').style.color="#BCC3CA";
-				document.getElementById('go-register').style.background="#2D79D6";
-				document.getElementById('go-register').style.color="white";
-				//用户选择注册角色
-				//先清空表单
 				clearLoginForm();
-				$('#login-field').append(renderChoice());
+			} else {
+				clearRegisterForm();
 			}
+			$('#login-field').append(renderChoice());
 		}
 
 		function goLogin(){
@@ -238,16 +237,13 @@
 				data:registerInfo,
 				success:function(data){
 					console.log(data);
+					showRegisterMessage(data);
 					if(data['ret']==0){
-						showRegisterMessage(data);
 						setTimeout(goLogin,2000);
 					}
-						showRegisterMessage(data);
 						setTimeout(goRegister,2000);
 					}
-				}
-
-			)
+				});
 		}
 
 		//等待过程中改变表单颜色
@@ -261,11 +257,11 @@
 		function showRegisterMessage(data){
 			clearRegisterForm();
 			if(data['ret']==0){
-				var temp ='<div class="register-msg-container"id="register-message-success">'+'register successfully'+"</div>";
+				var temp ='<div class="register-msg-container" id="register-message-success">'+'registered successfully'+"</div>";
 			}
-			// else{
-			// 	var temp ='<div class="register-msg-container"id="register-message-success">'+'registeration failed'+"</div>";
-			// }
+			else{
+				var temp ='<div class="register-msg-container" id="register-message-failure">'+data['message']+"</div>";
+			}
 
 			$('#login-field').append(temp);
 
