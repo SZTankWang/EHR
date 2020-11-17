@@ -106,7 +106,7 @@ class Nurse(db.Model):
 	lab_reports = db.relationship('Lab_report', backref='nurse', lazy=True)
 
 	def __repr__(self):
-		return f'Nurse < id: {self.license_id} >'
+		return f'Nurse < id: {self.id} >'
 
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
@@ -190,7 +190,7 @@ class Application(db.Model):
 	medical_record = db.relationship('Medical_record', backref='application', uselist=False ,lazy=True)
 
 	def __repr__(self):
-		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, date:{self.date}, \
+		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, \
 			status: {self.status}, time_slot_id: {self.time_slot_id}, approver_id: {self.approver_id}, \
 				doctor_id: {self.doctor_id}, patient_id: {self.patient_id} >'
 
