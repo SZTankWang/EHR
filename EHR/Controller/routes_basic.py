@@ -9,7 +9,7 @@ from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import app, db, login
 from EHR.model.models import *
-# from EHR.Controller import control_helper as helper
+from EHR.Controller import control_helper as helper
 import math
 import datetime
 
@@ -242,6 +242,7 @@ def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
 	next7d_slotid = helper.futureday_slotid(period=14)
 	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
+	
 	def response_generator(i):
 		slot_id = pending_app[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
