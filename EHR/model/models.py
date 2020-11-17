@@ -175,7 +175,7 @@ class Application(db.Model):
 	symptoms = db.Column(db.Text())
 	status = db.Column(db.Enum(StatusEnum), nullable=False)
 	reject_reason = db.Column(db.Text())
-	date = db.Column(db.Date(), nullable=False)
+	# date = db.Column(db.Date(), nullable=False)
 
 	#foreign key
 	time_slot_id = db.Column(db.Integer(), \
