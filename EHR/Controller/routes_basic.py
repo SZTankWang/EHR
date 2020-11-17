@@ -60,6 +60,7 @@ def register():
 			nurse = Nurse(id=id, department_id = department)
 			db.session.add(nurse)
 		db.session.commit()
+		helper.load_id2name_map()
 		return make_response(jsonify({"ret":0, 'message':""}), 200)
 	except:
 		db.session.rollback()
@@ -83,7 +84,6 @@ def login():
 		if not current_user.is_authenticated:
 			id = request.form['id']
 			password = request.form['password']
-
 			try:
 				user = User.query.get(id)
 				if not user:
@@ -92,6 +92,8 @@ def login():
 				if not user.check_password(password):
 					return make_response(jsonify({"ret": "Incorrect password"}))
 				login_user(user)
+				# update roster
+				helper.load_id2name_map()
 			except:
 				# flash("Unknown error, sorry!")
 				return make_response(jsonify({"ret": "Unknown error"}))
@@ -132,9 +134,9 @@ def hospitalData():
 	# curr_page = int(request.form['currPage'])
 	# page_size = int(request.form['pageSize'])
 
-	n_offset, n_tot_records, n_tot_page, page_count = helper.pageinate(Hospital)
+	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
 
-	rawHospitals = Hospital.query.offset(n_offset).limit(page_count)
+	rawHospitals = Hospital.query.offset(n_offset).limit(page_count).all()
 
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
@@ -147,9 +149,7 @@ def hospitalData():
 		  "address": hospital_addresses[i],
 		  "phone": hospital_phones[i],
 		  'n_tot_records': n_tot_records,
-		  'n_tot_page': n_tot_page} for i in range(helper.page_count)]), 200)
-
-
+		  'n_tot_page': n_tot_page} for i in range(len(rawHospitals))]), 200)
 
 
 @app.route('/hospitalListPage',methods=['GET'])
@@ -158,7 +158,7 @@ def goToHospitalList():
 
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
-	n_offset, n_tot_records, n_tot_page, page_count = helper.pageinate(Hospital)
+	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
 	partial_hpt_name = request.args.get('hospital')
 
 	search_name = "%{}%".format(partial_hpt_name)
@@ -240,8 +240,9 @@ routes: nursePendingApp, nurseTodayAppt
 @app.route('/nursePendingApp', methods=['GET', 'POST'])
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = helper.futureday_slotid(period=7)
+	next7d_slotid = helper.day2slotid(period=7)
 	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
+	
 	helper.load_id2name_map()
 	def response_generator(i):
 		slot_id = pending_app[i].time_slot_id
@@ -257,34 +258,67 @@ def nursePendingApp():
 				[response_generator(i) for i in range(len(pending_app)) ]), 200)
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
-@login_required
-def todayAppt():
-	# userID = current_user.get_id()
-	userID = "33107734"
+@login_required # Otherwise, we cannot get current_user's id
+def nurseTodayAppt():
+	nurseID = current_user.get_id()
+	# nurseID = "44116022"    # a nurseID that returns something, 
+	# 						for testing purpose, set the 'period' to 20
 	# department ID of current nurse
-	deptID = Nurse.query.filter(Nurse.id==userID).first().department_id
-	# applications for the same department where this.nurse is working for
-	same_dept_appts = Application.query.\
-					join(Nurse, Nurse.id==Application.approver_id).\
-						filter(Nurse.department_id==deptID).all()
+	today_depts_appts = helper.nurse_dept_appts(nurseID, period=0)
 
+	helper.load_id2name_map()
 	def response_generator(i):
-		slot_id = same_dept_appts[i].time_slot_id
+		slot_id = today_depts_appts[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
-		return {"appID": same_dept_appts[i].id,
+		return {"appID": today_depts_appts[i].id,
 			"date": slot_date.strftime("%Y-%m-%d"),
 			"time": seg_start_t.strftime("%H:%M"),
-			"doctor": helper.id2name(same_dept_appts[i].doctor_id),
-			"patient": helper.id2name(same_dept_appts[i].patient_id),
-			"symptoms": same_dept_appts[i].symptoms}
+			"doctor": helper.id2name(today_depts_appts[i].doctor_id),
+			"patient": helper.id2name(today_depts_appts[i].patient_id),
+			"symptoms": today_depts_appts[i].symptoms}
 
 	return make_response(jsonify(
-				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
+				[response_generator(i) for i in range(len(today_depts_appts)) ]), 200)
 	
+@app.route('/nurseFutureAppt', methods=['GET'])
+def nurseFutureAppt():
+	nurseID = current_user.get_id()
+	# nurseID = "44116022" # a working nurseID for testing purpose, set 'period' to 30
+	# department ID of current nurse
+	future_7d_appts = helper.nurse_dept_appts(nurseID, period=7)
 
-	# today_appt_list = Application.query.
+	helper.load_id2name_map()
+	def response_generator(i):
+		slot_id = future_7d_appts[i].time_slot_id
+		slot_date, seg_start_t = helper.slot2time(slot_id)
+		return {"appID": future_7d_appts[i].id,
+			"date": slot_date.strftime("%Y-%m-%d"),
+			"time": seg_start_t.strftime("%H:%M"),
+			"doctor": helper.id2name(future_7d_appts[i].doctor_id),
+			"patient": helper.id2name(future_7d_appts[i].patient_id),
+			"symptoms": future_7d_appts[i].symptoms}
 
-@app.route('/nurseViewAppt', methods=['POST'])
+	return make_response(jsonify(
+				[response_generator(i) for i in range(len(future_7d_appts)) ]), 200)
+
+
+@app.route('/nurseViewAppt', methods=['GET','POST'])
 def viewAppt():
 	appid = request.form['appID']
-	pass
+	# appid = 83
+	appt_res = Application.query.filter(Application.id==appid).first()
+	slot_date, seg_start_t = helper.slot2time(appt_res.time_slot_id)
+	
+	helper.load_id2name_map()
+	return make_response(
+		jsonify(
+			{"appID": appt_res.id,
+			"date": slot_date.strftime("%Y-%m-%d"),
+			"time": seg_start_t.strftime("%H:%M"), 
+			"doctor": helper.id2name(appt_res.doctor_id),
+			"patient": helper.id2name(appt_res.patient_id),
+			"symptoms": appt_res.symptoms}
+		)
+	)
+
+# @app.route('nurseProcessApp')

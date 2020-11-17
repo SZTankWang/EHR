@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from inspect import indentsize
 # from sqlalchemy.sql.schema import ForeignKey
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -175,7 +176,6 @@ class Application(db.Model):
 	symptoms = db.Column(db.Text())
 	status = db.Column(db.Enum(StatusEnum), nullable=False)
 	reject_reason = db.Column(db.Text())
-	#  = db.Column(db.Date(), nullable=False)
 
 	#foreign key
 	time_slot_id = db.Column(db.Integer(), \
@@ -254,3 +254,5 @@ class Lab_report(db.Model):
 		return f'Lab_report < id: {self.id}, (report_)type: {len(self.type)},\
 			mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
 				patient_id: {self.patient_id} >'
+
+
