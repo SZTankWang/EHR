@@ -11,7 +11,8 @@
 	<form id="pagination-counter" style="display: none;">
 		<input id="currPage" name='currPage'value=1></input>
 		<input id="pageSize" name='pageSize' value=10></input>
-		<input id="pageCount" name='pageCount' value=5></input>
+		<input id="pageCount" name='pageCount' value=0></input>
+		<input id="searchKey" name='searchKey' value=''></input>
 	</form>
 	<nav class="navbar navbar-light" style="background-color: #2D79D6;">
 	  <!-- Navbar content -->
@@ -93,7 +94,7 @@
 
 			</div>
 			<div id="list-footer">
-				<div id="pagecount">记录数</div>
+				<div id="pagecount">记录数：</div>
 				<div id="pagination-container"><nav aria-label="...">
 				  <ul class="pagination">
 				    <li class="page-item disabled">
@@ -148,17 +149,19 @@
 		//需要带上分页 重置当前页
 		function searchHospital(){
 			var hospital = $('#search-input').val();
+			$('#searchKey').val(hospital);
 			if(hospital != ''){
 				console.log(hospital);
+				data = $('#pagination-counter').serializeArray();
+				data = jsonify(data);
 				$.ajax({
 					url:"http://localhost:5000/searchHospital",
-					data:{'hospital':hospital,'currPage':1,'pageSize':$('#pageSize').val()},
+					data:data,
 					success:function(data){
 						console.log(data);
 						//分页样式设置
 						//设定第一页为active
 						$('#currPage').val(1);
-
 						renderHospital(data);
 					}
 				})
@@ -213,7 +216,9 @@
 		function jsonify(data){
 			var obj = {};
 			for(var i=0;i<data.length;i++){
-				obj[data[i].name]=data[i].value;
+				if(data[i].name!='pageCount'){
+					obj[data[i].name]=data[i].value;
+				}
 			}
 			return obj;
 		}
@@ -229,6 +234,10 @@
 			for(i=0;i<length;i++){
 				var card = '<div class="hospital-card"><div class="hospital-card-left"><div class="picture-holder"></div><div class="hospital-info"><div class="hospital-name">'+data[i]['name']+'</div><div class="hospital-addr">'+data[i]['address']+'</div></div></div><div class="hospital-card-right"><button type="button" class="btn btn-primary selectHospital" id='+data[i]['id']+' onclick=goToHospital()>预约就诊</button></div></div>';
 				$('#card-container').append(card);
+			}
+			if(data.length != 0){
+				$('#pagecount').empty();
+				$('#pagecount').append('记录数： '+data[0]['n_tot_records']);
 			}
 
 		}
