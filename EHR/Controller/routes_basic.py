@@ -1,7 +1,6 @@
 import collections
 from datetime import timedelta
 from itertools import count
-from operator import and_, methodcaller, ne
 from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
@@ -10,6 +9,7 @@ from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import app, db, login
 from EHR.model.models import *
+from EHR.Controller import control_helper as helper
 import math
 import datetime
 
@@ -132,7 +132,7 @@ def hospitalData():
 	# curr_page = int(request.form['currPage'])
 	# page_size = int(request.form['pageSize'])
 
-	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
+	n_offset, n_tot_records, n_tot_page, page_count = helper.pageinate(Hospital)
 
 	rawHospitals = Hospital.query.offset(n_offset).limit(page_count)
 
@@ -147,22 +147,9 @@ def hospitalData():
 		  "address": hospital_addresses[i],
 		  "phone": hospital_phones[i],
 		  'n_tot_records': n_tot_records,
-		  'n_tot_page': n_tot_page} for i in range(page_count)]), 200)
+		  'n_tot_page': n_tot_page} for i in range(helper.page_count)]), 200)
 
-def page_helper(db_obj):
-	try:
-		curr_page = int(request.form['currPage'])
-		page_size = int(request.form['pageSize'])
-	except:
-		curr_page = int(request.args.get('currPage'))
-		page_size = int(request.args.get('pageSize'))
 
-	n_offset = (curr_page-1) * page_size + 1
-	n_tot_records = db_obj.query.count()
-	n_tot_page = n_tot_records // page_size + 1
-	page_count = math.ceil(n_tot_records / page_size)
-
-	return n_offset, n_tot_records, n_tot_page, page_count
 
 
 @app.route('/hospitalListPage',methods=['GET'])
@@ -171,7 +158,7 @@ def goToHospitalList():
 
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
-	n_offset, n_tot_records, n_tot_page, page_count = page_helper(Hospital)
+	n_offset, n_tot_records, n_tot_page, page_count = helper.pageinate(Hospital)
 	partial_hpt_name = request.args.get('hospital')
 
 	search_name = "%{}%".format(partial_hpt_name)
@@ -212,34 +199,28 @@ def nurseAllAppt():
 @app.route('/nursePendingApp', methods=['GET', 'POST'])
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = [ res.id for res in (Time_slot.query.filter(Time_slot.slot_date<=datetime.date.today()+ timedelta(days=7),
-										  Time_slot.slot_date>=datetime.date.today()).all())]
-
-	pending_app = Application.query.filter(Application.id.in_(next7d_slotid)).all()
+	next7d_slotid = helper.futureday_slotid(period=14)
+	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
 	def response_generator(i):
 		slot_id = pending_app[i].time_slot_id
-		slot_date, seg_start_t = slot2time(slot_id)
+		slot_date, seg_start_t = helper.slot2time(slot_id)
 		return {"appID": pending_app[i].id,
 			"date": slot_date.strftime("%Y-%m-%d"),
-			"time": seg_start_t.strftime("%H:%M:%S"),
-			"doctor": pending_app[i].doctor_id,
-			"patient": pending_app[i].patient_id,
+			"time": seg_start_t.strftime("%H:%M"),
+			"doctor": helper.id2name(pending_app[i].doctor_id),
+			"patient": helper.id2name(pending_app[i].patient_id),
 			"symptoms": pending_app[i].symptoms}
 
 	return make_response(jsonify(
 				[response_generator(i) for i in range(len(pending_app)) ]), 200)
 
-def slot2time(slot_id:int):
-	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
-	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id
-	seg_start_t = Time_segment.query.filter(Time_segment.t_seg_id==seg_id).first().t_seg_starttime
-	return slot_date, seg_start_t
-
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
+@login_required
 def todayAppt():
-	userID = current_user.id
+	# userID = current_user.get_id()
+	userID = "81636646"
 	# dept. of current nurse
-	deptID = Nurse.query.filter_by(userID=Nurse.id).with_entities('department_id')
+	deptID = Nurse.query.filter(Nurse.id==userID).first().department_id
 	print(deptID)
 	pass
 
@@ -252,8 +233,7 @@ def viewAppt():
 
 @app.route('/doctorAvailSlot', methods=['POST', 'GET'])
 def doctorAvailSlot():
-	# doctorID = request.args.get('doctorID')
-	doctorID = '46768069'
+	doctorID = request.args.get('doctorID')
 	today = datetime.date.today()
 	avail_7d_slots = Time_slot.query.filter(
 					# future 7 days
