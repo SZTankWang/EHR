@@ -77,6 +77,25 @@ $(document).ready(function() {
       updateTable('TodayAppt');
     });
 
+    function updateTable(route, data=null){
+      var url = "http://localhost:5000/nurse" + route;
+      var type = data ? 'POST' : 'GET';
+      var btnTarget = (route == "PendingApp") ? '#application' : '#appointment';
+
+      $.ajax({
+        url: url,
+        type: type,
+        success: function(res){
+          myTable.clear().draw();
+          myTable.rows.add(res);
+          myTable.columns.adjust().draw();
+          $(".modal-button").each(function(){
+            $(this).attr('data-target',btnTarget);
+          });
+        }
+      });
+    }
+
     //-----------------go to createAppt page------------------
     $("#goCreateAppt").on("click", function(event) {
       setTimeout("window.location.replace('http://localhost:5000/nurseGoCreateAppt')", 1000);
@@ -139,24 +158,4 @@ function jsonify(data){
     obj[data[i].name]=data[i].value;
   }
   return obj;
-}
-
-function updateTable(route, data=null){
-  var url = "http://localhost:5000/nurse" + route;
-  var type = data ? 'POST' : 'GET';
-  var btnTarget = (route == "PendingApp") ? '#application' : '#appointment';
-
-  $.ajax({
-    url: url,
-    type: type,
-    data: data,
-    success: function(res){
-      myTable.clear().draw();
-      myTable.rows.add(res);
-      myTable.columns.adjust().draw();
-      $(".modal-button").each(function(){
-        $(this).attr('data-target',btnTarget);
-      });
-    }
-  });
 }

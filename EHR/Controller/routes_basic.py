@@ -9,9 +9,10 @@ from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import app, db, login
 from EHR.model.models import *
-# from EHR.Controller import control_helper as helper
+from EHR.Controller import control_helper as helper
 import math
 import datetime
+from time import time
 
 
 @app.route('/')
@@ -251,9 +252,11 @@ def nursePendingApp():
 			"doctor": helper.id2name(pending_app[i].doctor_id),
 			"patient": helper.id2name(pending_app[i].patient_id),
 			"symptoms": pending_app[i].symptoms}
-
-	return make_response(jsonify(
-				[response_generator(i) for i in range(len(pending_app)) ]), 200)
+	start = time()
+	ret = [response_generator(i) for i in range(len(pending_app)) ]
+	end = time()
+	print(end-start)
+	return make_response(jsonify(ret), 200)
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 @login_required
@@ -266,7 +269,6 @@ def todayAppt():
 	same_dept_appts = Application.query.\
 					join(Nurse, Nurse.id==Application.approver_id).\
 						filter(Nurse.department_id==deptID).all()
-
 	def response_generator(i):
 		slot_id = same_dept_appts[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
@@ -276,10 +278,12 @@ def todayAppt():
 			"doctor": helper.id2name(same_dept_appts[i].doctor_id),
 			"patient": helper.id2name(same_dept_appts[i].patient_id),
 			"symptoms": same_dept_appts[i].symptoms}
+	start = time()
+	ret = [response_generator(i) for i in range(len(same_dept_appts)) ]
+	end = time()
+	print(end-start)
+	return make_response(jsonify(ret), 200)
 
-	return make_response(jsonify(
-				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
-	
 
 	# today_appt_list = Application.query.
 
