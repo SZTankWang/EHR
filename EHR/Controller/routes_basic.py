@@ -200,56 +200,6 @@ def goToHospital():
 def department():
 	return render_template('patientDepartment.html')
 
-@app.route('/nurseHome', methods=['GET'])
-def nurseHome():
-	return render_template('nurseHome_save.html')
-	# return redirect(url_for('pendingApp'))
-
-@app.route('/nuserAllAppt', methods=['GET'])
-def nurseAllAppt():
-	render_template('nurseAllAppt.html')
-
-@app.route('/nursePendingApp', methods=['GET', 'POST'])
-def nursePendingApp():
-	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = [ res.id for res in (Time_slot.query.filter(Time_slot.slot_date<=datetime.date.today()+ timedelta(days=7),
-										  Time_slot.slot_date>=datetime.date.today()).all())]
-
-	pending_app = Application.query.filter(Application.id.in_(next7d_slotid)).all()
-	def response_generator(i):
-		slot_id = pending_app[i].time_slot_id
-		slot_date, seg_start_t = slot2time(slot_id)
-		return {"appID": pending_app[i].id,
-			"date": slot_date.strftime("%Y-%m-%d"),
-			"time": seg_start_t.strftime("%H:%M:%S"),
-			"doctor": pending_app[i].doctor_id,
-			"patient": pending_app[i].patient_id,
-			"symptoms": pending_app[i].symptoms}
-
-	return make_response(jsonify(
-				[response_generator(i) for i in range(len(pending_app)) ]), 200)
-
-def slot2time(slot_id:int):
-	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
-	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id
-	seg_start_t = Time_segment.query.filter(Time_segment.t_seg_id==seg_id).first().t_seg_starttime
-	return slot_date, seg_start_t
-
-@app.route('/nurseTodayAppt', methods=['GET', 'POST'])
-def todayAppt():
-	userID = current_user.id
-	# dept. of current nurse
-	deptID = Nurse.query.filter_by(userID=Nurse.id).with_entities('department_id')
-	print(deptID)
-	pass
-
-	# today_appt_list = Application.query.
-
-@app.route('/nurseViewAppt', methods=['POST'])
-def viewAppt():
-	appid = request.form['appID']
-	pass
-
 @app.route('/doctorAvailSlot', methods=['POST', 'GET'])
 def doctorAvailSlot():
 	# doctorID = request.args.get('doctorID')
@@ -283,3 +233,61 @@ def doctorAvailSlot():
 	return make_response(
 		jsonify(response),200
 	)
+
+
+#---------------------------nurse--------------------------------
+#---------------------------nurse--------------------------------
+#---------------------------nurse--------------------------------
+# page 1
+@app.route('/nurseHome', methods=['GET'])
+def nurseHome():
+	return render_template('nurseHome.html')
+# page 2
+@app.route('/nuserAllAppt', methods=['GET'])
+def nurseAllAppt():
+	render_template('nurseAllAppt.html')
+
+'''
+page 1: nurseHome
+routes: nursePendingApp, nurseTodayAppt
+'''
+@app.route('/nursePendingApp', methods=['GET', 'POST'])
+def nursePendingApp():
+	# look up Time_slot table for next 7 days time_slot id
+	next7d_slotid = [ res.id for res in (Time_slot.query.filter(Time_slot.slot_date<=datetime.date.today()+ timedelta(days=7),
+										  Time_slot.slot_date>=datetime.date.today()).all())]
+
+	pending_app = Application.query.filter(Application.id.in_(next7d_slotid)).all()
+	def response_generator(i):
+		slot_id = pending_app[i].time_slot_id
+		slot_date, seg_start_t = slot2time(slot_id)
+		return {"appID": pending_app[i].id,
+			"date": slot_date.strftime("%Y-%m-%d"),
+			"time": seg_start_t.strftime("%H:%M"),
+			"doctor": pending_app[i].doctor_id,
+			"patient": pending_app[i].patient_id,
+			"symptoms": pending_app[i].symptoms}
+
+	return make_response(jsonify(
+				[response_generator(i) for i in range(len(pending_app)) ]), 200)
+
+def slot2time(slot_id:int):
+	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
+	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id
+	seg_start_t = Time_segment.query.filter(Time_segment.t_seg_id==seg_id).first().t_seg_starttime
+	return slot_date, seg_start_t
+
+@app.route('/nurseTodayAppt', methods=['GET', 'POST'])
+def todayAppt():
+	userID = current_user.id
+	# dept. of current nurse
+	deptID = Nurse.query.filter_by(userID=Nurse.id).with_entities('department_id')
+	print(deptID)
+	pass
+
+	# today_appt_list = Application.query.
+
+@app.route('/nurseViewAppt', methods=['POST'])
+def viewAppt():
+	appid = request.form['appID']
+	pass
