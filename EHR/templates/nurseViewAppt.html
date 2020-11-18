@@ -112,44 +112,20 @@
 				Prescriptions
 				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#prescriptions" aria-expanded="false" aria-controls="prescriptions">Show</button>
 			</h5>
-			<div id="prescriptions" class="collapse">
-				<div class="card card-body"> <!--one card-->
-					<h5 class="mb-0">
-						<button class="btn btn-link" data-toggle="collapse" data-target="#pre1" aria-expanded="true" aria-controls="pre1">
-							medicine 1
-						</button>
-					</h5>
-					<div id="pre1" class="collapse" aria-labelledby="pre1" data-parent="#prescriptions">
-						<div class="card-body">Dose</div>
-						<div class="card-body">Comments</div>
-					</div>
-				</div>
-			</div>
+			<div id="prescriptions" class="collapse"></div>
 			<hr>
 			<h5>
 				Lab reports
 				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReports" aria-expanded="false" aria-controls="labReports">Show</button>
 			</h5>
-			<div id="labReports" class="collapse">
-				<div class="card card-body">
-					<h5 class="mb-0">
-						<button class="btn btn-link" data-toggle="collapse" data-target="#lab1" aria-expanded="true" aria-controls="lab1">
-							report 1
-						</button>
-					</h5>
-					<div id="lab1" class="collapse" aria-labelledby="lab1" data-parent="#labReports">
-						<div class="card-body">details</div>
-						<div class="card-body">comments</div>
-					</div>
-				</div>
-			</div>
+			<div id="labReports" class="collapse"></div>
 			<hr>
 			<h5>Upload lab report</h5>
 			<form id="labReportForm" enctype="multipart/form-data">
 				<div class="form-group row">
 					<label for="typeID" class="col-2 col-form-label"><b>Lab Report Type</b></label>
 					<div class="col-5">
-						<select class="form-control" id="type" name="typeID" required/>
+						<select class="form-control" id="labReportTypes" name="typeID" required/>
 				      <option value="1" selected>1</option>
 				    </select>
 					</div>
