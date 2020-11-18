@@ -2,8 +2,8 @@ $(document).ready(function() {
     $("#doctor").addClass("disabled");
     $("#slot").addClass("disabled");
     $("select").empty();
-    $("#status span").removeClass("visible");
-    $("#status span").addClass("invisible");
+    $("#ret span").removeClass("visible");
+    $("#ret span").addClass("invisible");
     $.ajax({
       url: "http://localhost:5000/getDepartmentsForNurse",
       type: 'GET',
@@ -22,7 +22,7 @@ $(document).ready(function() {
         type: 'POST',
         data: {'deptID': deptID},
         success: function(res){
-          $(this).empty();
+          // $(this).empty();
           for (let i=0; i < res.length; i++) {
             $(this).append(new Option(res[i].doctorName, res[i].doctorID))
           }
@@ -38,7 +38,7 @@ $(document).ready(function() {
         type: 'POST',
         data: {'doctorID': doctorID},
         success: function(res){
-          $(this).empty();
+          // $(this).empty();
           for (let i=0; i < res.length; i++) {
             $(this).append(new Option(res[i].slotDateTime, res[i].slotID))
           }
@@ -57,12 +57,12 @@ $(document).ready(function() {
         data: data,
         success: function(res){
           if (res.ret == "0") {
-            $("#status span").text("Success");
+            $("#ret span").text("Success");
           } else {
-            $("#status span").text("Error: failed to create the appointment");
+            $("#ret span").text("Error: failed to create the appointment");
           }
-          $("#status span").removeClass("invisible");
-          $("#status span").addClass("visible");
+          $("#ret span").removeClass("invisible");
+          $("#ret span").addClass("visible");
           setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 300);
         }
       });

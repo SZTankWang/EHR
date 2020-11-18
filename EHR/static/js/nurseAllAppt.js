@@ -38,21 +38,21 @@ $(document).ready(function() {
     // });
 
     // -----------show modal-----------
-    $('#main-table tbody').on( 'click', 'button', function () {
+    $('#main-table tbody').on( 'click', 'button', function (event) {
       var data = myTable.row( $(this).parents('tr') ).data();
-      if ($(".nav-table.active").text() == "Ongoing appointments") {
-        var code = "1";
+      if ($(".nav-table.active").text() == "Rejected applications") {
+        $("#appID").text(data['appID']);
+        $("#date").text(data['date']);
+        $("#time").text(data['time']);
+        $("#doctor").text(data['doctor']);
+        $("#patient").text(data['patient']);
+        $("#symptoms").text(data['symptoms']);
+        //$("#comments").text(data['comments']);
       } else {
-        var code = "2";
+        event.preventDefault();
+        var appID = data['appID'];
+        window.location.replace("http://localhost:5000/nurseGoViewAppt/" + appID);
       }
-      $("#appID"+code).text(data['appID']);
-      $("#date"+code).text(data['date']);
-      $("#time"+code).text(data['time']);
-      $("#doctor"+code).text(data['doctor']);
-      $("#patient"+code).text(data['patient']);
-      $("#symptoms"+code).text(data['symptoms']);
-      $("#comments"+code).text(data['comments']);
-      if (code == "2"){
       // 	$.ajax({
       // 		url: "http://localhost:5000/viewAppt",
       // 		type: 'POST',
@@ -70,7 +70,6 @@ $(document).ready(function() {
       // 			}
       // 		}
       // 	});
-      }
     } );
 
     // ----------switch table content-------------

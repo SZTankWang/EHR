@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    // $("select").empty();
     // init form
     var appID = $("#appID").text();
     $.ajax({
@@ -13,6 +14,9 @@ $(document).ready(function() {
         // for (let i=0; i < res.prescripitions.length; i++) {
         //   $("#prescriptions").append(newPrescriptionCard(i, prescripitions[i].id + ": " + prescripitions[i].medicine, prescripitions[i].dose, prescripitions[i].comments))
         // }
+        // for (let i=0; i < res.labReportTypes.length; i++) {
+        //   $(this).append(new Option(res.labReportTypes[i].typeName, res.labReportTypes[i].typeID))
+        // }
         // for (let i=0; i < res.labReports.length; i++){
         //   $("#labReports").append(newLabReportCard(i, labReports[i].id + ": " + labReports[i].lr_type, labReports[i].id, labReports[i].comments))
         // }
@@ -26,7 +30,7 @@ $(document).ready(function() {
     $("#editPreExam").on("click", function(event){
       event.preventDefault();
       var appID = $("#appID").text();
-      var data = $(this).parent().serializeArray();
+      var data = jsonify($(this).parent().serializeArray());
       data.appID = appID;
 
       $.ajax({
@@ -39,13 +43,11 @@ $(document).ready(function() {
       })
     });
 
-    $("#uploadReport").on("click", function(event){
+    $("form#labReportForm").on("submit", function(event){
       event.preventDefault();
       var appID = $("#appID").text();
-      var data = $(this).parent().serializeArray();
-      console.log(data);
-      data.appID = appID;
-      console.log(data);
+      var data = new FormData($("#labReportForm")[0]);
+      data.append("appID", appID);
 
       $.ajax({
         url: "http://localhost:5000/nurseUploadLabReport",
@@ -53,7 +55,10 @@ $(document).ready(function() {
         data: data,
         success: function(res){
           console.log(res);
-        }
+        },
+        cache: false,
+        processData: false,
+        contentType: false
       })
     });
 

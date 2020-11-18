@@ -350,3 +350,13 @@ def viewAppt():
 			"comments": appt_res.reject_reason}
 		)
 	)
+
+@app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
+@login_required
+def nurseUploadLabReport():
+	appID = request.form['appID']
+	typeID = request.form['typeID']
+	labReport = request.files['labReport']
+	comments = request.form['comments']
+	#TODO
+	return make_response(jsonify({"ret": 0}))

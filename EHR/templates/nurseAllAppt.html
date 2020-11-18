@@ -110,13 +110,13 @@
 		      <div class="modal-body">
 						<div class="container-fluid">
 					    <div class="row">
-					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID1"></span></div>
-					      <div class="col-md-3"><span><b>Date: </b></span><span id="date1"></span></div>
-								<div class="col-md-2"><span><b>Time: </b></span><span id="time1"></span></div>
+					      <div class="col-md-4"><span><b>Application ID: </b></span><span id="appID1"></span></div>
+					      <div class="col-md-4"><span><b>Date: </b></span><span id="date1"></span></div>
+								<div class="col-md-4"><span><b>Time: </b></span><span id="time1"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor1"></span></div>
-					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient1"></span></div>
+					      <div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor1"></span></div>
+					      <div class="col-md-4"><span><b>Patient: </b></span><span id="patient1"></span></div>
 					    </div>
 					    <div class="row">
 					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms1"></span></div>
@@ -130,113 +130,6 @@
 		        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="approveApp()">Approve</button>
 		        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="rejectApp()">Reject</button>
 		      </div> -->
-		    </div>
-		  </div>
-		</div>
-
-		<!-- modal2 -->
-		<div class="modal fade" id="appointment" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="appointment" aria-hidden="true">
-		  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title" id="appointmentLabel">Appointment</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-						<div class="container-fluid">
-					    <div class="row">
-					      <div class="col-md-5"><span><b>Application ID: </b></span><span id="appID2"></span></div>
-					      <div class="col-md-3"><span><b>Date: </b></span><span id="date2"></span></div>
-								<div class="col-md-2"><span><b>Time: </b></span><span id="time2"></span></div>
-					    </div>
-					    <div class="row">
-					      <div class="col-md-5"><span><b>Doctor: </b></span><span id="doctor2"></span></div>
-					      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient2"></span></div>
-					    </div>
-					    <div class="row">
-					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms2"></span></div>
-					    </div>
-							<div class="row">
-					      <div class="col"><span><b>Comments: </b></span><span id="comments2"></span></div>
-					    </div>
-					  </div>
-						<hr>
-						<form>
-							<h5>Pre-examination</h5>
-							<div class="form-group row">
-		            <label for="bodyTemperature" class="col-3 col-form-label"><b>Body temperature:</b></label>
-								<div class="col-2">
-			            <input type="number" step="0.01" class="form-control-plaintext" id="bodyTemperature" name="bodyTemperature" value="36.7" readonly>
-								</div>
-								<label for="bodyTemperature" class="form-control-label">&#8451;</label>
-							</div>
-							<div class="form-group row">
-								<label for="pulseRate" class="col-3 col-form-label"><b>Pulse rate:</b></label>
-								<div class="col-2">
-		            	<input type="number" step="0.01" class="form-control" id="pulseRate" name="pulseRate" value="">
-								</div>
-								<label for="pulseRate" class="form-control-label">BPM</label>
-							</div>
-							<div class="form-group row">
-								<label for="bloodPressure" class="col-3 col-form-label"><b>Blood pressure:</b></label>
-								<div class="col-2">
-		            	<input type="number" step="0.01" class="form-control" id="bloodPressure" name="bloodPressure" value="">
-								</div>
-								<label for="bloodPressure" class="form-control-label">mmHg</label>
-							</div>
-							<button type="submit" class="btn btn-primary">Edit</button>
-		        </form>
-						<hr>
-						<h5>Diagnosis</h5>
-					  <p id="diagnosis"></p>
-						<hr>
-						<h5>
-							Prescriptions
-							<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#prescriptions" aria-expanded="false" aria-controls="prescriptions">Show</button>
-						</h5>
-						<div id="prescriptions" class="collapse">
-							<div class="card card-body"> <!--one card-->
-								<h5 class="mb-0">
-									<button class="btn btn-link" data-toggle="collapse" data-target="#pre1" aria-expanded="true" aria-controls="pre1">
-										medicine 1
-									</button>
-								</h5>
-								<div id="pre1" class="collapse" aria-labelledby="heading1" data-parent="#prescriptions">
-									<div class="card-body">Dose</div>
-								</div>
-							</div>
-						</div>
-						<hr>
-						<h5>
-							Lab reports
-							<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReports" aria-expanded="false" aria-controls="labReports">Show</button>
-						</h5>
-						<div id="labReports" class="collapse">
-							<div class="card card-body">
-								<h5 class="mb-0">
-									<button class="btn btn-link" data-toggle="collapse" data-target="#lab1" aria-expanded="true" aria-controls="lab1">
-										report 1
-									</button>
-								</h5>
-								<div id="lab1" class="collapse" aria-labelledby="lab1" data-parent="#labReports">
-									<div class="card-body">details</div>
-								</div>
-							</div>
-						</div>
-						<form>
-		          <div class="form-group">
-								<div class="custom-file">
-								  <input type="file" class="custom-file-input" id="labRepot">
-								  <label class="custom-file-label" for="labRepot">Choose file</label>
-								</div>
-		          </div>
-							<button type="submit" class="btn btn-primary">Upload</button>
-		        </form>
-		      </div>
-		      <div class="modal-footer">
-		      </div>
 		    </div>
 		  </div>
 		</div>

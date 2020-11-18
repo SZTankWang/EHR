@@ -38,7 +38,7 @@ $(document).ready(function() {
     // });
 
     // -----------table click-----------
-    $('#main-table tbody').on( 'click', 'button', function () {
+    $('#main-table tbody').on( 'click', 'button', function (event) {
       var data = myTable.row( $(this).parents('tr') ).data();
       if ($(".nav-table.active").text() == "Pending applications") {
         $("#appID").text(data['appID']);
@@ -48,6 +48,7 @@ $(document).ready(function() {
         $("#patient").text(data['patient']);
         $("#symptoms").text(data['symptoms']);
       } else {
+        event.preventDefault();
         var appID = data['appID'];
         window.location.replace("http://localhost:5000/nurseGoViewAppt/" + appID);
       }
