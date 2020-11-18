@@ -326,35 +326,39 @@ def nurseGoViewAppt(appID):
 		date=slot_date.strftime("%Y-%m-%d"),
 		time=seg_start_t.strftime("%H:%M"),
 		doctor=helper.id2name(appt_res.doctor_id),
+		patientID=appt_res.patient_id,
 		patient=helper.id2name(appt_res.patient_id),
 		symptoms=appt_res.symptoms,
-		comments=appt_res.reject_reason)
+		comments=appt_res.reject_reason,
+		mcID=None,
+		appStatus=None)#TODO
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @login_required
 def viewAppt():
-	appid = request.form['appID']
+	#TODO
+	mcid = request.form['mcID']
 	# appid = 83
-	appt_res = Application.query.filter(Application.id==appid).first()
-	slot_date, seg_start_t = helper.slot2time(appt_res.time_slot_id)
-
-	helper.load_id2name_map()
+	# appt_res = Application.query.filter(Application.id==appid).first()
+	# slot_date, seg_start_t = helper.slot2time(appt_res.time_slot_id)
+	#
+	# helper.load_id2name_map()
 	return make_response(
-		jsonify(
-			{"appID": appt_res.id,
-			"date": slot_date.strftime("%Y-%m-%d"),
-			"time": seg_start_t.strftime("%H:%M"),
-			"doctor": helper.id2name(appt_res.doctor_id),
-			"patient": helper.id2name(appt_res.patient_id),
-			"symptoms": appt_res.symptoms,
-			"comments": appt_res.reject_reason}
+		jsonify(None
+			# {"appID": appt_res.id,
+			# "date": slot_date.strftime("%Y-%m-%d"),
+			# "time": seg_start_t.strftime("%H:%M"),
+			# "doctor": helper.id2name(appt_res.doctor_id),
+			# "patient": helper.id2name(appt_res.patient_id),
+			# "symptoms": appt_res.symptoms,
+			# "comments": appt_res.reject_reason}
 		)
 	)
 
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
 @login_required
 def nurseUploadLabReport():
-	appID = request.form['appID']
+	mcID = request.form['mcID']
 	typeID = request.form['typeID']
 	labReport = request.files['labReport']
 	comments = request.form['comments']

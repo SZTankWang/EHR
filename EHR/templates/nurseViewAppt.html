@@ -45,12 +45,9 @@
 
 	<div class="container" id="content-wrapper" style="padding:1em;">
 		<div id="content-header-wrapper">
-			<nav class="nav nav-tabs row">
-				<div class="col-4">
-					<a class="btn btn-primary" id="goBack" onClick="history.back()">Back</a>
-				</div>
-				<div class="col">
-					<h3>Appointment</h3>
+			<nav class="nav nav-tabs d-flex justify-content-center">
+				<div>
+					<h3>Appointment and Medical Record</h3>
 				</div>
 			</nav>
 		</div>
@@ -59,15 +56,23 @@
 			<div class="container-fluid">
 		    <div class="row">
 		      <div class="col-md-4"><span><b>Application ID: </b></span><span id="appID">{{appID}}</span></div>
-		      <div class="col-md-4"><span><b>Date: </b></span><span id="date">{{date}}</span></div>
+					<div class="col-md-4"><span><b>Date: </b></span><span id="date">{{date}}</span></div>
 					<div class="col-md-4"><span><b>Time: </b></span><span id="time">{{time}}</span></div>
 		    </div>
 		    <div class="row">
-		      <div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor">{{doctor}}</span></div>
-		      <div class="col-md-5"><span><b>Patient: </b></span><span id="patient">{{patient}}</span></div>
+					<div class="col-md-4"><span><b>Medical Record ID: </b></span><span id="mcID">{{mcID}}</span></div>
+					<div class="col-md-4"><span><b>Patient: </b></span><span id="patient">{{patient}}</span></div>
+					<div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor">{{doctor}}</span></div>
 		    </div>
+				<div class="row">
+					<div class="col-md-4"><span><b>Application/Appointment Status: </b></span><span id="time">{{appStatus}}</span></div>
+					<form action="/nurseGoViewMC" method="POST" class="col-md-4">
+						<input class="d-none" type="text" name="patientID" value="{{patientID}}" readonly>
+						<input type="submit" class="btn btn-sm btn-primary" id="viewMC" value="view patient's medical history">
+					</form>
+				</div>
 		    <div class="row">
-		      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms">{{symptoms}}</span></div>
+		      <div class="col"><span><b>Symptoms: </b></span><span id="symptoms">{{symptoms}}</span></div>
 		    </div>
 				<div class="row">
 		      <div class="col"><span><b>Comments: </b></span><span id="comments">{{comments}}</span></div>
@@ -77,22 +82,22 @@
 			<form>
 				<h5>Pre-examination</h5>
 				<div class="form-group row">
-          <label for="bodyTemperature" class="col-3 col-form-label">Body temperature:</label>
-					<div class="col-4">
+          <label for="bodyTemperature" class="col-2 col-form-label"><b>Body temperature</b></label>
+					<div class="col-3">
             <input type="number" step="0.01" class="form-control-plaintext" id="bodyTemperature" name="bodyTemperature" value="36.7" readonly>
 					</div>
 					<label for="bodyTemperature" class="form-control-label">&#8451;</label>
 				</div>
 				<div class="form-group row">
-					<label for="pulseRate" class="col-3 col-form-label">Pulse rate:</label>
-					<div class="col-4">
+					<label for="pulseRate" class="col-2 col-form-label"><b>Pulse rate</b></label>
+					<div class="col-3">
           	<input type="number" step="0.01" class="form-control" id="pulseRate" name="pulseRate" value="">
 					</div>
 					<label for="pulseRate" class="form-control-label">BPM</label>
 				</div>
 				<div class="form-group row">
-					<label for="bloodPressure" class="col-3 col-form-label">Blood pressure:</label>
-					<div class="col-4">
+					<label for="bloodPressure" class="col-2 col-form-label"><b>Blood pressure</b></label>
+					<div class="col-3">
           	<input type="number" step="0.01" class="form-control" id="bloodPressure" name="bloodPressure" value="">
 					</div>
 					<label for="bloodPressure" class="form-control-label">mmHg</label>
@@ -142,19 +147,19 @@
 			<h5>Upload lab report</h5>
 			<form id="labReportForm" enctype="multipart/form-data">
 				<div class="form-group row">
-					<label for="typeID" class="col-4 col-form-label">Lab Report Type</label>
-					<div class="col-6">
+					<label for="typeID" class="col-2 col-form-label"><b>Lab Report Type</b></label>
+					<div class="col-5">
 						<select class="form-control" id="type" name="typeID" required/>
 				      <option value="1" selected>1</option>
 				    </select>
 					</div>
 				</div>
 				<div class="form-group row">
-					<label class="col-10 col-form-label" for="labReport">Choose a lab report</label>
+					<label class="col-10 col-form-label" for="labReport"><b>Choose a lab report</b></label>
 				  <input class="form-control" type="file" id="labReport" name="labReport" required>
 				</div>
 				<div class="form-group row">
-					<label class="col-10 col-form-label" for="comments">Comments</label>
+					<label class="col-10 col-form-label" for="comments"><b>Comments</b></label>
 				  <textarea class="form-control" id="comments" name="comments"></textarea>
 				</div>
 				<input type="submit" id="uploadReport" class="btn btn-primary" value="Upload"/>

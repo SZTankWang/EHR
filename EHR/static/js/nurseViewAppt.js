@@ -1,11 +1,11 @@
 $(document).ready(function() {
     // $("select").empty();
     // init form
-    var appID = $("#appID").text();
+    var mcID = $("#mcID").text();
     $.ajax({
       url: "http://localhost:5000/nurseViewAppt",
       type: 'POST',
-      data: {"appID": appID},
+      data: {"mcID": mcID},
       success: function(res){
         // $("#bodyTemperature").text(res.preExam.bodyTemperature);
         // $("#pulseRate").text(res.preExam.pulseRate);
@@ -29,9 +29,9 @@ $(document).ready(function() {
     //--------------------forms--------------------
     $("#editPreExam").on("click", function(event){
       event.preventDefault();
-      var appID = $("#appID").text();
+      var mcID = $("#mcID").text();
       var data = jsonify($(this).parent().serializeArray());
-      data.appID = appID;
+      data.appID = mcID;
 
       $.ajax({
         url: "http://localhost:5000/nurseEditPreExam",
@@ -45,9 +45,9 @@ $(document).ready(function() {
 
     $("form#labReportForm").on("submit", function(event){
       event.preventDefault();
-      var appID = $("#appID").text();
+      var mcID = $("#mcID").text();
       var data = new FormData($("#labReportForm")[0]);
-      data.append("appID", appID);
+      data.append("mcID", mcID);
 
       $.ajax({
         url: "http://localhost:5000/nurseUploadLabReport",

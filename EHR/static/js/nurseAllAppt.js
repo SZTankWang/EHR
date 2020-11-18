@@ -47,29 +47,22 @@ $(document).ready(function() {
         $("#doctor").text(data['doctor']);
         $("#patient").text(data['patient']);
         $("#symptoms").text(data['symptoms']);
-        //$("#comments").text(data['comments']);
+        $.ajax({
+      		url: "http://localhost:5000/nurseGetComments",
+      		type: 'POST',
+      		data: {"appID": data['appID']},
+      		success: function(res){
+      			$("#comments").text(res.comments);
+      		},
+          error: function(err) {
+            console.log(err);
+          }
+      	});
       } else {
         event.preventDefault();
         var appID = data['appID'];
         window.location.replace("http://localhost:5000/nurseGoViewAppt/" + appID);
       }
-      // 	$.ajax({
-      // 		url: "http://localhost:5000/viewAppt",
-      // 		type: 'POST',
-      // 		data: {"appID": data['appID']},
-      // 		success: function(res){
-      // 			$("bodyTemperature").text(res.preExam.bodyTemperature);
-      // 			$("pulseRate").text(res.preExam.pulseRate);
-      // 			$("bloodPressure").text(res.preExam.bloodPressure);
-      // 			$("diagnosis").text(res.diagnosis);
-      // 			for (let i=0; i < res.prescripitions.length; i++) {
-      // 				$("prescriptions").append()
-      // 			}
-      // 			for (let i=0; i < res.labReports.length; i++){
-      //
-      // 			}
-      // 		}
-      // 	});
     } );
 
     // ----------switch table content-------------
