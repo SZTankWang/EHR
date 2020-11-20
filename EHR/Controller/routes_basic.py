@@ -1,7 +1,9 @@
+from EHR.Controller.control_helper import id2name
 import collections
 from datetime import timedelta
 from itertools import count
 from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response
+from flask.signals import appcontext_tearing_down
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 from numpy.lib.function_base import select
@@ -12,7 +14,7 @@ from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import math
 import datetime
-from time import time
+from time import strftime, time
 
 
 @app.route('/')
@@ -364,3 +366,51 @@ def nurseUploadLabReport():
 	comments = request.form['comments']
 	#TODO
 	return make_response(jsonify({"ret": 0}))
+
+@app.route('/nurseProcessApp', methods=['GET','POST'])
+def nurseProcessApp():
+	appID = request.form['appID']
+	# get Appt
+	appt = Application.query.filter(Application.id==appID).first()
+	if not appt:
+		return {'ret': f'The appointment: {appID} does not exists!'}
+
+	decision = request.form['action']
+	if decision.lower() == 'reject':
+		appt.status = StatusEnum.rejected
+		appt.reject_reason = request.form['comments']
+	elif decision.lower() == 'approve':
+		appt.status = StatusEnum.approved
+
+	db.session.commit()
+
+	return make_response({'ret':0})
+
+@app.route('/nurseOnGoingAppt', methods=['GET'])
+def nurseOnGoingAppt():
+	helper.load_id2name_map() # save this, only for development use
+	nurse_id = current_user.get_id()
+	# nurse_id = '46770556'
+	today_appts = helper.nurse_dept_appts(nurseID=nurse_id, period=0)
+	on_going_appts = {}
+	nowtime = datetime.datetime.now()
+	# nowtime = datetime.datetime.strptime("2020-11-19 09:05:00", "%Y-%m-%d %H:%M:%S")
+
+	for appt in today_appts:
+		appt_date, appt_start_time = helper.slot2time(appt.time_slot_id)
+		appt_date_time = datetime.datetime.combine(appt_date, appt_start_time)
+		print(appt)
+		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
+			on_going_appts[appt.id] = (appt, appt_date, appt_start_time)
+	
+	return make_response(
+		jsonify(
+			[{
+				"date": on_going_appts[apptid][1].strftime("%Y-%m-%d"),
+				"time": on_going_appts[apptid][2].strftime("%H:%M"),
+				"doctor": helper.id2name(on_going_appts[apptid][0].doctor_id),
+				"patient": helper.id2name(on_going_appts[apptid][0].patient_id),
+				"symptoms": on_going_appts[apptid][0].symptoms} for apptid in on_going_appts.keys()]
+	))
+
+
