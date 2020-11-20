@@ -301,7 +301,7 @@ def nurseFutureAppt():
 		slot_id = future_7d_appts[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
 		return {"appID": future_7d_appts[i].id,
-			"date": slot_date.strftime("%Y-%m-%dR"),
+			"date": slot_date.strftime("%Y-%m-%d"),
 			"time": seg_start_t.strftime("%H:%M"),
 			"doctor": helper.id2name(future_7d_appts[i].doctor_id),
 			"patient": helper.id2name(future_7d_appts[i].patient_id),
@@ -361,7 +361,7 @@ def nurseviewAppt():
 
 	return make_response(
 		jsonify(
-			{"bodyTemperature": mc.body_temperatur,
+			{"bodyTemperature": mc.body_temperature,
 			"pulseRate": mc.heart_rate.strftime("%Y-%m-%d")}
 			# "time": seg_start_t.strftime("%H:%M"),
 			# "doctor": helper.id2name(appt_res.doctor_id),
@@ -405,11 +405,11 @@ def nurseOnGoingAppt():
 	helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
-	
+
 	# testing data
 	# nurse_id = '17711783'
 	# nowtime = datetime.datetime.strptime("2020-11-20 13:10:00", "%Y-%m-%d %H:%M:%S")
-	
+
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.nurse_dept_appts(nurseID=nurse_id, period=0).\
 		filter(
@@ -423,7 +423,7 @@ def nurseOnGoingAppt():
 		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
-	
+
 	return make_response(
 		jsonify(
 			[{
@@ -438,7 +438,7 @@ def nurseOnGoingAppt():
 def nurseRejectedApp():
 	start_date, end_date = request.form['startDate'], request.form['endDate']
 	nurse_id = current_user.get_id()
-	
+
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
@@ -446,7 +446,7 @@ def nurseRejectedApp():
 
 	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
 		 start_date=start_date).filter(Application.status==StatusEnum.rejected)
-	
+
 	helper.load_id2name_map()
 	return make_response(
 		jsonify([

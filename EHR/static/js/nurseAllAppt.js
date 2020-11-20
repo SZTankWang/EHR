@@ -28,7 +28,7 @@ $('#main-table tbody').on( 'click', 'button', buttonAction);
 
 // ----------switch table content-------------
 // view ongoing applications
-$("#onGoingAppt").on('click', () => goUpdateTable("nursenGoingAppt"));
+$("#onGoingAppt").on('click', () => goUpdateTable("nurseOnGoingAppt"));
 
 // view future appointments
 $("#futureAppt").on('click', () => goUpdateTable("nurseFutureAppt"));
