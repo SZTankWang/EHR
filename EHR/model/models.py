@@ -170,18 +170,21 @@ class StatusEnum(enum.Enum):
 	pending = 'pending'
 	finished = 'finished'
 
+
 class Application(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
 	app_timestamp = db.Column(db.TIMESTAMP())
 	symptoms = db.Column(db.Text())
 	status = db.Column(db.Enum(StatusEnum), nullable=False)
 	reject_reason = db.Column(db.Text())
+	date = db.Column(db.Date(), nullable=False)
+	time = db.Column(db.Time(), nullable=False)
 
 	#foreign key
 	time_slot_id = db.Column(db.Integer(), \
 		db.ForeignKey('time_slot.id'), nullable=False)
-	# doctor_id = db.Column(db.String(100), \
-	# 	db.ForeignKey('doctor.id'), nullable=False)
+	doctor_id = db.Column(db.String(100), \
+		db.ForeignKey('doctor.id'), nullable=False)
 	approver_id = db.Column(db.String(100), \
 		db.ForeignKey('nurse.id'))
 	patient_id = db.Column(db.String(100), \
@@ -192,7 +195,8 @@ class Application(db.Model):
 	def __repr__(self):
 		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, \
 			status: {self.status}, time_slot_id: {self.time_slot_id}, approver_id: {self.approver_id}, \
-				doctor_id: {self.doctor_id}, patient_id: {self.patient_id} >'
+				doctor_id: {self.doctor_id}, patient_id: {self.patient_id}, date: {self.date}, \
+				time: {self.time} >'
 
 class Medical_record(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)

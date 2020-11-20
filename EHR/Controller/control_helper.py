@@ -30,6 +30,7 @@ def day2slotid(period: int, start_day=datetime.date.today()):
 											  Time_slot.slot_date>=start_day)).all()]
 	return next_d_slotid
 
+<<<<<<< HEAD
 
 slotid2date = {}
 def load_slots():
@@ -47,6 +48,25 @@ def slot2time(slot_id:int):
 	slot_date = slotid2date[slot_id]['slot_date']
 	seg_starttime = slotid2date[slot_id]['seg_starttime']
 	return slot_date, seg_starttime
+=======
+# No Longer Necessary! since we added date and time in Application
+# slotid2date = {}
+# def load_slots():
+# 	global slotid2date
+# 	slots = Time_slot.query.all()
+# 	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
+	
+# 	for slot in slots:
+# 		slotid2date[slot.id] = {"slot_date": slot.slot_date,
+# 								"seg_starttime": segid2time[slot.slot_seg_id]}
+# 	print("slotid2date:", slotid2date)
+
+# def slot2time(slot_id:int):
+# 	load_slots()
+# 	slot_date = slotid2date[slot_id]['slot_date']
+# 	seg_starttime = slotid2date[slot_id]['seg_starttime']
+# 	return slot_date, seg_starttime	
+>>>>>>> Qing
 
 
 id_name_map = None
@@ -67,10 +87,20 @@ def nurse_dept_appts(nurseID, period, start_date=datetime.date.today()):
 	"""
 	deptID = Nurse.query.filter(Nurse.id==nurseID).first().department_id
 	same_dept_appts = Application.query.\
-					join(Nurse, Nurse.id==Application.approver_id).\
+					join(Doctor, Doctor.id==Application.doctor_id).\
 					join(Time_slot, Time_slot.id==Application.time_slot_id).\
 						filter(
-							Nurse.department_id==deptID,
+							Doctor.department_id==deptID,
 							Time_slot.slot_date>=start_date,
 							Time_slot.slot_date<=start_date+timedelta(days=period))
 	return same_dept_appts
+
+def t_slotid2date(slot_id):
+	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
+	return slot_date
+
+def t_slot2time(slot_id):
+	slot_time = Time_segment.query.join(
+		Time_slot, Time_segment.t_seg_id==Time_slot.slot_seg_id
+	).filter(Time_slot.id==slot_id).first().t_seg_starttime
+	return slot_time

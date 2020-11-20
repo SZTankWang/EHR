@@ -11,6 +11,7 @@ import requests
 from bs4 import BeautifulSoup, NavigableString
 import datetime
 from sqlalchemy import func, or_
+from EHR.Controller import control_helper as helper
 
 
 
@@ -147,13 +148,11 @@ def get_single_column(db_obj, column_wanted) -> List:
 def gen_appt():
 	slotid_list = get_single_column(Time_slot, Time_slot.id) 
 	basetime = datetime.datetime.today()
-	status_list = [status for status, _ in StatusEnum.__members__.items()]
-	doctorid_list = get_single_column(Doctor, Doctor.id)
+	# status_list = [status for status, _ in StatusEnum.__members__.items()]
+	# doctorid_list = get_single_column(Doctor, Doctor.id)
 	nurseid_list = get_single_column(Nurse, Nurse.id)
 	patientid_list = get_single_column(Patient, Patient.id)
 	base_date = datetime.date.today()
-
-
 
 	for i in range(N_RECORD):
 		# initialize two date variales
@@ -164,16 +163,19 @@ def gen_appt():
 		while appt_tobe_date < appt_made_time.date():
 			appt_tobe_date = appt_tobe_date + timedelta(days=random.randint(0,7))
 			appt_made_time = appt_made_time + timedelta(days=random.randint(-14,14))
- 
+		status_enum = random.choice(list(StatusEnum))
+		tslotid = random.choice(slotid_list)
+		doctorid = Time_slot.query.filter(Time_slot.id==tslotid).first().doctor_id
 		appt = Application( 
-						# date = appt_tobe_date,
+						doctor_id = doctorid,
 						app_timestamp = appt_made_time,
-						status = random.choice(status_list),
-						time_slot_id = random.choice(slotid_list),
-						approver_id = random.choice(nurseid_list),
-					
+						status = status_enum.value,
+						time_slot_id = tslotid,
+						approver_id = random.choice(nurseid_list) if status_enum == StatusEnum.approved else None,
 						patient_id = random.choice(patientid_list),
-						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"])
+						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"]),
+						date = helper.t_slotid2date(tslotid),
+						time = helper.t_slot2time(tslotid)		
 		)
 		db.session.add(appt)
 	db.session.commit()
@@ -189,11 +191,11 @@ def practice_query():
 def main():
 	# please do not change the following execution order
 	print("on it")
-	# gen_hospital_data()
-	# gen_dept_data()
-	# gen_user_data()
-	# gen_time_seg()
-	# gen_time_slot()
+	gen_hospital_data()
+	gen_dept_data()
+	gen_user_data()
+	gen_time_seg()
+	gen_time_slot()
 	gen_appt()
 
 main()
