@@ -30,26 +30,8 @@ def day2slotid(period: int, start_day=datetime.date.today()):
 											  Time_slot.slot_date>=start_day)).all()]
 	return next_d_slotid
 
-<<<<<<< HEAD
-
-slotid2date = {}
-def load_slots():
-	global slotid2date
-	slots = Time_slot.query.all()
-	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
-
-	for slot in slots:
-		slotid2date[slot.id] = {"slot_date": slot.slot_date,
-								"seg_starttime": segid2time[slot.slot_seg_id]}
-	# print("slotid2date:", slotid2date)
-
-def slot2time(slot_id:int):
-	load_slots()
-	slot_date = slotid2date[slot_id]['slot_date']
-	seg_starttime = slotid2date[slot_id]['seg_starttime']
-	return slot_date, seg_starttime
-=======
 # No Longer Necessary! since we added date and time in Application
+# .............................................................
 # slotid2date = {}
 # def load_slots():
 # 	global slotid2date
@@ -66,7 +48,6 @@ def slot2time(slot_id:int):
 # 	slot_date = slotid2date[slot_id]['slot_date']
 # 	seg_starttime = slotid2date[slot_id]['seg_starttime']
 # 	return slot_date, seg_starttime	
->>>>>>> Qing
 
 
 id_name_map = None

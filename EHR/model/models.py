@@ -201,7 +201,7 @@ class Application(db.Model):
 class Medical_record(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
 	body_temperature = db.Column(db.Float(1))
-	body_pressure = db.Column(db.Float(1))
+	blood_pressure = db.Column(db.Float(1))
 	heart_rate = db.Column(db.Integer())
 	weight = db.Column(db.Float(1))
 	state = db.Column(db.Enum('conscious', 'coma'), default="conscious")

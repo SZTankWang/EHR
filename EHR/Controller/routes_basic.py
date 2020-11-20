@@ -345,20 +345,6 @@ def nurseviewAppt():
 	mcid = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mcid).first()
 
-
-# 	preExam: {
-# bodyTemperature: float/str,
-# pulseRate: float/str,
-# bloodPressure: float/str}
-
-# diagnosis:str
-
-# prescriptions: [{medicine, comments, etc.}, {}, ...]
-
-# labReportTypes:[{id:str, name:str}, {}, ...]
-
-# }
-
 	return make_response(
 		jsonify(
 			{"bodyTemperature": mc.body_temperatur,
@@ -374,11 +360,25 @@ def nurseviewAppt():
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
 @login_required
 def nurseUploadLabReport():
-	mcID = request.form['mcID']
-	typeID = request.form['typeID']
-	labReport = request.files['labReport']
+	nurse_id = current_user.get_id()
+
+	mc_id = request.form['mcID']
+	lr_type_id = request.form['typeID']
+	lab_report = request.files['labReport']
 	comments = request.form['comments']
-	#TODO
+	
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	patient_id = mc.patient_id
+
+	lab_report = Lab_report(
+		comments=comments,
+		lr_type = lr_type_id,
+		uploader_id=nurse_id,
+		patient_id=patient_id,
+		mc_id=mc_id,
+		file=lab_report
+	)
+	
 	return make_response(jsonify({"ret": 0}))
 
 @app.route('/nurseProcessApp', methods=['GET','POST'])
@@ -436,7 +436,8 @@ def nurseOnGoingAppt():
 
 @app.route('/nurseRejectedApp', methods=['GET', 'POST'])
 def nurseRejectedApp():
-	start_date, end_date = request.form['startDate'], request.form['endDate']
+	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
 	
 	# testing data
@@ -475,3 +476,47 @@ def nurseViewMC():
 def nurseGetComments():
 	#TODO
 	return make_response(jsonify({"comments":"1"}))
+
+@app.route('/nursePastAppt', methods=['GET', 'POST'])
+def nursePastAppt():
+	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
+	nurse_id = current_user.get_id()
+	
+	# testing data
+	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
+	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
+	# nurse_id = "17711783"
+
+	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
+		 start_date=start_date).filter(Application.status==StatusEnum.finished)
+	
+	helper.load_id2name_map()
+	return make_response(
+		jsonify([
+			{
+				"appID": app.id,
+				"date": app.date.strftime(helper.DATE_FORMAT),
+				"time": app.time.strftime(helper.TIME_FORMAT),
+				"doctor": helper.id2name(app.doctor_id),
+				"patient": helper.id2name(app.patient_id),
+				"symptoms": app.symptoms
+			} for app in apps
+		])
+	)
+
+@app.route('/nurseEditPreExam', methods=['GET','POST'])
+def nurseEditPreExam():
+	mc_id = request.form['mcID']
+	body_temperature = request.form['bodyTemperature']
+	pulse_rate = request.form['pulseRate']
+	blood_pressure = request.form['bloodPressue']
+
+	mc = Medical_record.query.filter( Medical_record.id == mc_id).first()
+	mc.body_temperatur = body_temperature
+	mc.heart_rate = pulse_rate
+	mc.blood_pressure = blood_pressure
+	db.session.commit()
+
+	return make_response(jsonify({'ret':0}))
+
