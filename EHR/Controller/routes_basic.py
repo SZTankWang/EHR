@@ -316,11 +316,12 @@ def nurseTodayAppt():
 @login_required
 def nurseFutureAppt():
 	nurseID = current_user.get_id()
-	# nurseID = "44116022" # a working nurseID for testing purpose, set 'period' to 30
+	# nurseID = "46770556" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
 	future_7d_appts = helper.nurse_dept_appts(nurseID, period=7).all()
 
 	helper.load_id2name_map()
+	helper.load_slots()
 	def response_generator(i):
 		slot_id = future_7d_appts[i].time_slot_id
 		slot_date, seg_start_t = helper.slot2time(slot_id)
@@ -352,26 +353,35 @@ def nurseGoViewAppt(appID):
 	helper.load_id2name_map()
 	return render_template('nurseViewAppt.html',
 		appID=appID,
-		date=slot_date.strftime("%Y-%m-%d"),
-		time=seg_start_t.strftime("%H:%M"),
+		date=slot_date.strftime(helper.DATE_FORMAT),
+		time=seg_start_t.strftime(helper.TIME_FORMAT),
 		doctor=helper.id2name(appt_res.doctor_id),
 		patientID=appt_res.patient_id,
 		patient=helper.id2name(appt_res.patient_id),
 		symptoms=appt_res.symptoms,
 		comments=appt_res.reject_reason,
 		mcID=None,
-		appStatus=None)#TODO
+		appStatus=appt_res.status)
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @login_required
 def nurseviewAppt():
-	#TODO
-	mcid = request.form['mcID']
-	# appid = 83
-	# appt_res = Application.query.filter(Application.id==appid).first()
-	# slot_date, seg_start_t = helper.slot2time(appt_res.time_slot_id)
-	#
-	# helper.load_id2name_map()
+
+# 	mcid = request.form['mcID']
+
+# 	preExam: {
+# bodyTemperature: float/str,
+# pulseRate: float/str,
+# bloodPressure: float/str}
+
+# diagnosis:str
+
+# prescriptions: [{medicine, comments, etc.}, {}, ...]
+
+# labReportTypes:[{id:str, name:str}, {}, ...]
+
+# }
+
 	return make_response(
 		jsonify(None
 			# {"appID": appt_res.id,
