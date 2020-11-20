@@ -180,10 +180,10 @@ class Application(db.Model):
 	#foreign key
 	time_slot_id = db.Column(db.Integer(), \
 		db.ForeignKey('time_slot.id'), nullable=False)
-	doctor_id = db.Column(db.String(100), \
-		db.ForeignKey('doctor.id'), nullable=False)
+	# doctor_id = db.Column(db.String(100), \
+	# 	db.ForeignKey('doctor.id'), nullable=False)
 	approver_id = db.Column(db.String(100), \
-		db.ForeignKey('nurse.id'), nullable=False)
+		db.ForeignKey('nurse.id'))
 	patient_id = db.Column(db.String(100), \
 		db.ForeignKey('patient.id'), nullable=False)
 	#one-to-one relationship
