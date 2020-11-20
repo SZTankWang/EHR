@@ -1,4 +1,4 @@
-from EHR.Controller.control_helper import id2name
+from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name, slot2time
 import collections
 from datetime import timedelta
 from itertools import count
@@ -248,7 +248,6 @@ def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
 	next7d_slotid = helper.day2slotid(period=14)
 	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
-
 	helper.load_id2name_map()
 	def response_generator(i):
 		slot_id = pending_app[i].time_slot_id
@@ -413,4 +412,40 @@ def nurseOnGoingAppt():
 				"symptoms": on_going_appts[apptid][0].symptoms} for apptid in on_going_appts.keys()]
 	))
 
+@app.route('/nurseRejectedApp', methods=['GET','POST'])
+def nurseRejectedApp():
+	"""
+	get the 'rejcted' appt within the startdate, enddate
+	"""
+	# app_start_date = request.form['startDate']
+	# app_end_date = request.form['endDate']
+	app_start_date = datetime.datetime.strptime("2020-12-01", helper.DATE_FORMAT)
+	app_end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
+
+	slot_ids = helper.day2slotid(period=(app_end_date-app_start_date).days, start_day=app_start_date)
+	nurseID = current_user.get_id()
+	appts = helper.nurse_dept_appts(nurseID=nurseID, 
+									period=app_end_date-app_start_date,
+									start_date=app_start_date)\
+										.filter(
+											Application.id.in_(slot_ids),
+											Application.status==StatusEnum.rejected
+											)
+	# for test purpose
+	helper.load_slots()
+	helper.load_id2name_map()
+	
+	return make_response(
+		jsonify(
+			[{
+				"appID": app.id, 
+				"date": helper.slot2time(app.time_slot_id)[0].strftime(helper.DATE_FORMAT),
+				"time": helper.slot2time(app.time_slot_id)[1].strftime(helper.TIME_FORMAT),
+				"doctor": helper.id2name(app.doctor_id),
+				"patient": helper.id2name(app.patient_id),
+				"symptoms": app.symptoms,
+				"status": app.status
+			}for app in appts]
+		)
+	)
 

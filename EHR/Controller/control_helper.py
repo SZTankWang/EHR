@@ -5,6 +5,8 @@ import math
 import datetime
 from operator import and_
 
+TIME_FORMAT = "%H:%M"
+DATE_FORMAT = "%Y-%m-%d"
 
 def paginate(db_obj):
 	try:
@@ -23,21 +25,26 @@ def paginate(db_obj):
 
 def day2slotid(period: int, start_day=datetime.date.today()):
 	next_d_slotid = [ res.id for res in (
-										  Time_slot.query.filter(and_(Time_slot.slot_date<=start_day+datetime.timedelta(days=period),
-										  Time_slot.slot_date>=start_day)).all())]
+										  Time_slot.query.filter(
+											  Time_slot.slot_date<=start_day+timedelta(days=period),
+											  Time_slot.slot_date>=start_day)).all()]
 	return next_d_slotid
 
+
+slotid2date = {}
+def load_slots():
+	global slotid2date
+	slots = Time_slot.query.all()
+	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
+	for slot in slots:
+		slotid2date[slot.id] = {"slot_date": slot.slot_date,
+								"seg_starttime": segid2time[slot.slot_seg_id]}
+	
 def slot2time(slot_id:int):
-	slot_date = Time_slot.query.filter(
-				Time_slot.id==slot_id).first().slot_date 
-
-	seg_id = Time_slot.query.filter(
-				Time_slot.id==slot_id).first().slot_seg_id 
-
-	seg_start_t = Time_segment.query.filter(
-				Time_segment.t_seg_id==seg_id).first().t_seg_starttime
-
-	return slot_date, seg_start_t	
+	
+	slot_date = slotid2date['slot_date']
+	seg_starttime = slotid2date['seg_starttime']
+	return slot_date, seg_starttime	
 
 
 id_name_map = None
@@ -63,5 +70,5 @@ def nurse_dept_appts(nurseID, period, start_date=datetime.date.today()):
 						filter(
 							Nurse.department_id==deptID,
 							Time_slot.slot_date>=start_date,
-							Time_slot.slot_date<=start_date+timedelta(days=period)).all()
+							Time_slot.slot_date<=start_date+timedelta(days=period))
 	return same_dept_appts
