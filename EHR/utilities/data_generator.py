@@ -10,13 +10,14 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup, NavigableString
 import datetime
-from sqlalchemy import func
+from sqlalchemy import func, or_
+
 
 
 N_RECORD = 100
 BLOOD_TYPE = ['A','B','O','AB']
 TIME_SLOT_START_TIME = '0001-01-01-09-00-00' # only "09-00-00" part matters
-TIME_SLOT_START_DATE = '2020-11-30'
+TIME_SLOT_START_DATE = '2020-11-20'
 
 def gen_hospital_data():
 
@@ -120,23 +121,23 @@ def gen_time_slot():
 	# datetime_format = date_format+'-'+time_format
 
 	# start_date = datetime.date.today()    
-	start_date = datetime.datetime.strptime(TIME_SLOT_START_DATE, date_format)
+	# start_date = datetime.datetime.strptime(TIME_SLOT_START_DATE, date_format)
+	start_date = datetime.date.today()
 	start_index = Time_slot.query.count()
 	n_tot_slot = Time_segment.query.count()
+	doctor_list = Doctor.query.filter(or_(Doctor.department_id==26,Doctor.department_id==1)).all()
 	for i in range(start_index, start_index+100):
 		# work-day decision below, not necessary, but leave it here just in case
 		# while not random_date or random_date.weekday() > 5:
 		#     random_date = start_date + timedelta(days=random.randint(1,7))
-		random_date = start_date + timedelta(days=random.randint(0,30))
-
-		dc = Doctor.query.order_by(func.random()).first()
+		random_date = start_date + timedelta(days=random.randint(0,14))
 		n_total = random.randint(0,2)
-		ts = Time_slot(id=i+1,
+		ts = Time_slot(
 					   slot_date=random_date,
 					   slot_seg_id=random.randint(1,n_tot_slot),
 					   n_total=n_total,
 					   n_booked=random.randint(0,n_total),
-					   doctor_id=dc.id)
+					   doctor_id=random.choice(doctor_list).id)
 		db.session.add(ts)
 	db.session.commit()
 
@@ -165,12 +166,12 @@ def gen_appt():
 			appt_made_time = appt_made_time + timedelta(days=random.randint(-14,14))
  
 		appt = Application( 
-						date = appt_tobe_date,
+						# date = appt_tobe_date,
 						app_timestamp = appt_made_time,
 						status = random.choice(status_list),
 						time_slot_id = random.choice(slotid_list),
-						doctor_id = random.choice(doctorid_list),
 						approver_id = random.choice(nurseid_list),
+					
 						patient_id = random.choice(patientid_list),
 						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"])
 		)
@@ -185,10 +186,6 @@ def practice_query():
 	print(seg_start_t)
 	print(type(seg_start_t))
 
-
-practice_query()
-
-
 def main():
 	# please do not change the following execution order
 	print("on it")
@@ -197,7 +194,7 @@ def main():
 	# gen_user_data()
 	# gen_time_seg()
 	# gen_time_slot()
-	# gen_appt()
+	gen_appt()
 
-# main()
+main()
 	

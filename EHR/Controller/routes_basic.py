@@ -210,7 +210,7 @@ def todayAppt():
 
 	return make_response(jsonify(
 				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
-
+	
 
 	# today_appt_list = Application.query.
 
@@ -367,7 +367,9 @@ def nurseGoViewAppt(appID):
 @login_required
 def nurseviewAppt():
 
-# 	mcid = request.form['mcID']
+	mcid = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mcid).first()
+
 
 # 	preExam: {
 # bodyTemperature: float/str,
@@ -383,9 +385,9 @@ def nurseviewAppt():
 # }
 
 	return make_response(
-		jsonify(None
-			# {"appID": appt_res.id,
-			# "date": slot_date.strftime("%Y-%m-%d"),
+		jsonify(
+			{"bodyTemperature": mc.body_temperatur,
+			"pulseRate": mc.heart_rate.strftime("%Y-%m-%d")}
 			# "time": seg_start_t.strftime("%H:%M"),
 			# "doctor": helper.id2name(appt_res.doctor_id),
 			# "patient": helper.id2name(appt_res.patient_id),
@@ -418,7 +420,6 @@ def nurseProcessApp():
 		appt.reject_reason = request.form['comments']
 	elif decision.lower() == 'approve':
 		appt.status = StatusEnum.approved
-	print(appt)
 
 	db.session.commit()
 
@@ -440,7 +441,7 @@ def nurseOnGoingAppt():
 		print(appt)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			on_going_appts[appt.id] = (appt, appt_date, appt_start_time)
-
+	
 	return make_response(
 		jsonify(
 			[{
@@ -463,7 +464,7 @@ def nurseRejectedApp():
 
 	slot_ids = helper.day2slotid(period=(app_end_date-app_start_date).days, start_day=app_start_date)
 	nurseID = current_user.get_id()
-	appts = helper.nurse_dept_appts(nurseID=nurseID,
+	appts = helper.nurse_dept_appts(nurseID=nurseID, 
 									period=app_end_date-app_start_date,
 									start_date=app_start_date)\
 										.filter(
@@ -473,11 +474,11 @@ def nurseRejectedApp():
 	# for test purpose
 	helper.load_slots()
 	helper.load_id2name_map()
-
+	
 	return make_response(
 		jsonify(
 			[{
-				"appID": app.id,
+				"appID": app.id, 
 				"date": helper.slot2time(app.time_slot_id)[0].strftime(helper.DATE_FORMAT),
 				"time": helper.slot2time(app.time_slot_id)[1].strftime(helper.TIME_FORMAT),
 				"doctor": helper.id2name(app.doctor_id),
