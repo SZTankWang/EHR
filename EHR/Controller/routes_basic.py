@@ -179,9 +179,9 @@ def searchHospital():
 
 @app.route('/goToHospital',methods=['GET'])
 def goToHospital():
-	hospitalID = request.args.get('hospitalID')
-	return "success"
-
+	# hospitalID = request.args.get('hospitalID')
+	# departments = Hospital.query.filter
+	pass
 '''
 医院列表页
 返回template, 医院科室信息
