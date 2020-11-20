@@ -205,6 +205,7 @@ class Medical_record(db.Model):
 	heart_rate = db.Column(db.Integer())
 	weight = db.Column(db.Float(1))
 	state = db.Column(db.Enum('conscious', 'coma'), default="conscious")
+	diagnosis = db.Column(db.Text())
 	#foreign key
 	patient_id = db.Column(db.String(100), \
 		db.ForeignKey('patient.id'), nullable=False)
