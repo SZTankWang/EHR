@@ -8,10 +8,12 @@
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
 	<link rel="stylesheet" type="text/css" href="/static/nurseHome.css">
 </head>
+
 <style>
 	.nav-link:hover{cursor: pointer;}
 	#overlay{position:absolute; top:0%; left:0%; width: 100vw; height:100vh; background-color: rgba(0,0,0,0.1); z-index: 2;}
 </style>
+
 <body>
 	<div id="overlay" class="">
 		<div class="w-100 d-flex justify-content-center align-items-center">
@@ -71,6 +73,7 @@
 			</nav>
 		</div>
 
+		<!-- data table -->
 		<div class='table' id="table-container" style="padding-top:0.5em;">
 			<table id="main-table" style="width:100%;">
 			  <thead>
@@ -97,7 +100,7 @@
 			</table>
 		</div>
 
-		<!-- modal1 -->
+		<!-- application modal -->
 		<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
 		  <div class="modal-dialog modal-dialog-scrollable modal-lg">
 		    <div class="modal-content">
@@ -110,26 +113,22 @@
 		      <div class="modal-body">
 						<div class="container-fluid">
 					    <div class="row">
-					      <div class="col-md-4"><span><b>Application ID: </b></span><span id="appID1"></span></div>
-					      <div class="col-md-4"><span><b>Date: </b></span><span id="date1"></span></div>
-								<div class="col-md-4"><span><b>Time: </b></span><span id="time1"></span></div>
+					      <div class="col-md-4"><span><b>Application ID: </b></span><span id="appID"></span></div>
+					      <div class="col-md-4"><span><b>Date: </b></span><span id="date"></span></div>
+								<div class="col-md-4"><span><b>Time: </b></span><span id="time"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor1"></span></div>
-					      <div class="col-md-4"><span><b>Patient: </b></span><span id="patient1"></span></div>
+					      <div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor"></span></div>
+					      <div class="col-md-4"><span><b>Patient: </b></span><span id="patient"></span></div>
 					    </div>
 					    <div class="row">
-					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms1"></span></div>
+					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms"></span></div>
 					    </div>
 							<div class="row">
-					      <div class="col"><span><b>Comments: </b></span><span id="comments1"></span></div>
+					      <div class="col"><span><b>Comments: </b></span><span id="comments"></span></div>
 					    </div>
 					  </div>
 		      </div>
-		      <!-- <div class="modal-footer">
-		        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="approveApp()">Approve</button>
-		        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="rejectApp()">Reject</button>
-		      </div> -->
 		    </div>
 		  </div>
 		</div>
@@ -141,7 +140,8 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/static/js/def/classes.js"></script>
+	<script type="text/javascript" src="/static/js/def/util.js"></script>
 	<script type="text/javascript" src="/static/js/nurseAllAppt.js"></script>
-	<script type="text/javascript" src="/static/index.js"></script>
 </body>
 </html>

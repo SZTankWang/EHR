@@ -246,8 +246,9 @@ routes: nursePendingApp, nurseTodayAppt
 @login_required
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = helper.day2slotid(period=14)
-	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid)).all()
+	next7d_slotid = helper.day2slotid(period=30)
+	pending_app = Application.query.filter(Application.time_slot_id.in_(next7d_slotid),
+											Application.status==StatusEnum.pending).all()
 
 	helper.load_id2name_map()
 	def response_generator(i):
@@ -381,6 +382,7 @@ def nurseProcessApp():
 		appt.reject_reason = request.form['comments']
 	elif decision.lower() == 'approve':
 		appt.status = StatusEnum.approved
+	print(appt)
 
 	db.session.commit()
 
@@ -402,7 +404,7 @@ def nurseOnGoingAppt():
 		print(appt)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			on_going_appts[appt.id] = (appt, appt_date, appt_start_time)
-	
+
 	return make_response(
 		jsonify(
 			[{
@@ -412,5 +414,3 @@ def nurseOnGoingAppt():
 				"patient": helper.id2name(on_going_appts[apptid][0].patient_id),
 				"symptoms": on_going_appts[apptid][0].symptoms} for apptid in on_going_appts.keys()]
 	))
-
-

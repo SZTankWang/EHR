@@ -1,3 +1,8 @@
+/**
+* @author Jingyi Zhu
+* @html nurseViewAppt.html
+*/
+
 $(document).ready(function() {
     $("select").empty();
     // init form

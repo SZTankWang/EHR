@@ -8,10 +8,12 @@
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
 	<link rel="stylesheet" type="text/css" href="/static/nurseHome.css">
 </head>
+
 <style>
 	.nav-link:hover{cursor: pointer;}
 	#overlay{position:absolute; top:0%; left:0%; width: 100vw; height:100vh; background-color: rgba(0,0,0,0.1); z-index: 2;}
 </style>
+
 <body>
 	<div id="overlay" class="">
 		<div class="w-100 d-flex justify-content-center align-items-center">
@@ -51,6 +53,7 @@
 	</div>
 
 	<div id="content-wrapper" style="padding:1em;">
+
 		<div id="content-header-wrapper">
 			<nav class="nav nav-tabs">
 				<div class="nav-item">
@@ -64,6 +67,8 @@
 				</div>
 			</nav>
 		</div>
+
+		<!-- data table -->
 		<div class='table' id="table-container" style="padding-top:0.5em;">
 			<table id="main-table" style="width:100%;">
 			  <thead>
@@ -90,7 +95,7 @@
 			</table>
 		</div>
 
-		<!-- modal1 -->
+		<!-- application modal -->
 		<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
 		  <div class="modal-dialog modal-dialog-scrollable modal-lg">
 		    <div class="modal-content">
@@ -125,14 +130,9 @@
 			        <input type="submit" class="btn btn-secondary processAppSubmit" name="action" value="Reject" />
 		        </form>
 		      </div>
-		      <!-- <div class="modal-footer">
-		        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="approveApp()">Approve</button>
-		        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="rejectApp()">Reject</button>
-		      </div> -->
 		    </div>
 		  </div>
 		</div>
-
 
 	</div>
 
@@ -141,7 +141,8 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/static/js/def/classes.js"></script>
+	<script type="text/javascript" src="/static/js/def/util.js"></script>
 	<script type="text/javascript" src="/static/js/nurseHome.js"></script>
-	<script type="text/javascript" src="/static/index.js"></script>
 </body>
 </html>

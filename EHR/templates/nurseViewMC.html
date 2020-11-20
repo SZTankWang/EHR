@@ -50,20 +50,62 @@
 		</nav>
 	</div>
 
-	<div id="content-wrapper" style="padding:1em;">
+	<div class="container" id="container-wrapper" style="padding:1em;">
+
 		<div id="content-header-wrapper">
-			<nav class="nav nav-tabs">
-				<div class="nav-item">
-					<div class="content-header nav-table nav-link active disabled" id="pendingApp">Pending applications</div>
+			<nav class="nav nav-tabs row">
+				<div class="col-4">
+					<a class="btn btn-primary" id="goBack" onclick="history.back()">Back</a>
 				</div>
-				<div class="nav-item">
-					<div class="content-header nav-table nav-link" id="todayAppt">Today's appointments</div>
-				</div>
-				<div class="ml-auto">
-					<a class="btn btn-primary" id="goCreateAppt" href="/nurseGoCreateAppt">Create New Appointment</a>
+				<div class="col">
+					<h3>Medical Records</h3>
+					<h3>Patient ID {{patientID}}</h3>
 				</div>
 			</nav>
 		</div>
+
+		<div id="content-wrapper" style="padding:3em;">
+			<form id="createAppt">
+				<div class="form-group row">
+					<label for="patientID" class="col-2 col-form-label">Patient's National ID</label>
+					<div class="col-3">
+						<input type="text" class="form-control" id="patientID" name="patientID" required/>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="deptID" class="col-2 col-form-label">Department</label>
+					<div class="col-3">
+						<select class="form-control" id="department" name="deptID" required/>
+				      <option value="1"></option>
+				    </select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="doctorID" class="col-2 col-form-label">Doctor</label>
+					<div class="col-3">
+						<select class="form-control" id="doctor" name="doctorID" required disabled/>
+				      <option value="1"></option>
+				    </select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="slotID" class="col-2 col-form-label">Time Slot</label>
+					<div class="col-3">
+						<select class="form-control" id="slot" name="slotID" required disabled/>
+				      <option value="1"></option>
+				    </select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="symptoms" class="form-label">Symptoms</label>
+					<div>
+						<textarea class="form-control" id="symptoms" name="symptoms" required/></textarea>
+					</div>
+				</div>
+				<button type="submit" class="btn btn-primary">Create</button>
+			</form>
+		</div>
+
 		<div class='table' id="table-container" style="padding-top:0.5em;">
 			<table id="main-table" style="width:100%;">
 			  <thead>
@@ -72,7 +114,6 @@
 						<th scope="col">Date</th>
 						<th scope="col">Time</th>
 						<th scope="col">Doctor</th>
-						<th scope="col">Patient</th>
 						<th scope="col">Symptoms</th>
 						<th scope="col"></th>
 			    </tr>
@@ -83,57 +124,11 @@
 					<th scope="col">Date</th>
 					<th scope="col">Time</th>
 					<th scope="col">Doctor</th>
-					<th scope="col">Patient</th>
 					<th scope="col">Symptoms</th>
 					<th scope="col"></th>
 				</tfoot>
 			</table>
 		</div>
-
-		<!-- modal1 -->
-		<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
-		  <div class="modal-dialog modal-dialog-scrollable modal-lg">
-		    <div class="modal-content">
-		      <div class="modal-header">
-		        <h5 class="modal-title" id="applicationLabel">Appointment Application</h5>
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		          <span aria-hidden="true">&times;</span>
-		        </button>
-		      </div>
-		      <div class="modal-body">
-						<div class="container-fluid">
-					    <div class="row">
-					      <div class="col-md-4"><span><b>Application ID: </b></span><span id="appID"></span></div>
-					      <div class="col-md-4"><span><b>Date: </b></span><span id="date"></span></div>
-								<div class="col-md-4"><span><b>Time: </b></span><span id="time"></span></div>
-					    </div>
-					    <div class="row">
-					      <div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor"></span></div>
-					      <div class="col-md-4"><span><b>Patient: </b></span><span id="patient"></span></div>
-					    </div>
-					    <div class="row">
-					      <div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms"></span></div>
-					    </div>
-					  </div>
-						<hr>
-						<form id="processApp">
-		          <div class="form-group">
-		            <label for="comments" class="col-form-label">Comments (required if you reject the application)</label>
-		            <textarea class="form-control" id="comments" name="comments"></textarea>
-		          </div>
-							<input type="submit" class="btn btn-primary processAppSubmit" name="action" value="Approve" />
-			        <input type="submit" class="btn btn-secondary processAppSubmit" name="action" value="Reject" />
-		        </form>
-		      </div>
-		      <!-- <div class="modal-footer">
-		        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="approveApp()">Approve</button>
-		        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="rejectApp()">Reject</button>
-		      </div> -->
-		    </div>
-		  </div>
-		</div>
-
-
 	</div>
 
 
