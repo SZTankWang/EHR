@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @html nurseViewAppt.html
+* @page nurseViewAppt.html
 */
 
 $(document).ready(function() {
@@ -23,7 +23,7 @@ $(document).ready(function() {
         $("#labReports").append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments));
       };
     };
-    sendRequest("ViewAppt", "POST", data, fillData);
+    sendRequest("nurseViewAppt", "POST", data, fillData);
 });
 
 
@@ -39,7 +39,7 @@ $(".lr-btn").on("click", function(event){
         button.attr('href', URL.createObjectURL(res.labReport));
       }
     };
-    sendRequest("PreviewLR", "POST", data, updateHref);
+    sendRequest("nursePreviewLR", "POST", data, updateHref);
     // $.ajax({
     //   url: "http://localhost:5000/nursePreviewLR",
     //   type: 'POST',
@@ -75,7 +75,7 @@ $("#editPreExam").on("click", function(event){
       goToPage("nurseViewAppt/" + $("#appID").text());
     }
   };
-  sendRequest("EditPreExam", "POST", data, refresh);
+  sendRequest("nurseEditPreExam", "POST", data, refresh);
 });
 
 $("form#labReportForm").on("submit", function(event){

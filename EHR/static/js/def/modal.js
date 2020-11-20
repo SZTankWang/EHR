@@ -1,5 +1,5 @@
 /**
-* @author: Jingyi
+* @author Jingyi Zhu
 * @desc HTML modal wrappers
 * @method setApp - set application data
 * @method setCommets - set comments
@@ -7,6 +7,11 @@
 * @method ...
 */
 
+/**
+* @desc modal for pending application
+* @attribute basic info: appID, date, time, doctor, patient, symptoms
+* @method setApp - set basic info
+*/
 class AppModal {
   constructor(){
     this.appID = $("#appID");
@@ -27,6 +32,11 @@ class AppModal {
   }
 }
 
+/**
+* @desc modal for application
+* @attribute comments
+* @method setComments
+*/
 class AppFullModal extends AppModal{
   constructor(){
     super();
@@ -38,6 +48,13 @@ class AppFullModal extends AppModal{
   }
 }
 
+/**
+* @desc modal for application
+* @attribute medical record: mcID,
+* preExam(bodyTemperature, pulseRate, bloodPressure),
+* diagnosis, precriptions, labReports
+* @method setMCID, setPreExam, setDiagnosis, setPrescriptions, setLabReports
+*/
 class MCModal extends AppFullModal{
   constructor(){
     super();

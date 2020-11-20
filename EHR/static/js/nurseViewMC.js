@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @html nurseViewMC.html
+* @page nurseViewMC.html
 */
 
 /**

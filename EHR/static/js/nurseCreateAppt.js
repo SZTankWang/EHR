@@ -1,75 +1,86 @@
 /**
 * @author Jingyi Zhu
-* @html nurseCreateAppt.html
+* @page nurseCreateAppt.html
 */
 
+//-------------------------document loaded---------------------------
 $(document).ready(function() {
-    $("#doctor").addClass("disabled");
-    $("#slot").addClass("disabled");
+    $("#department").addAttr("disabled");
+    $("#doctor").addAttr("disabled");
+    $("#slot").addAttr("disabled");
     $("select").empty();
     $("#ret span").removeClass("visible");
     $("#ret span").addClass("invisible");
-    $.ajax({
-      url: "http://localhost:5000/getDepartmentsForNurse",
-      type: 'GET',
-      success: function(res){
+    // display department options for the nurse's hospital
+    getAndDisplay("hospital");
+});
+
+// ---------------------capture user action--------------------------
+// display doctor options for the department
+$("#department").on("change", () => getAndDisplay("dept"));
+// display time slot options for the doctor
+$("#doctor").on("change", () => getAndDisplay("doctor"));
+// create appointment
+$("#createAppt").on("submit", createAppt);
+
+// --------------------------event handlers----------------------------
+/**
+* @desc request a list of options and display them in <select>
+* @param {string} target - hospital/dept/doctor
+*/
+function getAndDisplay(target){
+  var route, type, data, display;
+  if (target == "hospital") {
+    route = "nurseGetDepartmentsForNurse";
+    type = "GET";
+    data = null;
+    display = function(res){
+      for (let i=0; i < res.length; i++) {
+        $("#department").append(new Option(res[i].deptName, res[i].deptID));
+      }
+      $("#department").removeAttr("disabled");
+    };
+  } else {
+    type = "POST";
+    var id = $(this).children(":selected").value();
+    data = {target + "ID": id};
+    if (target == "dept") {
+      route = "nurseGetDoctorsForDepartment";
+      display = function(res){
         for (let i=0; i < res.length; i++) {
-          $("#department").append(new Option(res[i].deptName, res[i].deptID))
+          $("#doctor").append(new Option(res[i].doctorName, res[i].doctorID));
         }
-      }
-    });
-});
-
-//--------------------form--------------------
-$("#department").on("change", function(){
-  var deptID = $(this).children(":selected").value();
-  $.ajax({
-    url: "http://localhost:5000/nurseGetDoctorsForDepartment",
-    type: 'POST',
-    data: {'deptID': deptID},
-    success: function(res){
-      // $(this).empty();
-      for (let i=0; i < res.length; i++) {
-        $(this).append(new Option(res[i].doctorName, res[i].doctorID))
-      }
-      $("#doctor").removeClass("disabled");
+        $("#doctor").removeAttr("disabled");
+      };
+    } else {
+      route = "nurseGetSlotsForDoctor";
+      display = function(res){
+        for (let i=0; i < res.length; i++) {
+          $("#slot").append(new Option(res[i].slotDateTime, res[i].slotID))
+        }
+        $("#slot").removeAttr("disabled");
+      };
     }
-  });
-});
+  }
+  sendRequest(route, type, data, display);
+}
 
-$("#doctor").on("change", function(){
-  var doctorID = $(this).children(":selected").data();
-  $.ajax({
-    url: "http://localhost:5000/nurseGetSlotsForDoctor",
-    type: 'POST',
-    data: {'doctorID': doctorID},
-    success: function(res){
-      // $(this).empty();
-      for (let i=0; i < res.length; i++) {
-        $(this).append(new Option(res[i].slotDateTime, res[i].slotID))
-      }
-      $("#slot").removeClass("disabled");
-    }
-  });
-});
-
-$("#createAppt").on("submit", function(event){
+/**
+* @desc request a list of options and display them in <select>
+* @param {string} target - hospital/dept/doctor
+*/
+function createAppt(event){
   event.preventDefault();
   var data = $(this).serializeArray();
-  console.log(data);
-  $.ajax({
-    url: "http://localhost:5000/nurseCreateAppt",
-    type: 'POST',
-    data: data,
-    success: function(res){
-      if (res.ret == "0") {
-        $("#ret span").text("Success");
-      } else {
-        $("#ret span").text("Error: failed to create the appointment");
-      }
-      $("#ret span").removeClass("invisible");
-      $("#ret span").addClass("visible");
-      setTimeout("window.location.replace('http://localhost:5000/nurseHome')", 300);
+  var afterCreateAppt = function(res){
+    if (res.ret == "0") {
+      $("#ret span").text("Success");
+    } else {
+      $("#ret span").text("Error: failed to create the appointment");
     }
-  });
-});
+    $("#ret span").removeClass("invisible");
+    $("#ret span").addClass("visible");
+    goToPage("nurseHome", 300);
+  };
+  sendRequest("nurseCreateAppt", "POST", data, afterCreateAppt);
+}

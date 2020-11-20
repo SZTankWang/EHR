@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @html nurseAllAppt.js
+* @page nurseAllAppt.js
 */
 
 /**
@@ -19,7 +19,7 @@ $(document).ready(function() {
     myTable.initTable(res, "appointment");
     $("#overlay").addClass("d-none");
   };
-  sendRequest("FutureAppt", "GET", null, initTable);
+  sendRequest("nurseFutureAppt", "GET", null, initTable);
 });
 
 // ---------------------capture user action--------------------------
@@ -28,21 +28,21 @@ $('#main-table tbody').on( 'click', 'button', buttonAction);
 
 // ----------switch table content-------------
 // view ongoing applications
-$("#onGoingAppt").on('click', () => goUpdateTable("OnGoingAppt"));
+$("#onGoingAppt").on('click', () => goUpdateTable("nursenGoingAppt"));
 
 // view future appointments
-$("#futureAppt").on('click', () => goUpdateTable("FutureAppt"));
+$("#futureAppt").on('click', () => goUpdateTable("nurseFutureAppt"));
 
 // view past appointments
 $("#pastAppt").on('click', function(){
   var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
-  goUpdateTable("PastAppt", dateRange);
+  goUpdateTable("nursePastAppt", dateRange);
 });
 
 // view applications rejected by the loggedin nurse
 $("#rejectedApp").on('click', function(){
   var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
-  goUpdateTable("RejectedApp", dateRange);
+  goUpdateTable("nurseRejectedApp", dateRange);
 });
 
 
@@ -58,7 +58,7 @@ function buttonAction(event) {
     myModal.setApp(data);
     var reqData = {"appID": data['appID']};
     var setComments = (res) => {myModal.setComments(res.comments)};
-    sendRequest("GetComments", "POST", reqData, setComments);
+    sendRequest("nurseGetComments", "POST", reqData, setComments);
   } else {
     event.preventDefault();
     var appID = data['appID'];
@@ -73,7 +73,7 @@ function buttonAction(event) {
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  var btnTarget = (route == "RejectedApp") ? '#application' : '#appointment';
+  var btnTarget = (route == "nurseRejectedApp") ? '#application' : '#appointment';
   $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res, btnTarget);
