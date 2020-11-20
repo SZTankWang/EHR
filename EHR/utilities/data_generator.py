@@ -165,7 +165,7 @@ def gen_appt():
 			appt_made_time = appt_made_time + timedelta(days=random.randint(-14,14))
 		status_enum = random.choice(list(StatusEnum))
 		tslotid = random.choice(slotid_list)
-		doctorid = Time_slot.query.filter(Time_slot.id==tslotid).first.doctor_id
+		doctorid = Time_slot.query.filter(Time_slot.id==tslotid).first().doctor_id
 		appt = Application( 
 						doctor_id = doctorid,
 						app_timestamp = appt_made_time,
@@ -195,7 +195,7 @@ def main():
 	# gen_user_data()
 	# gen_time_seg()
 	# gen_time_slot()
-	# gen_appt()
+	gen_appt()
 
 main()
 	
