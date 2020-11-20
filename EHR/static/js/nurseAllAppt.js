@@ -19,7 +19,7 @@ $(document).ready(function() {
     myTable.initTable(res, "appointment");
     $("#overlay").addClass("d-none");
   };
-  sendRequest("nurseFutureAppt", "GET", null, initTable);
+  sendRequest("nurseOnGoingAppt", "GET", null, initTable);
 });
 
 // ---------------------capture user action--------------------------

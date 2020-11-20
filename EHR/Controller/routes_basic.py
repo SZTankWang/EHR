@@ -408,7 +408,7 @@ def nurseOnGoingAppt():
 
 	# testing data
 	# nurse_id = '17711783'
-	# nowtime = datetime.datetime.strptime("2020-11-20 13:10:00", "%Y-%m-%d %H:%M:%S")
+	# nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
 
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.nurse_dept_appts(nurseID=nurse_id, period=0).\
@@ -419,7 +419,7 @@ def nurseOnGoingAppt():
 	# filter3: now() in timeslot
 	now_approved_appts = []
 	for appt in today_approved_appts:
-		print(appt)
+		# print(appt)
 		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
