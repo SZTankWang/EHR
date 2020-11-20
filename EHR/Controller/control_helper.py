@@ -74,3 +74,7 @@ def nurse_dept_appts(nurseID, period, start_date=datetime.date.today()):
 							Time_slot.slot_date>=start_date,
 							Time_slot.slot_date<=start_date+timedelta(days=period))
 	return same_dept_appts
+
+def t_slotid2date(slot_id):
+	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
+	return slot_date
