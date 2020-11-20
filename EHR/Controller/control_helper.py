@@ -36,14 +36,16 @@ def load_slots():
 	global slotid2date
 	slots = Time_slot.query.all()
 	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
+
 	for slot in slots:
 		slotid2date[slot.id] = {"slot_date": slot.slot_date,
 								"seg_starttime": segid2time[slot.slot_seg_id]}
+	print("slotid2date:", slotid2date)
 
 def slot2time(slot_id:int):
-
-	slot_date = slotid2date['slot_date']
-	seg_starttime = slotid2date['seg_starttime']
+	load_slots()
+	slot_date = slotid2date[slot_id]['slot_date']
+	seg_starttime = slotid2date[slot_id]['seg_starttime']
 	return slot_date, seg_starttime
 
 
