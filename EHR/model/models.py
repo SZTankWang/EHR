@@ -178,6 +178,7 @@ class Application(db.Model):
 	status = db.Column(db.Enum(StatusEnum), nullable=False)
 	reject_reason = db.Column(db.Text())
 	date = db.Column(db.Date(), nullable=False)
+	time = db.Column(db.Time(), nullable=False)
 
 	#foreign key
 	time_slot_id = db.Column(db.Integer(), \
@@ -194,7 +195,8 @@ class Application(db.Model):
 	def __repr__(self):
 		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, \
 			status: {self.status}, time_slot_id: {self.time_slot_id}, approver_id: {self.approver_id}, \
-				doctor_id: {self.doctor_id}, patient_id: {self.patient_id} >'
+				doctor_id: {self.doctor_id}, patient_id: {self.patient_id}, date: {self.date}, \
+				time: {self.time} >'
 
 class Medical_record(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
