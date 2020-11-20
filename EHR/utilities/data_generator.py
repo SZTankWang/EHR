@@ -174,7 +174,8 @@ def gen_appt():
 						approver_id = random.choice(nurseid_list) if status_enum == StatusEnum.approved else None,
 						patient_id = random.choice(patientid_list),
 						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"]),
-						date = helper.t_slotid2date(tslotid)		
+						date = helper.t_slotid2date(tslotid),
+						time = helper.t_slot2time(tslotid)		
 		)
 		db.session.add(appt)
 	db.session.commit()
@@ -190,11 +191,11 @@ def practice_query():
 def main():
 	# please do not change the following execution order
 	print("on it")
-	# gen_hospital_data()
-	# gen_dept_data()
-	# gen_user_data()
-	# gen_time_seg()
-	# gen_time_slot()
+	gen_hospital_data()
+	gen_dept_data()
+	gen_user_data()
+	gen_time_seg()
+	gen_time_slot()
 	gen_appt()
 
 main()
