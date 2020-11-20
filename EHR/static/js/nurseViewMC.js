@@ -1,25 +1,24 @@
 /**
 * @author Jingyi Zhu
 * @page nurseViewMC.html
+* @import util.js, apptAndMC.js
 */
 
 /**
-* @global instance of MyTable and MyModal
+* @global instance of MCModal
 */
-var myTable;
-var myModal;
+var mcModal
 
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
   // initialize instance
   myModal = new MCModal();
-  myTable = new MCTable();
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res);
     $("#overlay").addClass("d-none");
   };
-  sendRequest("ViewMC", "GET", null, initTable);
+  sendRequest("nurseViewMC", "GET", null, initTable);
 });
 
 // ---------------------capture user action--------------------------
@@ -34,11 +33,28 @@ $('#main-table tbody').on( 'click', 'button', buttonAction);
 function buttonAction(event) {
   var data = myTable.table.row( $(this).parents('tr') ).data();
   data['patient'] = $("#patientName").text();
+  const mcID = data['mcID'];
+  myModal.setMCID(mcID);
   myModal.setApp(data);
-  myModal.setMCID(data['mcID']);
-  var reqData = {"appID": data['appID']};
-  var setComments = (res) => {myModal.setComments(res.comments)};
-  sendRequest("GetComments", "POST", reqData, setComments);
+  // request and fill in comments
+  var appData = {"appID": data['appID']};
+  var fillAppData = (res) => {
+    myModal.setAppStatus(res.appStatus);
+    myModal.setComments(res.comments);
+  };
+  sendRequest("nurseGetComments", "POST", appData, fillAppData);
+  // request and fill in medical record data
+  const mcData = {"mcID": mcID};
+  var fillMCData = (res) => {
+    mcModal.setBodyTemperature(res.preExam.bodyTemperature);
+    mcModal.setPulseRate(res.preExam.pulseRate);
+    mcModal.setBloodPressure(res.preExam.bloodPressure);
+    mcModal.setDiagnosis(res.diagnosis);
+    mcModal.setPrescriptions(res.prescripitions);
+    mcModal.setLabReportTypes(res.labReportTypes);
+    mcModal.setLabReports(res.labReports);
+  };
+  sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
 }
 
 /**

@@ -1,121 +1,121 @@
 /**
 * @author Jingyi Zhu
 * @page nurseViewAppt.html
+* @import util.js, apptAndMC.js
 */
 
+/**
+* @global instance of MCPage
+*/
+var mcPage;
+
+//-------------------------document loaded---------------------------
 $(document).ready(function() {
     $("select").empty();
-    // init form
-    const mcID = $("#mcID").text();
-    const data = {"mcID": mcID};
-    var fillData = (res) => {
-      $("#bodyTemperature").text(res.preExam.bodyTemperature);
-      $("#pulseRate").text(res.preExam.pulseRate);
-      $("#bloodPressure").text(res.preExam.bloodPressure);
-      $("#diagnosis").text(res.diagnosis);
-      for (let i=0; i < res.prescripitions.length; i++) {
-        $("#prescriptions").append(newPrescriptionCard(i+1, prescripitions[i].id + ": " + prescripitions[i].medicine, prescripitions[i].dose, prescripitions[i].comments));
-      };
-      for (let i=0; i < res.labReportTypes.length; i++) {
-        $(this).append(new Option(res.labReportTypes[i].typeName, res.labReportTypes[i].typeID));
-      };
-      for (let i=0; i < res.labReports.length; i++){
-        $("#labReports").append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments));
-      };
+    // initialize instance
+    mcPage = new MCPage();
+    // request and fill in comments
+    const appID = mcPage.appID.text();
+    const appData = {"appID": appID};
+    var setComments = (res) => {
+      mcPage.setComments(res.comments);
     };
-    sendRequest("nurseViewAppt", "POST", data, fillData);
+    sendRequest("nurseGetComments", "POST", appData, setComments);
+    // request and fill in medical record data
+    const mcID = mcPage.mcID.text();
+    const mcData = {"mcID": mcID};
+    var fillMCData = (res) => {
+      mcPage.setBodyTemperature(res.preExam.bodyTemperature);
+      mcPage.setPulseRate(res.preExam.pulseRate);
+      mcPage.setBloodPressure(res.preExam.bloodPressure);
+      mcPage.setDiagnosis(res.diagnosis);
+      mcPage.setPrescriptions(res.prescripitions);
+      mcPage.setLabReportTypes(res.labReportTypes);
+      mcPage.setLabReports(res.labReports);
+    };
+    sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
 });
 
 
-//--------------get the lab report-----------------
-$(".lr-btn").on("click", function(event){
-  const targetCard = $(this).attr("data-target");
-  const button = $(targetCard+" a");
-  if (button.attr('href') == ""){
-    const lrID = button.attr('id').slice(6);
-    const data = {"lrID": lrID};
-    var updateHref = (res) => {
-      if (res.labReport) {
-        button.attr('href', URL.createObjectURL(res.labReport));
-      }
-    };
-    sendRequest("nursePreviewLR", "POST", data, updateHref);
-    // $.ajax({
-    //   url: "http://localhost:5000/nursePreviewLR",
-    //   type: 'POST',
-    //   data: {"lrID": lrID},
-    //   success: function(res){
-    //     if (res.labReport) {
-    //       button.attr('href', URL.createObjectURL(res.labReport));
-    //     }
-    //   },
-    //   error: function(err) {
-    //     console.log(err);
-    //   }
-    // });
-  }
-});
+// ---------------------capture user action--------------------------
+// edit preExam data
+$("#editPreExam").on("click", editPreExam);
+// upload a lab report
+$("#labReportForm").on("submit", uploadLabReport);
 
-$(".preview-btn").on("click", function(event){
-  if ($(this).attr('href') == "") {
-    alert("Lab report empty");
-    event.preventDefault();
-  }
-})
 
-//--------------------forms--------------------
-$("#editPreExam").on("click", function(event){
+// --------------------------event handlers----------------------------
+/**
+* @desc submit preExam edits
+* @param {event} event - click
+* @this event target element - edit button
+*/
+function editPreExam(event){
   event.preventDefault();
-  var mcID = $("#mcID").text();
+  var mcID = mcPage.mcID.text();
   var data = jsonify($(this).parent().serializeArray());
-  data.appID = mcID;
+  data.mcID = mcID;
 
-  var refresh = (res) => {
-    if (res.ret == "0") {
-      goToPage("nurseViewAppt/" + $("#appID").text());
-    }
-  };
+  var refresh = (res) => {refreshOnSuccess(res)};
   sendRequest("nurseEditPreExam", "POST", data, refresh);
-});
+}
 
-$("form#labReportForm").on("submit", function(event){
+/**
+* @desc upload a lab report
+* @param {event} event - submit
+* @this event target element - upload button
+*/
+function uploadLabReport(event){
   event.preventDefault();
-  var mcID = $("#mcID").text();
+  var mcID = mcPage.mcID.text();
   var data = new FormData($("#labReportForm")[0]);
   data.append("mcID", mcID);
-  var refresh = (res) => {
-    if (res.ret == "0") {
-      goToPage("nurseViewAppt/" + $("#appID").text(), 0)
-    }
-  };
+
+  var refresh = (res) => {refreshOnSuccess(res)};
   sendFileRequest("UploadLabReport", "POST", data, refresh);
-
-  // $.ajax({
-  //   url: "http://localhost:5000/nurseUploadLabReport",
-  //   type: 'POST',
-  //   data: data,
-  //   success: function(res){
-  //     console.log(res);
-  //     if (res.ret == "0") {
-  //       window.location.replace("http://localhost:5000/nurseViewAppt/" + $("#appID").text());
-  //     }
-  //   },
-  //   error: function(err) {
-  //     console.log(err);
-  //   },
-  //   cache: false,
-  //   processData: false,
-  //   contentType: false
-  // })
-});
-
-//------------card def-------------
-function newPrescriptionCard(index, idAndMedicine, dose, comments){
-  var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#pre" + index + "' aria-expanded='true' aria-controls='pre" + index + "'>" + idAndMedicine + "</button> </h5> <div id='pre" + index + "' class='collapse' aria-labelledby='pre" + index + "' data-parent='#prescriptions'> <div class='card-body'>" + dose + "</div> <div class='card-body'>" + comments + "</div> </div> </div>";
-  return card
 }
 
-function newLabReportCard(index, type, id, comments){
-  var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='lr-btn btn btn-link' data-toggle='collapse' data-target='#lab" + index + "' aria-expanded='true' aria-controls='lab" + index + "'>" + index + ". " + type + "</button> </h5> <div id='lab" + index + "' class='collapse' aria-labelledby='lab" + index + "' data-parent='#labReports'> <hr> <div class='card-body'><span>Lab report id: " + id + " </span><a id='preview" + id + "' class='preview-btn btn btn-sm btn-outline-primary' href='' target='_blank'>preview</a> </div> <div class='card-body'>" + comments + "</div> </div> </div>";
-  return card
+// send upload lab report request
+function sendFileRequest(route, type, data, successHandler){
+  $.ajax({
+    url: "http://localhost:5000/nurse" + route,
+    type: type,
+    data: data,
+    success: (res) => {
+      successHandler(res);
+    },
+    error: (err) => {
+      alert("request error");
+      console.log(err);
+    },
+    cache: false,
+    processData: false,
+    contentType: false
+  })
 }
+
+// refresh page if submission is successful
+function refreshOnSuccess(res){
+  if (res.ret == "0") {
+    goToPage("nurseViewAppt/" + mcPage.appID.text(), 0)
+  }
+}
+
+// "form#labReportForm"
+// $.ajax({
+//   url: "http://localhost:5000/nurseUploadLabReport",
+//   type: 'POST',
+//   data: data,
+//   success: function(res){
+//     console.log(res);
+//     if (res.ret == "0") {
+//       window.location.replace("http://localhost:5000/nurseViewAppt/" + $("#appID").text());
+//     }
+//   },
+//   error: function(err) {
+//     console.log(err);
+//   },
+//   cache: false,
+//   processData: false,
+//   contentType: false
+// })

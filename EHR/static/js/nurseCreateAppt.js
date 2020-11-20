@@ -1,6 +1,7 @@
 /**
 * @author Jingyi Zhu
 * @page nurseCreateAppt.html
+* @import util.js
 */
 
 //-------------------------document loaded---------------------------
