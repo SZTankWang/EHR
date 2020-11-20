@@ -271,21 +271,19 @@ def nurseTodayAppt():
 	# nurseID = "44116022"    # a nurseID that returns something,
 	# 						for testing purpose, set the 'period' to 20
 	# department ID of current nurse
-	today_depts_appts = helper.nurse_dept_appts(nurseID, period=100).all()
+	today_depts_appts = helper.nurse_dept_appts(nurseID, period=0).all()
 
 	helper.load_id2name_map()
-	def response_generator(i):
-		slot_id = today_depts_appts[i].time_slot_id
-		slot_date, seg_start_t = helper.slot2time(slot_id)
-		return {"appID": today_depts_appts[i].id,
-			"date": slot_date.strftime("%Y-%m-%d"),
-			"time": seg_start_t.strftime("%H:%M"),
-			"doctor": helper.id2name(today_depts_appts[i].doctor_id),
-			"patient": helper.id2name(today_depts_appts[i].patient_id),
-			"symptoms": today_depts_appts[i].symptoms}
+	def response_generator(app):
+		return {"appID": app.id,
+			"date": app.date.strftime(helper.DATE_FORMAT),
+			"time": app.time.strftime(helper.TIME_FORMAT),
+			"doctor": helper.id2name(app.doctor_id),
+			"patient": helper.id2name(app.patient_id),
+			"symptoms": app.symptoms}
 
 	return make_response(jsonify(
-				[response_generator(i) for i in range(len(today_depts_appts)) ]), 200)
+				[response_generator(app) for app in today_depts_appts ]), 200)
 
 @app.route('/nurseFutureAppt', methods=['GET'])
 @login_required
@@ -296,18 +294,15 @@ def nurseFutureAppt():
 	future_7d_appts = helper.nurse_dept_appts(nurse_id, period=7).all()
 
 	helper.load_id2name_map()
-	helper.load_slots()
-	def response_generator(i):
-		slot_id = future_7d_appts[i].time_slot_id
-		slot_date, seg_start_t = helper.slot2time(slot_id)
-		return {"appID": future_7d_appts[i].id,
-			"date": slot_date.strftime("%Y-%m-%dR"),
-			"time": seg_start_t.strftime("%H:%M"),
-			"doctor": helper.id2name(future_7d_appts[i].doctor_id),
-			"patient": helper.id2name(future_7d_appts[i].patient_id),
-			"symptoms": future_7d_appts[i].symptoms}
+	def response_generator(app):
+		return {"appID": app.id,
+			"date": app.date.strftime(helper.DATE_FORMAT),
+			"time": app.time.strftime(helper.TIME_FORMAT),
+			"doctor": helper.id2name(app.doctor_id),
+			"patient": helper.id2name(app.patient_id),
+			"symptoms": app.symptoms}
 	return make_response(jsonify(
-				[response_generator(i) for i in range(len(future_7d_appts)) ]), 200)
+				[response_generator(app) for app in future_7d_appts ]), 200)
 
 # @app.route('nurseProcessApp')
 
@@ -323,13 +318,12 @@ def nurseGoCreateAppt():
 @login_required
 def nurseGoViewAppt(appID):
 	appt_res = Application.query.filter(Application.id==appID).first()
-	slot_date, seg_start_t = helper.slot2time(appt_res.time_slot_id)
 
 	helper.load_id2name_map()
 	return render_template('nurseViewAppt.html',
 		appID=appID,
-		date=slot_date.strftime(helper.DATE_FORMAT),
-		time=seg_start_t.strftime(helper.TIME_FORMAT),
+		date=appt_res.date.strftime(helper.DATE_FORMAT),
+		time=appt_res.time.strftime(helper.TIME_FORMAT),
 		doctor=helper.id2name(appt_res.doctor_id),
 		patientID=appt_res.patient_id,
 		patient=helper.id2name(appt_res.patient_id),
@@ -344,18 +338,22 @@ def nurseviewAppt():
 
 	mcid = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mcid).first()
+	prescription_list = Prescription.query.filter(Prescription.mc_id==mcid).all()
+	
+	# return make_response(
+	# 	jsonify("preExam":{
+	# 		{"bodyTemperature": mc.body_temperature,
+	# 		"pulseRate": mc.heart_rate,
+	# 		"bloodPressure": mc.blood_pressure},
+	# 		"diagnosis": mc.diagnosis,
+	# 		"prescriptions": [{} for prescr in ]
+	# 	prescriptions: [{medicine, comments, etc.}, {}, ...]
+	# labReportTypes:[{id:str, name:str}, {}, ...]
+	# labReports:[{lr_type: str, id:str, comments:str}, {}, ...]}
 
-	return make_response(
-		jsonify(
-			{"bodyTemperature": mc.body_temperatur,
-			"pulseRate": mc.heart_rate.strftime("%Y-%m-%d")}
-			# "time": seg_start_t.strftime("%H:%M"),
-			# "doctor": helper.id2name(appt_res.doctor_id),
-			# "patient": helper.id2name(appt_res.patient_id),
-			# "symptoms": appt_res.symptoms,
-			# "comments": appt_res.reject_reason}
-		)
-	)
+	return make_response(jsonify({'ret':0}))
+
+
 
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
 @login_required
@@ -378,7 +376,7 @@ def nurseUploadLabReport():
 		mc_id=mc_id,
 		file=lab_report
 	)
-	
+
 	return make_response(jsonify({"ret": 0}))
 
 @app.route('/nurseProcessApp', methods=['GET','POST'])
@@ -419,7 +417,6 @@ def nurseOnGoingAppt():
 	# filter3: now() in timeslot
 	now_approved_appts = []
 	for appt in today_approved_appts:
-		print(appt)
 		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
@@ -513,7 +510,7 @@ def nurseEditPreExam():
 	blood_pressure = request.form['bloodPressue']
 
 	mc = Medical_record.query.filter( Medical_record.id == mc_id).first()
-	mc.body_temperatur = body_temperature
+	mc.body_temperature = body_temperature
 	mc.heart_rate = pulse_rate
 	mc.blood_pressure = blood_pressure
 	db.session.commit()
