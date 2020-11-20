@@ -15,7 +15,10 @@ $(document).ready(function() {
   myModal = new HomeModal();
   myTable = new HomeTable();
   // initialize table
-  var initTable = (res) => myTable.initTable(res, "appointment");
+  var initTable = (res) => {
+    myTable.initTable(res, "appointment");
+    $("#overlay").addClass("d-none");
+  };
   sendRequest("FutureAppt", "GET", null, initTable);
 });
 
@@ -72,7 +75,10 @@ function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
   var btnTarget = (route == "RejectedApp") ? '#application' : '#appointment';
   $("#overlay").removeClass("d-none");
-  var updateTable = (res) => myTable.updateTable(res, btnTarget);
+  var updateTable = (res) => {
+    myTable.updateTable(res, btnTarget);
+    $("#overlay").addClass("d-none");
+  };
   sendRequest(route, type, data, updateTable);
 }
 

@@ -15,7 +15,10 @@ $(document).ready(function() {
   myModal = new HomeModal();
   myTable = new HomeTable();
   // initialize table
-  var initTable = (res) => myTable.initTable(res, "application");
+  var initTable = (res) => {
+    myTable.initTable(res, "application");
+    $("#overlay").addClass("d-none");
+  };
   sendRequest("PendingApp", "GET", null, initTable);
 });
 
@@ -83,19 +86,9 @@ function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
   var btnTarget = (route == "PendingApp") ? '#application' : '#appointment';
   $("#overlay").removeClass("d-none");
-  var updateTable = (res) => myTable.updateTable(res, btnTarget);
+  var updateTable = (res) => {
+    myTable.updateTable(res, btnTarget);
+    $("#overlay").addClass("d-none");
+  };
   sendRequest(route, type, data, updateTable);
-}
-
-
-//------------------------------utilities-------------------------------
-
-function newPrescriptionCard(index, idAndMedicine, dose, comments){
-  var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#pre" + index + "' aria-expanded='true' aria-controls='pre" + index + "'>" + idAndMedicine + "</button> </h5> <div id='pre" + index + "' class='collapse' aria-labelledby='pre" + index + "' data-parent='#prescriptions'> <div class='card-body'>" + dose + "</div> <div class='card-body'>" + comments + "</div> </div> </div>";
-  return card
-}
-
-function newLabReportCard(index, idAndType, id, comments){
-  var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#lab" + index + "' aria-expanded='true' aria-controls='lab" + index + "'>" + idAndType + "</button> </h5> <div id='lab" + index + "' class='collapse' aria-labelledby='lab" + index + "' data-parent='#labReports'> <div class='card-body'>" + id + "</div> <div class='card-body'>" + comments + "</div> </div> </div>";
-  return card
 }

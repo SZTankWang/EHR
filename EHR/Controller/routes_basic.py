@@ -190,11 +190,6 @@ def goToHospital():
 def department():
 	return render_template('patientDepartment.html')
 
-@app.route('/nurseHome', methods=['GET'])
-def nurseHome():
-	return render_template('nurseHome_save.html')
-	# return redirect(url_for('pendingApp'))
-
 @app.route('/nuserAllAppt', methods=['GET'])
 def nurseAllAppt():
 	render_template('nurseAllAppt.html')
@@ -474,8 +469,7 @@ def nurseOnGoingAppt():
 				"patient": helper.id2name(on_going_appts[apptid][0].patient_id),
 				"symptoms": on_going_appts[apptid][0].symptoms} for apptid in on_going_appts.keys()]
 	))
-<<<<<<< HEAD
-=======
+
 
 @app.route('/nurseRejectedApp', methods=['GET','POST'])
 def nurseRejectedApp():
@@ -513,5 +507,3 @@ def nurseRejectedApp():
 			}for app in appts]
 		)
 	)
-
->>>>>>> 75beab19f70027bbf62d1462389c698b3f818d6a

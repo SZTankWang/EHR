@@ -2,7 +2,46 @@ function goToPage(route, delay){
   setTimeout("window.location.replace('http://localhost:5000/" + route + "')", delay);
 }
 
+function jsonify(data){
+  var obj = {};
+  for(var i=0;i<data.length;i++){
+    obj[data[i].name]=data[i].value;
+  }
+  return obj;
+}
+
 function sendRequest(route, type, data, successHandler){
+  $.ajax({
+    url: "http://localhost:5000/nurse" + route,
+    type: type,
+    data: data,
+    success: (res) => {
+      successHandler(res);
+    },
+    error: (err) => {
+      alert("request error");
+      console.log(err);
+    }
+  });
+}
+
+function sendFileRequest(route, type, data, successHandler){
+  $.ajax({
+    url: "http://localhost:5000/nurse" + route,
+    type: type,
+    data: data,
+    success: (res) => {
+      successHandler(res);
+    },
+    error: (err) => {
+      alert("request error");
+      console.log(err);
+    },
+    cache: false,
+    processData: false,
+    contentType: false
+  })
+
   $.ajax({
     url: "http://localhost:5000/nurse" + route,
     type: type,
@@ -11,16 +50,11 @@ function sendRequest(route, type, data, successHandler){
       successHandler(res);
       $("#overlay").addClass("d-none");
     },
-    error: (err) => console.log(err)
+    error: (err) => {
+      alert("request error");
+      console.log(err);
+    }
   });
-}
-
-function jsonify(data){
-  var obj = {};
-  for(var i=0;i<data.length;i++){
-    obj[data[i].name]=data[i].value;
-  }
-  return obj;
 }
 
 //-------------------------tab styling--------------------------

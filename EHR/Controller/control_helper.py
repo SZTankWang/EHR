@@ -1,19 +1,14 @@
 from flask import request
 from sqlalchemy.sql.sqltypes import String
 from EHR.model.models import *
-import math 
+import math
 import datetime
 from operator import and_
 
-<<<<<<< Updated upstream
 TIME_FORMAT = "%H:%M"
 DATE_FORMAT = "%Y-%m-%d"
 
 def paginate(db_obj):
-=======
-
-def pageinate(db_obj):
->>>>>>> Stashed changes
 	try:
 		curr_page = int(request.form['currPage'])
 		page_size = int(request.form['pageSize'])
@@ -28,7 +23,6 @@ def pageinate(db_obj):
 
 	return n_offset, n_tot_records, n_tot_page, page_count
 
-<<<<<<< Updated upstream
 def day2slotid(period: int, start_day=datetime.date.today()):
 	next_d_slotid = [ res.id for res in (
 										  Time_slot.query.filter(
@@ -45,12 +39,12 @@ def load_slots():
 	for slot in slots:
 		slotid2date[slot.id] = {"slot_date": slot.slot_date,
 								"seg_starttime": segid2time[slot.slot_seg_id]}
-	
+
 def slot2time(slot_id:int):
-	
+
 	slot_date = slotid2date['slot_date']
 	seg_starttime = slotid2date['seg_starttime']
-	return slot_date, seg_starttime	
+	return slot_date, seg_starttime
 
 
 id_name_map = None
@@ -58,7 +52,7 @@ def load_id2name_map():
 	global id_name_map
 	id_name_map = {u.id: u.first_name + " "+u.last_name \
 					for u in User.query.all()}
-	
+
 def id2name(this_id:int)->String:
 	# person = User.query.filter(User.id==this_id).first()
 	person_name = id_name_map[this_id]
@@ -78,26 +72,3 @@ def nurse_dept_appts(nurseID, period, start_date=datetime.date.today()):
 							Time_slot.slot_date>=start_date,
 							Time_slot.slot_date<=start_date+timedelta(days=period))
 	return same_dept_appts
-=======
-def futureday_slotid(period: int, start_day=datetime.date.today()):
-	next_d_slotid = [ res.id for res in (
-										  Time_slot.query.filter(and_(Time_slot.slot_date<=start_day+datetime.timedelta(days=period),
-										  Time_slot.slot_date>=start_day)).all())]
-	return next_d_slotid
-
-def slot2time(slot_id:int):
-	slot_date = Time_slot.query.filter(
-				Time_slot.id==slot_id).first().slot_date 
-
-	seg_id = Time_slot.query.filter(
-				Time_slot.id==slot_id).first().slot_seg_id 
-
-	seg_start_t = Time_segment.query.filter(
-				Time_segment.t_seg_id==seg_id).first().t_seg_starttime
-
-	return slot_date, seg_start_t	
-
-def id2name(this_id:int)->String:
-	person = User.query.filter(User.id==this_id).first()
-	return person.first_name + " " + person.last_name
->>>>>>> Stashed changes
