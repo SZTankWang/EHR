@@ -260,7 +260,7 @@ def todayAppt():
 
 	return make_response(jsonify(
 				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
-	
+
 
 	# today_appt_list = Application.query.
 
@@ -320,9 +320,9 @@ routes: nursePendingApp, nurseTodayAppt
 @login_required
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = helper.day2slotid(period=7)
+	next7d_slotid = helper.day2slotid(period=100)
 	nurseID = current_user.get_id()
-	pending_app = helper.nurse_dept_appts(nurseID=nurseID, period=7).\
+	pending_app = helper.nurse_dept_appts(nurseID=nurseID, period=100).\
 									filter(
 										Application.status==StatusEnum.pending,
 										Application.time_slot_id.in_(next7d_slotid)).all()
@@ -346,7 +346,7 @@ def nurseTodayAppt():
 	# nurseID = "44116022"    # a nurseID that returns something,
 	# 						for testing purpose, set the 'period' to 20
 	# department ID of current nurse
-	today_depts_appts = helper.nurse_dept_appts(nurseID, period=0).all()
+	today_depts_appts = helper.nurse_dept_appts(nurseID, period=100).all()
 
 	helper.load_id2name_map()
 	def response_generator(i):
@@ -368,7 +368,7 @@ def nurseFutureAppt():
 	nurseID = current_user.get_id()
 	# nurseID = "46770556" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
-	future_7d_appts = helper.nurse_dept_appts(nurseID, period=7).all()
+	future_7d_appts = helper.nurse_dept_appts(nurseID, period=100).all()
 
 	helper.load_id2name_map()
 	helper.load_slots()
@@ -491,7 +491,7 @@ def nurseOnGoingAppt():
 		print(appt)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			on_going_appts[appt.id] = (appt, appt_date, appt_start_time)
-	
+
 	return make_response(
 		jsonify(
 			[{
@@ -514,7 +514,7 @@ def nurseRejectedApp():
 
 	slot_ids = helper.day2slotid(period=(app_end_date-app_start_date).days, start_day=app_start_date)
 	nurseID = current_user.get_id()
-	appts = helper.nurse_dept_appts(nurseID=nurseID, 
+	appts = helper.nurse_dept_appts(nurseID=nurseID,
 									period=app_end_date-app_start_date,
 									start_date=app_start_date)\
 										.filter(
@@ -524,11 +524,11 @@ def nurseRejectedApp():
 	# for test purpose
 	helper.load_slots()
 	helper.load_id2name_map()
-	
+
 	return make_response(
 		jsonify(
 			[{
-				"appID": app.id, 
+				"appID": app.id,
 				"date": helper.slot2time(app.time_slot_id)[0].strftime(helper.DATE_FORMAT),
 				"time": helper.slot2time(app.time_slot_id)[1].strftime(helper.TIME_FORMAT),
 				"doctor": helper.id2name(app.doctor_id),
@@ -538,3 +538,18 @@ def nurseRejectedApp():
 			}for app in appts]
 		)
 	)
+
+@app.route('/nurseGoViewMC', methods=['GET','POST'])
+def nurseGoViewMC():
+	#TODO
+	return render_template("nurseViewMC.html")
+
+@app.route('/nurseViewMC', methods=['GET','POST'])
+def nurseViewMC():
+	#TODO
+	return make_response(jsonify([{"appID":"1", "mcID":"1", "date":"1", "time":"1", "doctor":"1", "symptoms":"1"}]))
+
+@app.route('/nurseGetComments', methods=['GET','POST'])
+def nurseGetComments():
+	#TODO
+	return make_response(jsonify({"comments":"1"}))

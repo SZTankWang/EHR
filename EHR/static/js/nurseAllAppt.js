@@ -12,7 +12,7 @@ var myModal;
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
   // initialize instance
-  myModal = new HomeModal();
+  myModal = new AppFullModal();
   myTable = new HomeTable();
   // initialize table
   var initTable = (res) => {
@@ -53,11 +53,11 @@ $("#rejectedApp").on('click', function(){
 * @this event target element - view button
 */
 function buttonAction(event) {
-  var data = myTable.row( $(this).parents('tr') ).data();
+  var data = myTable.table.row( $(this).parents('tr') ).data();
   if ($(".nav-table.active").text() == "Rejected applications") {
-    myModal.update(data);
+    myModal.setApp(data);
     var reqData = {"appID": data['appID']};
-    var setComments = (res) => {$("#comments").text(res.comments)};
+    var setComments = (res) => {myModal.setComments(res.comments)};
     sendRequest("GetComments", "POST", reqData, setComments);
   } else {
     event.preventDefault();
