@@ -190,30 +190,6 @@ def goToHospital():
 def department():
 	return render_template('patientDepartment.html')
 
-@app.route('/nurseTodayAppt', methods=['GET', 'POST'])
-@login_required
-def todayAppt():
-	nurseID = current_user.get_id()
-	# applications for the same department where this.nurse is working for
-
-	same_dept_appts = helper.nurse_dept_appts(nurseID=nurseID, period=0).all()
-
-	def response_generator(i):
-		slot_id = same_dept_appts[i].time_slot_id
-		slot_date, seg_start_t = helper.slot2time(slot_id)
-		return {"appID": same_dept_appts[i].id,
-			"date": slot_date.strftime("%Y-%m-%d"),
-			"time": seg_start_t.strftime("%H:%M"),
-			"doctor": helper.id2name(same_dept_appts[i].doctor_id),
-			"patient": helper.id2name(same_dept_appts[i].patient_id),
-			"symptoms": same_dept_appts[i].symptoms}
-
-	return make_response(jsonify(
-				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
-
-
-	# today_appt_list = Application.query.
-
 @app.route('/doctorAvailSlot', methods=['POST', 'GET'])
 def doctorAvailSlot():
 	doctorID = request.args.get('doctorID')
@@ -270,9 +246,9 @@ routes: nursePendingApp, nurseTodayAppt
 @login_required
 def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
-	next7d_slotid = helper.day2slotid(period=7)
+	next7d_slotid = helper.day2slotid(period=100)
 	nurseID = current_user.get_id()
-	pending_app = helper.nurse_dept_appts(nurseID=nurseID, period=7).\
+	pending_app = helper.nurse_dept_appts(nurseID=nurseID, period=100).\
 									filter(
 										Application.status==StatusEnum.pending,
 										Application.time_slot_id.in_(next7d_slotid)).all()
@@ -296,7 +272,7 @@ def nurseTodayAppt():
 	# nurseID = "44116022"    # a nurseID that returns something,
 	# 						for testing purpose, set the 'period' to 20
 	# department ID of current nurse
-	today_depts_appts = helper.nurse_dept_appts(nurseID, period=0).all()
+	today_depts_appts = helper.nurse_dept_appts(nurseID, period=100).all()
 
 	helper.load_id2name_map()
 	def response_generator(i):
@@ -318,7 +294,7 @@ def nurseFutureAppt():
 	nurseID = current_user.get_id()
 	# nurseID = "46770556" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
-	future_7d_appts = helper.nurse_dept_appts(nurseID, period=7).all()
+	future_7d_appts = helper.nurse_dept_appts(nurseID, period=100).all()
 
 	helper.load_id2name_map()
 	helper.load_slots()
@@ -487,3 +463,18 @@ def nurseRejectedApp():
 			}for app in appts]
 		)
 	)
+
+@app.route('/nurseGoViewMC', methods=['GET','POST'])
+def nurseGoViewMC():
+	#TODO
+	return render_template("nurseViewMC.html")
+
+@app.route('/nurseViewMC', methods=['GET','POST'])
+def nurseViewMC():
+	#TODO
+	return make_response(jsonify([{"appID":"1", "mcID":"1", "date":"1", "time":"1", "doctor":"1", "symptoms":"1"}]))
+
+@app.route('/nurseGetComments', methods=['GET','POST'])
+def nurseGetComments():
+	#TODO
+	return make_response(jsonify({"comments":"1"}))

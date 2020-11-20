@@ -12,7 +12,7 @@ var myModal;
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
   // initialize instance
-  myModal = new HomeModal();
+  myModal = new AppModal();
   myTable = new HomeTable();
   // initialize table
   var initTable = (res) => {
@@ -46,7 +46,7 @@ $("#todayAppt").on("click", () => goUpdateTable("TodayAppt"));
 function buttonAction(event) {
   var data = myTable.table.row( $(this).parents('tr') ).data();
   if ($(".nav-table.active").text() == "Pending applications") {
-    myModal.update(data);
+    myModal.setApp(data);
   } else {
     event.preventDefault();
     var appID = data['appID'];

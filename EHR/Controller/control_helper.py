@@ -40,7 +40,7 @@ def load_slots():
 	for slot in slots:
 		slotid2date[slot.id] = {"slot_date": slot.slot_date,
 								"seg_starttime": segid2time[slot.slot_seg_id]}
-	print("slotid2date:", slotid2date)
+	# print("slotid2date:", slotid2date)
 
 def slot2time(slot_id:int):
 	load_slots()

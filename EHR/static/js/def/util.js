@@ -1,3 +1,8 @@
+/**
+* @author: Jingyi
+* @desc utilities
+*/
+
 function goToPage(route, delay){
   setTimeout("window.location.replace('http://localhost:5000/" + route + "')", delay);
 }
@@ -21,6 +26,7 @@ function sendRequest(route, type, data, successHandler){
     error: (err) => {
       alert("request error");
       console.log(err);
+      $("#overlay").addClass("d-none");
     }
   });
 }
@@ -41,20 +47,6 @@ function sendFileRequest(route, type, data, successHandler){
     processData: false,
     contentType: false
   })
-
-  $.ajax({
-    url: "http://localhost:5000/nurse" + route,
-    type: type,
-    data: data,
-    success: (res) => {
-      successHandler(res);
-      $("#overlay").addClass("d-none");
-    },
-    error: (err) => {
-      alert("request error");
-      console.log(err);
-    }
-  });
 }
 
 //-------------------------tab styling--------------------------
