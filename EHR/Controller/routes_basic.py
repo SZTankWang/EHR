@@ -235,6 +235,20 @@ def todayAppt():
 
 	return make_response(jsonify(
 				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
+	
+
+	def response_generator(i):
+		slot_id = same_dept_appts[i].time_slot_id
+		slot_date, seg_start_t = helper.slot2time(slot_id)
+		return {"appID": same_dept_appts[i].id,
+			"date": slot_date.strftime("%Y-%m-%d"),
+			"time": seg_start_t.strftime("%H:%M"),
+			"doctor": helper.id2name(same_dept_appts[i].doctor_id),
+			"patient": helper.id2name(same_dept_appts[i].patient_id),
+			"symptoms": same_dept_appts[i].symptoms}
+
+	return make_response(jsonify(
+				[response_generator(i) for i in range(len(same_dept_appts)) ]), 200)
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 @login_required
