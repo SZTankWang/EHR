@@ -1,5 +1,5 @@
 /**
-* @author: Jingyi
+* @author Jingyi Zhu
 * @desc utilities
 */
 
@@ -17,7 +17,7 @@ function jsonify(data){
 
 function sendRequest(route, type, data, successHandler){
   $.ajax({
-    url: "http://localhost:5000/nurse" + route,
+    url: "http://localhost:5000/" + route,
     type: type,
     data: data,
     success: (res) => {
@@ -31,23 +31,6 @@ function sendRequest(route, type, data, successHandler){
   });
 }
 
-function sendFileRequest(route, type, data, successHandler){
-  $.ajax({
-    url: "http://localhost:5000/nurse" + route,
-    type: type,
-    data: data,
-    success: (res) => {
-      successHandler(res);
-    },
-    error: (err) => {
-      alert("request error");
-      console.log(err);
-    },
-    cache: false,
-    processData: false,
-    contentType: false
-  })
-}
 
 //-------------------------tab styling--------------------------
 // main navigation

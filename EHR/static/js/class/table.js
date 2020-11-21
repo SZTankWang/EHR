@@ -1,11 +1,12 @@
 /**
-* @author: Jingyi
+* @author Jingyi Zhu
 * @desc jQuery DataTable wrappers
-* @method initTable - initialize the table
-* @method updateTableData - empty the table and add new data
-* @method updateTable - update table data and other features
 */
 
+/**
+* @desc basic table class
+* @method updateTableData - empty the table and add new data
+*/
 class Table{
   constuctor(){
     this.table = null;
@@ -18,6 +19,11 @@ class Table{
   }
 }
 
+/**
+* @desc table for nurseHome and nurseAllAppt
+* @method initTable - initialize the table
+* @method updateTable - update table data and switch button functionality
+*/
 class HomeTable extends Table{
   initTable(data, btnTarget){
     this.table = $("#main-table").DataTable({
@@ -50,9 +56,13 @@ class HomeTable extends Table{
   }
 }
 
+/**
+* @desc table for medical records
+* @method initTable - initialize the table
+* @method updateTable - update table data
+*/
 class MCTable extends Table {
   initTable(data){
-    console.log("hiiii");
     this.table = $("#main-table").DataTable({
       "data": data,
       "columns" : [

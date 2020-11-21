@@ -339,7 +339,7 @@ def nurseviewAppt():
 	mcid = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mcid).first()
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mcid).all()
-	
+
 	# return make_response(
 	# 	jsonify("preExam":{
 	# 		{"bodyTemperature": mc.body_temperature,
@@ -364,7 +364,7 @@ def nurseUploadLabReport():
 	lr_type_id = request.form['typeID']
 	lab_report = request.files['labReport']
 	comments = request.form['comments']
-	
+
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	patient_id = mc.patient_id
 
@@ -403,11 +403,10 @@ def nurseOnGoingAppt():
 	helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
-	
 	# testing data
 	# nurse_id = '17711783'
-	# nowtime = datetime.datetime.strptime("2020-11-20 13:10:00", "%Y-%m-%d %H:%M:%S")
-	
+	nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
+
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.nurse_dept_appts(nurseID=nurse_id, period=0).\
 		filter(
@@ -420,7 +419,6 @@ def nurseOnGoingAppt():
 		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
-	
 	return make_response(
 		jsonify(
 			[{
@@ -436,7 +434,7 @@ def nurseRejectedApp():
 	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
 	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
-	
+
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
@@ -444,7 +442,7 @@ def nurseRejectedApp():
 
 	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
 		 start_date=start_date).filter(Application.status==StatusEnum.rejected)
-	
+
 	helper.load_id2name_map()
 	return make_response(
 		jsonify([
@@ -479,7 +477,7 @@ def nursePastAppt():
 	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
 	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
-	
+
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
@@ -487,7 +485,7 @@ def nursePastAppt():
 
 	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
 		 start_date=start_date).filter(Application.status==StatusEnum.finished)
-	
+
 	helper.load_id2name_map()
 	return make_response(
 		jsonify([
@@ -516,4 +514,3 @@ def nurseEditPreExam():
 	db.session.commit()
 
 	return make_response(jsonify({'ret':0}))
-

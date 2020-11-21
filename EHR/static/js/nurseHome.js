@@ -1,6 +1,7 @@
 /**
 * @author Jingyi Zhu
-* @html nurseHome.html
+* @page nurseHome.html
+* @import util.js
 */
 
 /**
@@ -19,7 +20,7 @@ $(document).ready(function() {
     myTable.initTable(res, "application");
     $("#overlay").addClass("d-none");
   };
-  sendRequest("PendingApp", "GET", null, initTable);
+  sendRequest("nursePendingApp", "GET", null, initTable);
 });
 
 // ---------------------capture user action--------------------------
@@ -31,10 +32,10 @@ $(".processAppSubmit").on("click", goProcessApplication);
 
 // ----------switch table content-------------
 // view pending applications
-$("#pendingApp").on("click", () => goUpdateTable("PendingApp"));
+$("#pendingApp").on("click", () => goUpdateTable("nursePendingApp"));
 
 // view today's appointments
-$("#todayAppt").on("click", () => goUpdateTable("TodayAppt"));
+$("#todayAppt").on("click", () => goUpdateTable("nurseTodayAppt"));
 
 
 // --------------------------event handlers----------------------------
@@ -73,7 +74,7 @@ function goProcessApplication(event){
     data.appID = appID;
     data.action = action;
     var goHome = () => goToPage("nurseHome", 1000);
-    sendRequest("ProcessApp", "POST", data, goHome);
+    sendRequest("nurseProcessApp", "POST", data, goHome);
   }
 }
 
@@ -84,7 +85,7 @@ function goProcessApplication(event){
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  var btnTarget = (route == "PendingApp") ? '#application' : '#appointment';
+  var btnTarget = (route == "nursePendingApp") ? '#application' : '#appointment';
   $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res, btnTarget);

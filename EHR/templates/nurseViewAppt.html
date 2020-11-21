@@ -67,7 +67,7 @@
 					<div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor">{{doctor}}</span></div>
 		    </div>
 				<div class="row">
-					<div class="col-md-4"><span><b>Application/Appointment Status: </b></span><span id="time">{{appStatus}}</span></div>
+					<div class="col-md-4"><span><b>Application/Appointment Status: </b></span><span id="appStatus">{{appStatus}}</span></div>
 					<form action="/nurseGoViewMC" method="POST" class="col-md-4">
 						<input class="d-none" type="text" name="patientID" value="{{patientID}}" readonly>
 						<input type="submit" class="btn btn-sm btn-primary" id="viewMC" value="view patient's medical history">
@@ -151,7 +151,8 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="/static/js/def/util.js"></script>
+	<script type="text/javascript" src="/static/js/function/util.js"></script>
+	<script type="text/javascript" src="/static/js/function/apptAndMC.js"></script>
 	<script type="text/javascript" src="/static/js/nurseViewAppt.js"></script>
 </body>
 </html>

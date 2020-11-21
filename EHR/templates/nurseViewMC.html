@@ -50,30 +50,32 @@
 		</nav>
 	</div>
 
-	<div id="content-wrapper" style="padding-top:1em;">
+	<div id="content-wrapper" style="padding-top:0.5em;">
 
 		<div id="content-header-wrapper">
-			<div class="container justify-content-md-center">
-				<div class="row">
-					<div class="col-4">
-						<a class="btn btn-primary" id="goBack" onclick="history.back()">Back</a>
-					</div>
-					<div class="col-6">
-						<h4>Medical Records</h4>
-					</div>
+			<div class="row row-sm justify-content-start">
+				<div class="col justify-content-start">
+					<a class="ml-auto btn btn-primary" id="goBack" onclick="history.back()">Back</a>
 				</div>
-				<div class="row justify-content-md-center">
-					<div class="col-4">
-						Patient ID: <span id="patientID">{{patientID}}</span>
-					</div>
-					<div class="col-4">
-						Patient Name: <span id="patientName">{{patientName}}</span>
-					</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col d-flex justify-content-center">
+					<h4>Medical Records</h4>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="col d-flex justify-content-md-center">
+					<b>Patient ID: </b><span id="patientID">{{patientID}}</span>
+				</div>
+				<div class="col d-flex justify-content-md-center">
+					<b>Patient Name: </b><span id="patientName">{{patientName}}</span>
 				</div>
 			</div>
 		</div>
 
-		<div class='table' id="table-container" style="padding-top:0.5em;">
+		<hr>
+
+		<div class='table' id="table-container" style="padding-left:0.5em;padding-right:0.5em;">
 			<table id="main-table" style="width:100%;">
 			  <thead>
 			    <tr>
@@ -112,9 +114,10 @@
 		      <div class="modal-body">
 						<div class="container-fluid">
 					    <div class="row">
-								<div class="col-md-4"><span><b>Application ID: </b></span><span id="appID"></span></div>
-								<div class="col-md-4"><span><b>Date: </b></span><span id="date"></span></div>
-								<div class="col-md-4"><span><b>Time: </b></span><span id="time"></span></div>
+								<div class="col-md-3"><span><b>Application ID: </b></span><span id="appID"></span></div>
+								<div class="col-md-3"><span><b>Date: </b></span><span id="date"></span></div>
+								<div class="col-md-3"><span><b>Time: </b></span><span id="time"></span></div>
+								<div class="col-md-3"><span><b>Application/Appointment Status: </b></span><span id="appStatus"></span></div>
 					    </div>
 					    <div class="row">
 								<div class="col-md-4"><span><b>Medical Record ID: </b></span><span id="mcID"></span></div>
@@ -131,21 +134,21 @@
 							<h5>Pre-examination</h5>
 							<div class="row">
 			          <div class="col-md-3"><b>Body temperature</b></div>
-								<div class="col-md-auto">
+								<div class="col-md-auto" id="bodyTemperature">
 			            233
 								</div>
 								<div class="col-md-auto">&#8451;</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>Pulse rate</b></div>
-								<div class="col-md-auto">
+								<div class="col-md-auto" id="pulseRate">
 			          	233
 								</div>
 								<div class="col-md-auto">BPM</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>Blood pressure</b></div>
-								<div class="col-md-auto">
+								<div class="col-md-auto" id="bloodPressure">
 			          	233
 								</div>
 								<div class="col-md-auto">mmHg</div>
@@ -178,10 +181,10 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="/static/js/def/table.js"></script>
-	<script type="text/javascript" src="/static/js/def/modal.js"></script>
-	<script type="text/javascript" src="/static/js/def/util.js"></script>
+	<script type="text/javascript" src="/static/js/class/table.js"></script>
+	<script type="text/javascript" src="/static/js/class/modal.js"></script>
+	<script type="text/javascript" src="/static/js/function/util.js"></script>
+	<script type="text/javascript" src="/static/js/function/apptAndMC.js"></script>
 	<script type="text/javascript" src="/static/js/nurseViewMC.js"></script>
-	<script type="text/javascript" src="/static/js/nurseViewAppt.js"></script>
 </body>
 </html>
