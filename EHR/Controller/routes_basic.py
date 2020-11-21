@@ -1,4 +1,4 @@
-from EHR.Controller.control_helper import TIME_FORMAT, id2name
+from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
 import collections
 from datetime import timedelta
 from itertools import count
@@ -471,7 +471,7 @@ def nurseViewMC():
 
 @app.route('/nurseGetComments', methods=['GET','POST'])
 def nurseGetComments():
-	#TODO
+	
 	return make_response(jsonify({"comments":"1"}))
 
 @app.route('/nursePastAppt', methods=['GET', 'POST'])
