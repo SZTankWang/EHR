@@ -108,6 +108,21 @@ def t_slot2time(slot_id):
 	).filter(Time_slot.id==slot_id).first().t_seg_starttime
 	return slot_time
 
+def nurse_hosp2dept(nurseID):
+	deptID = nurse.query.filter(nurse.id==nurseID).first().department_id
+	hospitalID= department.query.filter(department.id==deptID).first().hospital_id
+	dept_list,dept_name= hosp2dept(hospitalID)
+	return dept_list,dept_name
+
 def hosp2dept(hospitalID):
-	dept_list = Department.query.filter(Department.hospital_id==hospitalID).all()
+	dept_list = department.query.filter(department.hospital_id==hospitalID).all()
 	return [dept_list[i].id for i in range(len(dept_list))],[dept_list[j].title for j in range(len(dept_list))]
+
+def dept2doc(deptID):
+	doctor_list= doctor.query.filter(doctor.department_id==deptID).all()
+	return [doctor_list[i].id for i in range(len(doctor_list))]
+
+def doc2slots(doctorID, period, start_date=datetime.date.today()):
+	return Time_slot.query.filter(Time_slot.doctor_id==docterID,Time_slot.slot_date>=start_date,
+					   Time_slot.slot_date<=start_date+timedelta(days=period)).all()
+
