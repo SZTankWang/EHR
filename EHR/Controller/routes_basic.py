@@ -422,6 +422,7 @@ def nurseOnGoingAppt():
 	return make_response(
 		jsonify(
 			[{
+				"appID": app.id,
 				"date": appt.date.strftime(helper.DATE_FORMAT),
 				"time": appt.time.strftime(helper.TIME_FORMAT),
 				"doctor": helper.id2name(appt.doctor_id),

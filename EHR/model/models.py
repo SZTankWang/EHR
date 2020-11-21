@@ -189,7 +189,7 @@ class Application(db.Model):
 		db.ForeignKey('nurse.id'))
 	patient_id = db.Column(db.String(100), \
 		db.ForeignKey('patient.id'), nullable=False)
-	mc_id = db.Column(db.Integer(), db.ForeignKey('medical_record.id'))
+	# mc_id = db.Column(db.Integer(), db.ForeignKey('medical_record.id'))
 
 	#one-to-one relationship
 	medical_record = db.relationship('Medical_record', backref='application', uselist=False ,lazy=True)
