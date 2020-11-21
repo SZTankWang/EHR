@@ -180,7 +180,7 @@ def searchHospital():
 @app.route('/goToHospital',methods=['GET'])
 @login_required
 def goToHospital():
-	hospitalID = request.form['hospitalID']
+	hospitalID = request.args.get('hospitalID')
 	department_ID,department_name = helper.hosp2dept(hospitalID)
 	return render_template("patientDepartment.html",hospital_ID=hospitalID,
 	department_list=[{'departmentID':department_ID[i],
