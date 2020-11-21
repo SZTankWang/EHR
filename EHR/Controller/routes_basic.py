@@ -405,7 +405,7 @@ def nurseOnGoingAppt():
 	nowtime = datetime.datetime.now()
 	# testing data
 	# nurse_id = '17711783'
-	nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
+	# nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
 
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.nurse_dept_appts(nurseID=nurse_id, period=0).\
@@ -422,7 +422,7 @@ def nurseOnGoingAppt():
 	return make_response(
 		jsonify(
 			[{
-				"appID": app.id,
+				"appID": appt.id,
 				"date": appt.date.strftime(helper.DATE_FORMAT),
 				"time": appt.time.strftime(helper.TIME_FORMAT),
 				"doctor": helper.id2name(appt.doctor_id),
@@ -470,8 +470,9 @@ def nurseViewMC():
 
 @app.route('/nurseGetComments', methods=['GET','POST'])
 def nurseGetComments():
-	
-	return make_response(jsonify({"comments":"1"}))
+	app_id = request.form['appID']
+	appt = Application.query.filter(Application.id==app_id)
+	return make_response(jsonify({"comments":appt.reject_reason}))
 
 @app.route('/nursePastAppt', methods=['GET', 'POST'])
 def nursePastAppt():

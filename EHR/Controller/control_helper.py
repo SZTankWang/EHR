@@ -31,24 +31,25 @@ def day2slotid(period: int, start_day=datetime.date.today()):
 	return next_d_slotid
 
 # No Longer Necessary! since we added date and time in Application
-slotid2date = {}
-def load_slots():
-	global slotid2date
-	slots = Time_slot.query.all()
-	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
+# slotid2date = {}
+# def load_slots():
+# 	global slotid2date
+# 	slots = Time_slot.query.all()
+# 	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
 
-	for slot in slots:
-		slotid2date[slot.id] = {"slot_date": slot.slot_date,
-								"seg_starttime": segid2time[slot.slot_seg_id]}
-	# print("slotid2date:", slotid2date)
+# 	for slot in slots:
+# 		slotid2date[slot.id] = {"slot_date": slot.slot_date,
+# 								"seg_starttime": segid2time[slot.slot_seg_id]}
+# 	# print("slotid2date:", slotid2date)
 
-def slot2time(slot_id:int):
-	load_slots()
-	slot_date = slotid2date[slot_id]['slot_date']
-	seg_starttime = slotid2date[slot_id]['seg_starttime']
-	return slot_date, seg_starttime
+# def slot2time(slot_id:int):
+# 	load_slots()
+# 	slot_date = slotid2date[slot_id]['slot_date']
+# 	seg_starttime = slotid2date[slot_id]['seg_starttime']
+# 	return slot_date, seg_starttime
 
-
+def segid2time(t_seg_id):
+	return Time_segment.query.filter(Time_segment.t_seg_id==t_seg_id).one().t_seg_starttime
 
 id_name_map = None
 def load_id2name_map():

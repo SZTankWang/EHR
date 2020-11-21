@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from inspect import indentsize
+from sqlalchemy.sql.schema import ForeignKey
 # from sqlalchemy.sql.schema import ForeignKey
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import db, login
@@ -103,7 +104,7 @@ class Nurse(db.Model):
 
 	#one-to-many relationship
 	applications = db.relationship('Application', backref='nurse', lazy=True)
-	medical_records = db.relationship('Medical_record', backref='nurse', lazy=True)
+	# medical_records = db.relationship('Medical_record', backref='nurse', lazy=True)
 	lab_reports = db.relationship('Lab_report', backref='nurse', lazy=True)
 
 	def __repr__(self):
@@ -130,7 +131,7 @@ class Patient(db.Model):
 
 	#one-to-many relationship
 	applications = db.relationship('Application', backref='patient', lazy=True)
-	medical_records = db.relationship('Medical_record', backref='patient', lazy=True)
+	# medical_records = db.relationship('Medical_record', backref='patient', lazy=True)
 	lab_reports = db.relationship('Lab_report', backref='patient', lazy=True)
 
 
@@ -189,10 +190,10 @@ class Application(db.Model):
 		db.ForeignKey('nurse.id'))
 	patient_id = db.Column(db.String(100), \
 		db.ForeignKey('patient.id'), nullable=False)
-	# mc_id = db.Column(db.Integer(), db.ForeignKey('medical_record.id'))
+	mc_id = db.Column(db.Integer(), db.ForeignKey('medical_record.id'))
 
 	#one-to-one relationship
-	medical_record = db.relationship('Medical_record', backref='application', uselist=False ,lazy=True)
+	mc = db.relationship('Medical_record', backref='appointment', uselist=False ,lazy=True)
 	timeslot = db.relationship('Time_slot', backref='application', uselist=False, lazy=True)
 	
 	def __repr__(self):
@@ -201,22 +202,30 @@ class Application(db.Model):
 				doctor_id: {self.doctor_id}, patient_id: {self.patient_id}, date: {self.date}, \
 				time: {self.time} >'
 
+class stateEnum(enum.Enum):
+	conscious = "conscious"
+	coma = "coma"
+
 class Medical_record(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
-	body_temperature = db.Column(db.Float(1))
-	blood_pressure = db.Column(db.Float(1))
+	# static health condition of the patient
+	body_temperature = db.Column(db.Numeric(5,1))
+	low_blood_pressure = db.Column(db.Numeric(5,1))
+	high_blood_pressure = db.Column(db.Numeric(5,1))
 	heart_rate = db.Column(db.Integer())
-	weight = db.Column(db.Float(1))
-	state = db.Column(db.Enum('conscious', 'coma'), default="conscious")
+	weight = db.Column(db.Numeric(5,1))
+	state = db.Column(db.Enum(stateEnum), default=stateEnum.conscious)
 	diagnosis = db.Column(db.Text())
+
 	#foreign key
 	patient_id = db.Column(db.String(100), \
 		db.ForeignKey('patient.id'), nullable=False)
-	appt_id = db.Column(db.Integer(), \
-		db.ForeignKey('application.id'), nullable=False)
-	nurse_id = db.Column(db.String(100), \
-		db.ForeignKey('nurse.id'), nullable=False)
-	#one-to-many relationship
+	# appt_id = db.Column(db.Integer(), \
+	# 	db.ForeignKey('application.id'), nullable=False)
+	# nurse_id = db.Column(db.String(100), \
+	# 	db.ForeignKey('nurse.id'), nullable=False)
+
+	## one-to-many relationship
 	lab_reports = db.relationship('Lab_report', backref='medical_record', lazy=True)
 	prescription = db.relationship('Prescription', backref='medical_record', lazy=True)
 
