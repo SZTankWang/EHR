@@ -86,3 +86,7 @@ def t_slot2time(slot_id):
 		Time_slot, Time_segment.t_seg_id==Time_slot.slot_seg_id
 	).filter(Time_slot.id==slot_id).first().t_seg_starttime
 	return slot_time
+
+def hosp2dept(hospitalID):
+	dept_list = Department.query.filter(Department.hospital_id==hospitalID).all()
+	return [dept_list[i].id for i in range(len(dept_list))],[dept_list[j].title for j in range(len(dept_list))]
