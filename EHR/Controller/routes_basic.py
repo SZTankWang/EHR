@@ -329,24 +329,39 @@ def nurseGoViewAppt(appID):
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @login_required
-def nurseviewAppt():
+def nurseViewAppt():
 
-	mcid = request.form['mcID']
-	mc = Medical_record.query.filter(Medical_record.id==mcid).first()
-	prescription_list = Prescription.query.filter(Prescription.mc_id==mcid).all()
+	# mc_id = request.form['mcID']
+	mc_id=1
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).one()
+	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
+	lab_reports = mc.lab_reports 
+	lab_r_types = [report.lr_type for report in lab_reports]
 
-	# return make_response(
-	# 	jsonify("preExam":{
-	# 		{"bodyTemperature": mc.body_temperature,
-	# 		"heartRate": mc.heart_rate,
-	# 		"bloodPressure": mc.blood_pressure},
-	# 		"diagnosis": mc.diagnosis,
-	# 		"prescriptions": [{} for prescr in ]
-	# 	prescriptions: [{medicine, comments, etc.}, {}, ...]
-	# labReportTypes:[{id:str, name:str}, {}, ...]
-	# labReports:[{lr_type: str, id:str, comments:str}, {}, ...]}
+	return make_response(
+		jsonify({
+			"preExam": 
+				{"bodyTemperature": mc.body_temperature,
+				"pulseRate": mc.heart_rate,
+				"bloodPressure": mc.blood_pressure},
 
-	return make_response(jsonify({'ret':0}))
+			"diagnosis": 
+				mc.diagnosis,
+
+			"prescriptions": 
+				[{"medicine": pres.medicine,
+				  "dose": pres.dose,
+				  "comments": pres.comments} for pres in prescription_list],
+
+			"labReportTypes": 
+				[{"type": lrt.type.value,
+				  "description": lrt.description
+					} for lrt in lab_r_types],
+
+			"labReports":
+				[{"lr_type": lr.lr_type.value,
+				"id": lr.id,
+				"comments": lr.comments} for lr in lab_reports]}))
 
 
 
@@ -357,7 +372,7 @@ def nurseUploadLabReport():
 
 	mc_id = request.form['mcID']
 	lr_type_id = request.form['typeID']
-	lab_report = request.files['labReport']
+	lab_report_file = request.files['labReport'].read()
 	comments = request.form['comments']
 
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
@@ -369,8 +384,11 @@ def nurseUploadLabReport():
 		uploader_id=nurse_id,
 		patient_id=patient_id,
 		mc_id=mc_id,
-		file=lab_report
+		file=lab_report_file
 	)
+	mc.lab_reports.append(lab_report)
+	db.session.add(lab_report)
+	db.session.commit()
 
 	return make_response(jsonify({"ret": 0}))
 
@@ -480,7 +498,7 @@ def nurseViewMC():
 @app.route('/nurseGetComments', methods=['GET','POST'])
 def nurseGetComments():
 	app_id = request.form['appID']
-	appt = Application.query.filter(Application.id==app_id)
+	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason}))
 
 @app.route('/nursePastAppt', methods=['GET', 'POST'])
@@ -528,3 +546,13 @@ def nurseEditPreExam():
 	db.session.commit()
 
 	return make_response(jsonify({'ret':0}))
+
+	# mcID: str
+	# bodyTemperature: float/str,
+	# heartRate: float/str,
+	# highBloodPressure: float/str,
+	# lowBloodPressure: float/str,
+	# weight: float/str,
+	# height: float/str,
+	# state: str
+
