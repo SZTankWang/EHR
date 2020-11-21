@@ -21,6 +21,7 @@ $(document).ready(function() {
     $("#overlay").addClass("d-none");
   };
   sendRequest("nurseOnGoingAppt", "GET", null, initTable);
+  setStartOrEndDate();
 });
 
 // ---------------------capture user action--------------------------
@@ -45,6 +46,9 @@ $("#rejectedApp").on('click', function(){
   var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
   goUpdateTable("nurseRejectedApp", dateRange);
 });
+
+//change time range
+$("#timeRange").on('submit', function(){});
 
 
 // --------------------------event handlers----------------------------
@@ -81,6 +85,23 @@ function goUpdateTable(route, data=null){
     $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
+  setStartOrEndDate();
+}
+
+/**
+* @desc set the start or end date according to the tab
+*/
+function setStartOrEndDate(){
+  var today = getFullDate(new Date());
+  if ($(".nav-table.active").text() == "Ongoing appointments") {
+    switchInputValue (true, true, null, true);
+  } else if ($(".nav-table.active").text() == "Future appointments") {
+    switchInputValue (true, false, today, false);
+  } else if ($(".nav-table.active").text() == "Past appointments") {
+    switchInputValue (false, true, today, false);
+  } else {
+    switchInputValue (false, false, null, false);
+  }
 }
 
 //------------------------------utilities-------------------------------
@@ -89,8 +110,15 @@ function jsonifyDateRange(startDate, endDate, range=null){
   if (range) {
     endDate.setDate(startDate.getDate() + 7);
   }
-  var startDateStr = startDate.toISOString().split('T')[0];
-  var endDateStr = endDate.toISOString().split('T')[0];
+  var startDateStr = getFullDate(startDate);
+  var endDateStr = getFullDate(endDate);
   var data = {"startDate": startDateStr, "endDate": endDateStr};
   return data;
+}
+
+function switchInputValue (start, end, today, submit) {
+  $("#startDate").prop("disabled", start);
+  $("#endDate").prop("disabled", end);
+  $("#startDate").prop("value", today);
+  $("#applyRange").prop("disabled", submit);
 }

@@ -31,6 +31,9 @@ function sendRequest(route, type, data, successHandler){
   });
 }
 
+function getFullDate(date){
+  return date.toISOString().split("T")[0];
+}
 
 //-------------------------tab styling--------------------------
 // main navigation

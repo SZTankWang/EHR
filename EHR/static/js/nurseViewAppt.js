@@ -25,13 +25,13 @@ $(document).ready(function() {
     const mcID = mcPage.mcID.text();
     const mcData = {"mcID": mcID};
     var fillMCData = (res) => {
-      mcPage.setBodyTemperature(res.preExam.bodyTemperature);
-      mcPage.setPulseRate(res.preExam.pulseRate);
-      mcPage.setBloodPressure(res.preExam.bloodPressure);
-      mcPage.setDiagnosis(res.diagnosis);
-      mcPage.setPrescriptions(res.prescripitions);
-      mcPage.setLabReportTypes(res.labReportTypes);
-      mcPage.setLabReports(res.labReports);
+      // mcPage.setBodyTemperature(res.preExam.bodyTemperature);
+      // mcPage.setPulseRate(res.preExam.pulseRate);
+      // mcPage.setBloodPressure(res.preExam.bloodPressure);
+      // mcPage.setDiagnosis(res.diagnosis);
+      // mcPage.setPrescriptions(res.prescripitions);
+      // mcPage.setLabReportTypes(res.labReportTypes);
+      // mcPage.setLabReports(res.labReports);
     };
     sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
 });
@@ -39,7 +39,7 @@ $(document).ready(function() {
 
 // ---------------------capture user action--------------------------
 // edit preExam data
-$("#editPreExam").on("click", editPreExam);
+$("#editPreExam").on("submit", editPreExam);
 // upload a lab report
 $("#labReportForm").on("submit", uploadLabReport);
 
@@ -53,7 +53,7 @@ $("#labReportForm").on("submit", uploadLabReport);
 function editPreExam(event){
   event.preventDefault();
   var mcID = mcPage.mcID.text();
-  var data = jsonify($(this).parent().serializeArray());
+  var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
   var refresh = (res) => {refreshOnSuccess(res)};

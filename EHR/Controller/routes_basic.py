@@ -472,7 +472,7 @@ def nurseViewMC():
 def nurseGetComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id)
-	return make_response(jsonify({"comments":appt.reject_reason}))
+	return make_response(jsonify({"comments":appt[0].reject_reason}))
 
 @app.route('/nursePastAppt', methods=['GET', 'POST'])
 def nursePastAppt():
@@ -507,7 +507,7 @@ def nurseEditPreExam():
 	mc_id = request.form['mcID']
 	body_temperature = request.form['bodyTemperature']
 	pulse_rate = request.form['pulseRate']
-	blood_pressure = request.form['bloodPressue']
+	blood_pressure = request.form['bloodPressure']
 
 	mc = Medical_record.query.filter( Medical_record.id == mc_id).first()
 	mc.body_temperature = body_temperature
