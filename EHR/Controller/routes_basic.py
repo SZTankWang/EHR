@@ -280,13 +280,13 @@ def nurseTodayAppt():
 	return make_response(jsonify(
 				[response_generator(app) for app in today_depts_appts ]), 200)
 
-@app.route('/nurseFutureAppt', methods=['GET'])
+@app.route('/nurseFutureAppt', methods=['GET', 'POST'])
 @login_required
 def nurseFutureAppt():
 	nurse_id = current_user.get_id()
 	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
-	future_7d_appts = helper.nurse_dept_appts(nurse_id, period=7).all()
+	future_appts = helper.nurse_dept_appts(nurse_id, direction="future").all()
 
 	helper.load_id2name_map()
 	def response_generator(app):
@@ -297,7 +297,7 @@ def nurseFutureAppt():
 			"patient": helper.id2name(app.patient_id),
 			"symptoms": app.symptoms}
 	return make_response(jsonify(
-				[response_generator(app) for app in future_7d_appts ]), 200)
+				[response_generator(app) for app in future_appts ]), 200)
 
 # @app.route('nurseProcessApp')
 
@@ -427,17 +427,31 @@ def nurseOnGoingAppt():
 
 @app.route('/nurseRejectedApp', methods=['GET', 'POST'])
 def nurseRejectedApp():
-	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
-	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
-	nurse_id = current_user.get_id()
-
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
 	# nurse_id = "17711783"
+	nurse_id = current_user.get_id()
+	start_date = request.form['startDate']
+	end_date = request.form['endDate']
+	if start_date:
+		start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+	if end_date:
+		end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 
-	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
-		 start_date=start_date).filter(Application.status==StatusEnum.rejected)
+	if start_date:
+		if end_date:
+			apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
+			 	start_date=start_date).filter(Application.status==StatusEnum.rejected)
+		else:
+			apps = helper.nurse_dept_appts(nurseID=nurse_id, direction="future", period=(end_date-start_date).days,\
+			 	start_date=start_date).filter(Application.status==StatusEnum.rejected)
+	else:
+		if end_date:
+			apps = helper.nurse_dept_appts(nurseID=nurse_id, direction="past", period=(end_date-start_date).days,\
+			 	start_date=end_date).filter(Application.status==StatusEnum.rejected)
+		else:
+			apps = helper.nurse_dept_appts(nurseID=nurse_id).filter(Application.status==StatusEnum.rejected)
 
 	helper.load_id2name_map()
 	return make_response(
@@ -471,17 +485,20 @@ def nurseGetComments():
 
 @app.route('/nursePastAppt', methods=['GET', 'POST'])
 def nursePastAppt():
-	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
-	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
-	nurse_id = current_user.get_id()
-
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
 	# nurse_id = "17711783"
 
-	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
-		 start_date=start_date).filter(Application.status==StatusEnum.finished)
+	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
+	nurse_id = current_user.get_id()
+	if request.form['startDate']:
+		start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+		apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
+			 start_date=start_date).filter(Application.status==StatusEnum.finished)
+	else: # if startDate is None then get all past appts
+		apps = helper.nurse_dept_appts(nurseID=nurse_id, direction="past",\
+			 start_date=end_date).filter(Application.status==StatusEnum.finished)
 
 	helper.load_id2name_map()
 	return make_response(

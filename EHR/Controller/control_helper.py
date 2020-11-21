@@ -63,18 +63,39 @@ def id2name(this_id:int)->String:
 	return person_name
 
 
-def nurse_dept_appts(nurseID, period, start_date=datetime.date.today()):
+def nurse_dept_appts(nurseID, direction=None, period=None, start_date=datetime.date.today()):
 	"""
 	check this nurse dept. all appointments, with specified time period
 	"""
 	deptID = Nurse.query.filter(Nurse.id==nurseID).first().department_id
-	same_dept_appts = Application.query.\
-					join(Doctor, Doctor.id==Application.doctor_id).\
-					join(Time_slot, Time_slot.id==Application.time_slot_id).\
-						filter(
-							Doctor.department_id==deptID,
-							Time_slot.slot_date>=start_date,
-							Time_slot.slot_date<=start_date+timedelta(days=period))
+	if period:
+		same_dept_appts = Application.query.\
+						join(Doctor, Doctor.id==Application.doctor_id).\
+						join(Time_slot, Time_slot.id==Application.time_slot_id).\
+							filter(
+								Doctor.department_id==deptID,
+								Time_slot.slot_date>=start_date,
+								Time_slot.slot_date<=start_date+timedelta(days=period))
+	else:
+		if direction == "future":
+			same_dept_appts = Application.query.\
+							join(Doctor, Doctor.id==Application.doctor_id).\
+							join(Time_slot, Time_slot.id==Application.time_slot_id).\
+								filter(
+									Doctor.department_id==deptID,
+									Time_slot.slot_date>=start_date)
+		elif direction == "past":
+			same_dept_appts = Application.query.\
+							join(Doctor, Doctor.id==Application.doctor_id).\
+							join(Time_slot, Time_slot.id==Application.time_slot_id).\
+								filter(
+									Doctor.department_id==deptID,
+									Time_slot.slot_date<=start_date)
+		else:
+			same_dept_appts = Application.query.\
+							join(Doctor, Doctor.id==Application.doctor_id).\
+								filter(
+									Doctor.department_id==deptID)
 	return same_dept_appts
 
 def t_slotid2date(slot_id):
