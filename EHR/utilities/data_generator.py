@@ -2,7 +2,9 @@ from datetime import date, timedelta
 from random import randint
 import sys
 from sys import path_importer_cache
-from typing import DefaultDict, List
+from typing import Container, DefaultDict, List
+
+from sqlalchemy.orm.session import _state_session
 sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
 from EHR.model.models import *
 from EHR import db 
@@ -13,8 +15,7 @@ from bs4 import BeautifulSoup, NavigableString
 import datetime
 from sqlalchemy import func, or_
 from EHR.Controller import control_helper as helper
-
-
+import string 
 
 N_RECORD = 100
 BLOOD_TYPE = ['A','B','O','AB']
@@ -155,7 +156,6 @@ def gen_appt():
 	# doctorid_list = get_single_column(Doctor, Doctor.id)
 	nurseid_list = get_single_column(Nurse, Nurse.id)
 	mcid_list = Medical_record.query.all()
-	print("mcid_list:", mcid_list)
 	patientid_list = get_single_column(Patient, Patient.id)
 	base_date = datetime.date.today()
 
@@ -194,7 +194,8 @@ def gen_appt():
 		appt = Application( 
 						doctor_id = doctorid,
 						app_timestamp = appt_made_time,
-						status = status_enum.value,
+						# status = status_enum.value,
+						status = status_enum,
 						time_slot_id = tslotid,
 						approver_id = random.choice(nurseid_list) if status_enum == StatusEnum.approved else None,
 						patient_id = patientid,
@@ -221,13 +222,49 @@ def gen_prescription():
 		db.session.add(prscrpt)
 	db.session.commit()
 
+def gen_random_string(times, length):
+	letters = string.ascii_lowercase
+	str_list = []
+	for _ in range(times):
+		random_str = ''.join(random.choice(letters) for i in range(length))
+		str_list.append(random_str)
+	return str_list
+
+def gen_report_type():
+	n_type = len(labReportTypeEnum)
+	descriptions = gen_random_string(n_type, 30)
+	for i in range(n_type):
+		lrt = Lab_report_type(
+			type=list(labReportTypeEnum)[i],
+			description=descriptions[i]
+		)
+		db.session.add(lrt)
+	db.session.commit()
+
+def gen_lab_reports():
+	rp_file = open("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/sample_lab_report.pdf", "rb").read()
+	mc_ids = [mc.id for mc in Medical_record.query.all()]
+	nurse_ids = [n.id for n in Nurse.query.all()]
+	patient_ids = [p.id for p in Patient.query.all()]
+
+	for i in range(N_RECORD):
+		lb = Lab_report(
+			lr_type = random.choice(list(labReportTypeEnum)),
+			comments = gen_random_string(1, 30),
+			mc_id = random.choice(mc_ids),
+			uploader_id = random.choice(nurse_ids),
+			patient_id = random.choice(patient_ids),
+			file=rp_file
+		)
+		db.session.add(lb)
+	db.session.commit()
+
 def practice_query():
 	slot_id=15
 	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date 
 	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id 
 	seg_start_t = Time_segment.query.filter(Time_segment.t_seg_id==seg_id).first().t_seg_starttime
-	print(seg_start_t)
-	print(type(seg_start_t))
+
 
 def main():
 	# please do not change the following execution order
@@ -238,7 +275,9 @@ def main():
 	# gen_time_seg()
 	# gen_time_slot()
 	# gen_appt()
-	gen_prescription()
+	# gen_prescription()
+	# gen_report_type()
+	gen_lab_reports()
 
 main()
 	

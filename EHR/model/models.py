@@ -245,8 +245,17 @@ class Prescription(db.Model):
 	def __repr__(self):
 		return f'Prescription < id: {self.id}, mc_id: {self.mc_id} >'
 
+class labReportTypeEnum(enum.Enum):
+	urine_test = "Urine Test"
+	blood_test = "Blood Test"
+	tumor_markers = "Tumor Marker"
+	metabolic_panel = "Metabolic Panel"
+	lipid_panel = "Lipid Panel"
+	liver_panel = "Liver Panel"
+	thyroid_stimulating_hormone = "Thyroid Stimulating Hormone"
+
 class Lab_report_type(db.Model):
-	type = db.Column(db.String(50), primary_key=True)
+	type = db.Column(db.Enum(labReportTypeEnum), primary_key=True)
 	description = db.Column(db.Text())
 	#one-to-many relationship, one report type might contains sereval reports.
 	lab_reports = db.relationship('Lab_report', backref='lab_report_type', lazy=True)
@@ -258,7 +267,7 @@ class Lab_report(db.Model):
 	file = db.Column(db.LargeBinary())
 	comments = db.Column(db.Text())
 	#foreign key
-	lr_type = db.Column(db.String(50), \
+	lr_type = db.Column(db.Enum(labReportTypeEnum), \
 		db.ForeignKey('lab_report_type.type'), nullable=False)
 	mc_id = db.Column(db.Integer(), \
 		db.ForeignKey('medical_record.id'), nullable=False)
