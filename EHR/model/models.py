@@ -214,6 +214,7 @@ class Medical_record(db.Model):
 	high_blood_pressure = db.Column(db.Numeric(5,1))
 	heart_rate = db.Column(db.Integer())
 	weight = db.Column(db.Numeric(5,1))
+	height = db.Column(db.Numeric(5,1))
 	state = db.Column(db.Enum(stateEnum), default=stateEnum.conscious)
 	diagnosis = db.Column(db.Text())
 

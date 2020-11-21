@@ -384,6 +384,8 @@ def nurseUploadLabReport():
 		mc_id=mc_id,
 		file=lab_report
 	)
+	db.session.add(lab_report)
+	db.session.commit()
 
 	return make_response(jsonify({"ret": 0}))
 

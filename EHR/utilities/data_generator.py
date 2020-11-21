@@ -184,6 +184,7 @@ def gen_appt():
 				high_blood_pressure = random.randint(80,120),
 				heart_rate = random.randint(60,100),
 				weight = random.uniform(0,200),
+				height = random.uniform(150,200),
 				state = random.choice(list(stateEnum)),
 				diagnosis = "doctor diagnosis: ...",
 				patient_id = patientid
