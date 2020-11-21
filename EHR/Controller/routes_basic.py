@@ -178,17 +178,13 @@ def searchHospital():
 		  'n_tot_records': n_tot_records} for i in range(len(rawHospitals))]), 200)
 
 @app.route('/goToHospital',methods=['GET'])
+@login_required
 def goToHospital():
-	# hospitalID = request.args.get('hospitalID')
-	# departments = Hospital.query.filter
-	pass
-'''
-医院列表页
-返回template, 医院科室信息
-'''
-@app.route('/department',methods=['GET'])
-def department():
-	return render_template('patientDepartment.html')
+	hospitalID = request.form['hospitalID']
+	department_ID,department_name = helper.hosp2dept(hospitalID)
+	return render_template("patientDepartment.html",hospital_ID=hospitalID,
+	department_list=[{'departmentID':department_ID[i],
+	'departmentName':department_name[i]} for i in range(len(department_ID))])
 
 @app.route('/doctorAvailSlot', methods=['POST', 'GET'])
 def doctorAvailSlot():
