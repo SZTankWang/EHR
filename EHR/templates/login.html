@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>welcome to WeCare</title>
+	<link rel="stylesheet" href="/static/login.css">
+
+</head>
+<body>
+	<div id="login-bg">
+	</div>
+	<div id="login-form-container">
+		<p id='login-title'>WeCare</p>
+		<div id="login-field">
+			<div id="login-form-mode-bar">
+				<div class="mode" id="go-login" onclick="goLogin()">login</div>
+				<div class="mode" id="go-register" onclick="goRegister()">register</div>
+
+			</div>
+				<form action="" class='form' id="login-form" method="POST">
+					<div id="input-wrapper">
+						<div class="login-input" id='input-name' >
+
+							<label for="id">License ID/ID</label>
+							<input type="text" class='text-input'id="login-username" name="id">
+
+						</div>
+						<div class="login-input" id='login-input-pass'>
+							<label for="password">Password</label>
+							<input type="password" class='text-input' id="password" name="password">
+						</div>
+					</div>
+
+			</form>
+			<div id="login-btn-wrapper">
+				<button type="button" class="primary-btn" id='doLogin' onclick="login()">Login</button>
+			</div>
+
+			<div id="option-container">
+				<div class="login-option" id='forget-password'>
+					forget password
+				</div>
+				<div class="login-option" id='forget-username'>
+					forget username
+				</div>
+			</div>
+
+			</div>
+		</div>
+
+
+	<script crossorigin="anonymous" integrity="sha512-WNLxfP/8cVYL9sj8Jnp6et0BkubLP31jhTG9vhL/F5uEZmg5wEzKoXp1kJslzPQWwPT1eyMiSxlKCgzHLOTOTQ==" src="https://lib.baomitu.com/jquery/3.5.1/jquery.js"></script>	<script type="module" src="/static/login.js"></script>
+	<script type="text/javascript">
+		//登录页头登录/注册切换按钮
+		renderFormType();
+
+		function renderFormType(){
+			var type=$('.form').attr('id');
+			if(type=='login-form'){
+				$('#go-login').css({'background':'#2D79D6','color':'white' 	});
+			}
+			else{
+				$('#go-register').css({'background':'#2D79D6','color':'white'});
+			}
+
+		}
+
+		function clickDoctor(){
+			console.log('捕获');
+			$('#choice-view-container').remove();
+			renderRegister('doctor');
+		}
+
+		function clickNurse(){
+			console.log('护士');
+			$('#choice-view-container').remove();
+			renderRegister('nurse');
+
+		}
+
+		function clickPatient(){
+			console.log('病人');
+			$('#choice-view-container').remove();
+			renderRegister('patient');
+		}
+
+		function goRegister(){
+			console.log('切换至注册');
+			document.getElementById('go-login').style.background="white";
+			document.getElementById('go-login').style.color="#BCC3CA";
+			document.getElementById('go-register').style.background="#2D79D6";
+			document.getElementById('go-register').style.color="white";
+			if($('.form').attr('id')=='login-form'){
+				clearLoginForm();
+			} else {
+				clearRegisterForm();
+			}
+			$('#login-field').append(renderChoice());
+		}
+
+		function goLogin(){
+			if($('.form').attr('id')!='login-form'){
+				console.log('切换至登录');
+				document.getElementById('go-login').style.background="#2D79D6";
+				document.getElementById('go-login').style.color="white";
+				document.getElementById('go-register').style.background="white";
+				document.getElementById('go-register').style.color="#BCC3CA";
+				if($('#choice-view-container')){
+					$('#choice-view-container').remove();
+				}
+				clearRegisterForm();
+				// $('.form').empty();
+				// $('.form').attr('id','')
+				$('#login-field').append(concatLogin());
+
+			}
+
+		}
+
+		function clearRegisterForm(){
+			$('.register-form').remove();
+			$('.register-btn-wrapper').remove();
+			// $('')
+			if($('.register-msg-container')){
+				$('.register-msg-container').remove();
+			}
+		}
+		//清空表单和忘记密码
+		function clearLoginForm(){
+			$('.form').remove();
+			$('#login-btn-wrapper').remove();
+			$('#option-container').remove();
+		}
+
+		//替换成选择角色
+		function renderChoice(){
+			var temp="";
+			temp+= "<!-- 按钮部分 --><div id='choice-view-container'><div id='choice-header-wrapper'><div id='choice-header'>Register as:</div><span></span></div><div id='choice-btn-outer-container'><div class='choice-btn-container' id='doctor' onclick='clickDoctor()'><div class='choice-background' id='doctor-background'></div><div class='choice-description'>Doctor</div></div><div class='choice-btn-container' id='staff' onclick='clickNurse()'><div class='choice-background' id='staff-background'></div><div class='choice-description'>Staff</div></div><div class='choice-btn-container' id='patient' onclick='clickPatient()'><div class='choice-background' id='patient-background'></div><div class='choice-description'>Patient</div></div></div></div>";
+			return temp;
+		}
+
+		function renderRegister(role){
+			$('#login-field').append(concatRegister(role));
+
+		}
+
+		function concatRegister(role){
+			var temp = '';
+			if(role=='patient'){
+				temp+='<form action="" class="register-form" id="patient-register-form"><div class="register-input" ><label for="firstName">First Name</label><input type="text" id="firstName" name="firstName"></div><div class="register-input" ><label for="lastName">Last Name</label><input type="text" id="lastName" name="lastName"></div><div class="register-input"><label for="National ID">National ID</label><input type="text" id="ID" name="id"></div><div class="register-input"><label for="phone">Phone</label><input type="text" id="phone" name="phone"></div><div class="register-input"><label for="Email">Email</label><input type="email" id="Email" name="email"></div><div class="register-input"><label for="password">Password</label><input type="password" id="password" name="password"></div></form><div class="register-btn-wrapper"id="patient-register-btn-wrapper"><button type="button" class="primary-btn" id="doRegister" onclick="register()">Register</button></div>';
+			}
+			if(role=='doctor'){
+				temp+='<form action="" class="register-form" id="doctor-register-form"><div class="register-input" ><label for="departmentID">Department ID</label><input type="text" id="departmentID" name="department"></div><div class="register-input" ><label for="firstName">First Name</label><input type="text" id="firstName" name="firstName"></div><div class="register-input" ><label for="lastName">Last Name</label><input type="text" id="lastName" name="lastName"></div><div class="register-input"><label for="LicenseID">License ID</label><input type="text" id="ID" name="id"></div><div class="register-input"><label for="phone">Phone</label><input type="text" id="phone" name="phone"></div><div class="register-input"><label for="Email">Email</label><input type="email" id="Email" name="email"></div><div class="register-input"><label for="password">Password</label><input type="password" id="password" name="password"></div></form><div class="register-btn-wrapper"id="doctor-register-btn-wrapper"><button type="button" class="primary-btn" id="doRegister" onclick="register()"">Register</button></div>';
+			}
+			if(role=='nurse'){
+				temp+='<form action="" class="register-form" id="nurse-register-form"><div class="register-input" ><label for="departmentID">Department ID</label><input type="text" id="departmentID" name="department"></div><div class="register-input" ><label for="firstName">First Name</label><input type="text" id="firstName" name="firstName"></div><div class="register-input" ><label for="lastName">Last Name</label><input type="text" id="lastName" name="lastName"></div><div class="register-input"><label for="LicenseID">License ID</label><input type="text" id="ID" name="id"></div><div class="register-input"><label for="phone">Phone</label><input type="text" id="phone" name="phone"></div><div class="register-input"><label for="Email">Email</label><input type="email" id="Email" name="email"></div><div class="register-input"><label for="password">Password</label><input type="password" id="password" name="password"></div></form><div class="register-btn-wrapper"id="nurse-register-btn-wrapper"><button type="button" class="primary-btn" id="doRegister" onclick="register()">Register</button></div>'
+			}
+
+
+			return temp;
+			}
+
+		function concatLogin(){
+			var temp='';
+			temp += '<form action="" class="form" id="login-form" method="POST"><div id="input-wrapper"><div class="login-input" id="input-name" ><label for="id">License ID/ID</label><input type="text" class="text-input"id="login-username" name="id"></div><div class="login-input" id="login-input-pass"><label for="password">Password</label><input type="password" class="text-input" id="password" name="password"></div></div></form><div id="login-btn-wrapper"><button type="button" class="primary-btn" id="doLogin" onclick="login()">Login</button></div><div id="option-container"><div class="login-option" id="forget-password">forget password</div><div class="login-option" id="forget-username">forget username</div></div>'
+
+			return temp;
+		}
+
+		function login(){
+			onWaitingChangeStyle();
+			var sendData = $('.form').serializeArray();
+			sendData=jsonify(sendData);
+			//console.log(sendData);
+			$.ajax({
+				url:"http://localhost:5000/login",
+				type: 'POST',
+				data: sendData,
+				success: function(res){
+					//console.log(res);
+					clearLoginForm();
+					$('#login-form-mode-bar').remove();
+					showLoginMessage(res);
+					if(res['ret']==0){
+						setTimeout(loadHomePage,1000);
+					}
+					else{
+						setTimeout("window.location.replace('http://localhost:5000/login')",1000);
+					}
+				}
+			})
+		}
+
+		function loadHomePage(role){
+			// $.ajax({
+			// 	url:"http://localhost:5000/loadHomePage",
+			// 	type:'GET',
+			// 	success: function(res){
+			// 		$(this).html(res);
+			// 	}
+			// })
+			window.location.replace("http://localhost:5000/loadHomePage")
+		}
+
+		function register(){
+			//获取注册表单角色
+			onWaitingChangeStyle();
+			registerInfo = [];
+			if($('.register-form').attr('id')=='doctor-register-form'){
+				console.log('医生注册');
+				var registerInfo = $('.register-form').serializeArray();
+				registerInfo = jsonify(registerInfo);
+				registerInfo["role"]="doctor";
+				// console.log(registerInfo);
+			}
+			if($('.register-form').attr('id')=='nurse-register-form'){
+				console.log('护士注册');
+				var registerInfo = $('.register-form').serializeArray();
+				registerInfo = jsonify(registerInfo);
+				registerInfo["role"]="nurse";
+				// console.log(registerInfo);
+			}
+			if($('.register-form').attr('id')=='patient-register-form'){
+				console.log('病人注册');
+				var registerInfo = $('.register-form').serializeArray();
+				registerInfo = jsonify(registerInfo);
+				registerInfo["role"]="patient";
+				// console.log(registerInfo);
+			}
+			console.log(registerInfo);
+
+			//ajax请求
+			jQuery.ajax({
+				url: "http://localhost:5000/register",
+				type: 'POST',
+				data:registerInfo,
+				success:function(data){
+					console.log(data);
+					showRegisterMessage(data);
+					if(data['ret']==0){
+						setTimeout(goLogin,2000);
+					}
+						setTimeout(goRegister,2000);
+					}
+				});
+		}
+
+		//等待过程中改变表单颜色
+		function onWaitingChangeStyle(){
+			var labels=document.getElementsByTagName('label');
+			for(var i=0;i<labels.length;i++){
+				labels[i].style.color='grey';
+			}
+		}
+
+		function showRegisterMessage(data){
+			clearRegisterForm();
+			if(data['ret']==0){
+				var temp ='<div class="register-msg-container" id="register-message-success">'+'registered successfully'+"</div>";
+			}
+			else{
+				var temp ='<div class="register-msg-container" id="register-message-failure">'+data['message']+"</div>";
+			}
+
+			$('#login-field').append(temp);
+
+		}
+
+		function showLoginMessage(data){
+			clearLoginForm();
+			if(data['ret']==0){
+				var temp ='<div class="login-msg-container" id="success-login-msg">'+'welcome back'+'</div>';
+			}
+
+			else{
+				var temp ='<div class="login-msg-container" id="success-login-msg">'+'Error, check your information'+'</div>';
+			}
+
+			$('#login-field').append(temp);
+
+		}
+		//表单数据json化 通用函数
+		function jsonify(data){
+			var obj = {};
+			for(var i=0;i<data.length;i++){
+				obj[data[i].name]=data[i].value;
+			}
+			return obj;
+		}
+</script>
+</body>
+</html>

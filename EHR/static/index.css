@@ -1,0 +1,113 @@
+/*body{
+	background-image: url(https://source.unsplash.com/C9XxB96hEEM/1600x900);
+	background-position: 50% 0%;
+	background-size: 60% 60%;
+	background-repeat: no-repeat;
+}*/
+
+:root{
+	font-family: Helvetica;
+	font-size:14px;
+}
+#user-link-wrapper{
+	display: flex;
+	flex-direction: row;
+	padding-right:4px;
+}
+
+.navbar-link{
+	margin-right:15%;
+}
+
+#background-container{
+	display: flex;
+	height:30vh;
+	background-image: url(https://source.unsplash.com/C9XxB96hEEM/1600x900);
+	background-position: 50% 15%;
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+}
+
+#search-bar-container{
+	width:50vw;
+	position:fixed;
+	top:33%;
+	left:25%;
+}
+
+#do-search{
+	background-color: white;
+	border:1px solid #AEB6BF ;
+}
+
+/*#search-btn-container{
+	border: 1px solid red ;
+}*/
+#function-container{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	/*border:1px solid red;*/
+	position:fixed;
+	top:40%;
+	left:0%;
+	width:100%;
+	min-height:30vh;
+}
+
+.function{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+/*	border:1px solid blue;
+*/	height:80%;
+	width:fit-content;
+	justify-content: space-evenly;
+	padding-top: 3px;
+}
+#info-container{
+	width:30%;
+	height:40vh;
+	border:1px solid #AEB6BF;
+	border-radius: 3px;
+  -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+    transition: all 250ms cubic-bezier(.02, .01, .47, 1);
+}
+
+.my-card{
+	width:15vw;
+	height: 20vh;
+	border:1px solid #AEB6BF;
+	border-radius: 3px;
+	margin-top: 5px;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	flex-direction: column;
+	margin:1vw;
+	  -webkit-transition: all 250ms cubic-bezier(0.02, 0.01, 0.47, 1);
+    transition: all 250ms cubic-bezier(.02, .01, .47, 1);
+}
+
+.my-card:hover{
+    box-shadow: 0 16px 32px 0 rgba(48, 55, 66, 0.15);
+    transform: translate(0,-5px);
+    transition-delay: 0s;
+ 	cursor:pointer;
+}
+
+.content-wrapper{
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	min-height: fit-content;
+/*	border: 1px solid red;
+*/}
+
+.function-title{
+	font-family: Helvetica;
+	font-size: 1em;
+	font-weight:bolder;
+}
