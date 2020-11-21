@@ -560,9 +560,77 @@ def nurseEditPreExam():
 
 	return make_response(jsonify({'ret':0}))
 
+@app.route('/nurseCreateAppt', methods=['GET','POST'])
+@login_required
+def createAppt():
+	try:
+		nurseID = current_user.get_id()
+		appID = request.form['id']
+		symptom = request.form['symptoms']
+		time_slot_id = request.form['time_slot_id']
+		doctor_id = request.form['doctor_id']
+		patient_id = request.form['patient_id']
+		slot = Time_slot.query.filter(Time_slot.id = time_slot_id).first()
+		date = slot.slot_date
+		time = Time_segment.query.filter(Time_segment.t_seg_id = slot.slot_seg_id).first().t_seg_starttime
+		application = Application(id=appID,app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+		symptoms=symptom,status=StatusEnum.approved,reject_reason="",date=date,time=time,time_slot_id=time_slot_id,
+				doctor_id=doctor_id,approver_id=nurseID,patient_id=patient_id)
+		'''medical_record = Medical_record(id=mcID,body_temperature=body_temperature,low_blood_pressure=low_blood_pressure,
+					high_blood_pressure=high_blood_pressure,heart_rate=heart_rate,weight=weight,
+						height=height,state=state,diagnosis=diagnosis,patient_id=patient_id)'''
+		# update corresponding table
+		db.session.add(application)
+		db.session.add(medical_record)
+		timeslot = Time_slot.query.filter(id == time_slot_id).first()
+		if timeslot.n_booked > 0:
+			timeslot.n_booked = timeslot.n_booked - 1
+		else:
+			db.session.rollback()
+			return make_response(jsonify({'ret':1, 'message':"no available slots!"}))
+		db.session.commit()
+		return make_response(jsonify({"ret":0, 'message':""}), 200)
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message':"error"}))
+
+@app.route('/nurseGetDepartmentsForNurse',methods=['GET'])
+@login_required
+def nurseGetDepartmentsForNurse():
+	nurseID = current_user.get_id()
+	dept_list,dept_name=helper.nurse_hosp_dept(nurseID)
+	return make_response(
+		jsonify(
+			[{"deptid": dept_list[i],
+			"deptname": dept_name[i]} for i in range(len(dept_list))]),200)
+
+@app.route('/nurseGetDoctorsForDepartment',methods=['GET','POST'])
+@login_required
+def nurseGetDoctorsForDepartment():
+	deptID = request.form['deptID']
+	doctor_list= helper.dept2doc(deptID) ##put into helper
+	helper.load_id2name_map()
+	return make_response(
+		jsonify(
+			[{"doctorID": doctor_list[i],
+			"doctorName": helper.id2name(doctor_list[i])} for i in range(len(doctor_list))]),200)
+
+@app.route('/nurseGetSlotsForDoctor',methods=['GET','POST'])
+@login_required
+def nurseGetSlotsForDoctor():
+	doctorID = request.form['doctorID']
+	slot_list= doc2slots(doctorID, 0, start_date=datetime.date.today())
+	time_list = [helper.slot2time(slot_list[i].id) for i in range(len(slot_list))]
+	return make_response(
+		jsonify(
+			[{"slotid": slot_list[i],"slottime": timedate.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")} 
+			 for i in range(len(slot_list))]),200)
+
+
 @app.route('/nursePreviewLR', methods=['GET', 'POST'])
 def nursePreviewLR():
 	lr_id = request.form['lrID']
 	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
+
 	
 
