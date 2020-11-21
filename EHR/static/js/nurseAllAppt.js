@@ -95,7 +95,7 @@ function goUpdateTable(route, dateRange=null){
 function updateDateRange(event){
   event.preventDefault();
   var dateRange = $(this).serializeArray();
-  console.log(dateRange);
+  dateRange = jsonify(dateRange);
   var route = getRoute();
   goUpdateTable(route, dateRange);
 }
