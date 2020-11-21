@@ -625,8 +625,27 @@ def nurseGetSlotsForDoctor():
 		jsonify(
 			[{"slotid": slot_list[i],"slottime": timedate.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")} 
 			 for i in range(len(slot_list))]),200)
+@app.route('/nurseGoViewAppt', methods=['GET', 'POST'])
+@login_required
+def nurseGoCreateAppt():
+	patient_id = request.form['patientID']
+	helper.load_id2name_map()
+	return render_template('nurseViewMC.html',patient_id,helper.id2name(patient_id))
 
 
+@app.route('/nurseViewAppt', methods=['GET', 'POST'])
+@login_required
+def nurseGoCreateAppt():
+	patient_id = request.form['patientID']
+	helper.load_id2name_map()
+	table = Application.query.filter(Application.patient_id=patientID,Application.status=StatusEnum.approved).all()
+	return make_response(
+		jsonify(patient_id,helper.id2name(patient_id),[{'appID':table[i].id,'mcID':table[i].mc_id,
+		'date':table[i].date,'time':table[i].time,'doctor':helper.id2name(table[i].doctor_id)} for i in range(len(table))]
+		       )
+	)
+
+			
 @app.route('/nursePreviewLR', methods=['GET', 'POST'])
 def nursePreviewLR():
 	lr_id = request.form['lrID']
