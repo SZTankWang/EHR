@@ -330,20 +330,24 @@ def nurseGoViewAppt(appID):
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @login_required
 def nurseViewAppt():
-
-	# mc_id = request.form['mcID']
-	mc_id=1
-	mc = Medical_record.query.filter(Medical_record.id==mc_id).one()
+	mc_id = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 	lab_reports = mc.lab_reports 
-	lab_r_types = [report.lr_type for report in lab_reports]
+	lab_r_types = Lab_report_type.query.all()
 
 	return make_response(
 		jsonify({
 			"preExam": 
-				{"bodyTemperature": mc.body_temperature,
-				"pulseRate": mc.heart_rate,
-				"bloodPressure": mc.blood_pressure},
+				{"bodyTemperature": str(mc.body_temperature),
+				"heartRate": str(mc.heart_rate),
+				"lowbloodPressure": str(mc.low_blood_pressure),
+				"highBloodPressure": str(mc.high_blood_pressure),
+				"weight": str(mc.weight),
+				"height": str(mc.height),
+				"state": mc.state.value},
 
 			"diagnosis": 
 				mc.diagnosis,
@@ -537,22 +541,28 @@ def nurseEditPreExam():
 	mc_id = request.form['mcID']
 	body_temperature = request.form['bodyTemperature']
 	heart_rate = request.form['heartRate']
-	blood_pressure = request.form['bloodPressure']
+	high_blood_pressure = request.form['highBloodPressure']
+	low_blood_pressure = request.form['lowBloodPressure']
+	weight = request.form['weight']
+	height = request.form['height']
+	state = stateEnum(request.form['state'])
 
 	mc = Medical_record.query.filter( Medical_record.id == mc_id).first()
 	mc.body_temperature = body_temperature
 	mc.heart_rate = heart_rate
-	mc.blood_pressure = blood_pressure
+	mc.high_blood_pressure = high_blood_pressure
+	mc.low_blood_pressure = low_blood_pressure
+	mc.weight = weight 
+	mc.height = height
+	mc.state = state
+	
 	db.session.commit()
 
 	return make_response(jsonify({'ret':0}))
 
-	# mcID: str
-	# bodyTemperature: float/str,
-	# heartRate: float/str,
-	# highBloodPressure: float/str,
-	# lowBloodPressure: float/str,
-	# weight: float/str,
-	# height: float/str,
-	# state: str
+@app.route('/nursePreviewLR', methods=['GET', 'POST'])
+def nursePreviewLR():
+	lr_id = request.form['lrID']
+	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
+	
 
