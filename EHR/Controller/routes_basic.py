@@ -435,10 +435,24 @@ def nurseRejectedApp():
 	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
 
+<<<<<<< Updated upstream
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
 	# nurse_id = "17711783"
+=======
+	slot_ids = helper.day2slotid(period=(app_end_date-app_start_date).days, start_day=app_start_date)
+	nurseID = current_user.get_id()
+	appts = helper.nurse_dept_appts(nurseID=nurseID,
+									period=app_end_date-app_start_date,
+									start_date=app_start_date)\
+										.filter(
+											Application.id.in_(slot_ids),
+											Application.status==StatusEnum.rejected
+											).all()
+	# for test purpose
+	helper.load_id2name_map()
+>>>>>>> Stashed changes
 
 	apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
 		 start_date=start_date).filter(Application.status==StatusEnum.rejected)
@@ -449,7 +463,11 @@ def nurseRejectedApp():
 			{
 				"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
+<<<<<<< Updated upstream
 				"time": app.time.strftime(helper.TIME_FORMAT),
+=======
+				"time": helper.slot2time(app.time_slot_id)[1].strftime(helper.TIME_FORMAT),
+>>>>>>> Stashed changes
 				"doctor": helper.id2name(app.doctor_id),
 				"patient": helper.id2name(app.patient_id),
 				"symptoms": app.symptoms
