@@ -321,7 +321,7 @@ def nurseGoViewAppt(appID):
 
 	helper.load_id2name_map()
 	return render_template('nurseViewAppt.html',
-		appID=appID,
+		appID=appt_res.id,
 		date=appt_res.date.strftime(helper.DATE_FORMAT),
 		time=appt_res.time.strftime(helper.TIME_FORMAT),
 		doctor=helper.id2name(appt_res.doctor_id),
@@ -329,7 +329,7 @@ def nurseGoViewAppt(appID):
 		patient=helper.id2name(appt_res.patient_id),
 		symptoms=appt_res.symptoms,
 		comments=appt_res.reject_reason,
-		mcID=None,
+		mcID=appt_res.mc_id,
 		appStatus=appt_res.status)
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])

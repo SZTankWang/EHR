@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from random import randint
 import sys
 from sys import path_importer_cache
 from typing import DefaultDict, List
@@ -145,12 +146,15 @@ def gen_time_slot():
 def get_single_column(db_obj, column_wanted) -> List:
 	return [res[0] for res in db_obj.query.with_entities(column_wanted).all()]
 
+
 def gen_appt():
 	slotid_list = get_single_column(Time_slot, Time_slot.id) 
 	basetime = datetime.datetime.today()
 	# status_list = [status for status, _ in StatusEnum.__members__.items()]
 	# doctorid_list = get_single_column(Doctor, Doctor.id)
 	nurseid_list = get_single_column(Nurse, Nurse.id)
+	mcid_list = Medical_record.query.all()
+	print("mcid_list:", mcid_list)
 	patientid_list = get_single_column(Patient, Patient.id)
 	base_date = datetime.date.today()
 
@@ -165,17 +169,37 @@ def gen_appt():
 			appt_made_time = appt_made_time + timedelta(days=random.randint(-14,14))
 		status_enum = random.choice(list(StatusEnum))
 		tslotid = random.choice(slotid_list)
+		timeslot_filter = Time_slot.query.filter(Time_slot.id==tslotid)
 		doctorid = Time_slot.query.filter(Time_slot.id==tslotid).first().doctor_id
+		patientid = random.choice(patientid_list)
+		# for those appts with status=approved, generate a new medical_record
+		mc_count=None
+		if status_enum == StatusEnum.approved:
+			mc_count = Medical_record.query.count()
+			mc = Medical_record(
+				id = mc_count+1,
+				body_temperature = random.uniform(30,45),
+				low_blood_pressure = random.randint(60,90),
+				high_blood_pressure = random.randint(80,120),
+				heart_rate = random.randint(60,100),
+				weight = random.uniform(0,200),
+				state = random.choice(list(stateEnum)),
+				diagnosis = "doctor diagnosis: ...",
+				patient_id = patientid
+			)
+			db.session.add(mc)
+
 		appt = Application( 
 						doctor_id = doctorid,
 						app_timestamp = appt_made_time,
 						status = status_enum.value,
 						time_slot_id = tslotid,
 						approver_id = random.choice(nurseid_list) if status_enum == StatusEnum.approved else None,
-						patient_id = random.choice(patientid_list),
+						patient_id = patientid,
 						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"]),
-						date = helper.t_slotid2date(tslotid),
-						time = helper.t_slot2time(tslotid)		
+						date = timeslot_filter.one().slot_date,
+						time = helper.segid2time(timeslot_filter.one().slot_seg_id),
+						mc_id = mc_count+1 if mc_count else None		
 		)
 		db.session.add(appt)
 	db.session.commit()
