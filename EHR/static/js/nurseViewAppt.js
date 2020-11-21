@@ -25,13 +25,17 @@ $(document).ready(function() {
     const mcID = mcPage.mcID.text();
     const mcData = {"mcID": mcID};
     var fillMCData = (res) => {
-      // mcPage.setBodyTemperature(res.preExam.bodyTemperature);
-      // mcPage.setPulseRate(res.preExam.pulseRate);
-      // mcPage.setBloodPressure(res.preExam.bloodPressure);
-      // mcPage.setDiagnosis(res.diagnosis);
-      // mcPage.setPrescriptions(res.prescripitions);
-      // mcPage.setLabReportTypes(res.labReportTypes);
-      // mcPage.setLabReports(res.labReports);
+      mcPage.setBodyTemperature(res.preExam.bodyTemperature);
+      mcPage.setHeartRate(res.preExam.heartRate);
+      mcPage.setHighBloodPressure(res.preExam.highBloodPressure);
+      mcPage.setLowBloodPressure(res.preExam.lowBloodPressure);
+      mcPage.setWeight(res.preExam.weight);
+      mcPage.setHeight(res.preExam.height);
+      mcPage.setState(res.preExam.state);
+      mcPage.setDiagnosis(res.diagnosis);
+      mcPage.setPrescriptions(res.prescripitions);
+      mcPage.setLabReportTypes(res.labReportTypes);
+      mcPage.setLabReports(res.labReports);
     };
     sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
 });

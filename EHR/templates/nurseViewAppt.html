@@ -86,23 +86,50 @@
 				<div class="form-group row">
           <label for="bodyTemperature" class="col-2 col-form-label"><b>Body temperature</b></label>
 					<div class="col-3">
-            <input type="number" step="0.01" class="form-control-plaintext" id="bodyTemperature" name="bodyTemperature" value="36.7" readonly>
+            <input type="number" step="0.01" class="form-control" id="bodyTemperature" name="bodyTemperature" value="">
 					</div>
 					<label for="bodyTemperature" class="form-control-label">&#8451;</label>
 				</div>
 				<div class="form-group row">
-					<label for="pulseRate" class="col-2 col-form-label"><b>Pulse rate</b></label>
+					<label for="heartRate" class="col-2 col-form-label"><b>Heart rate</b></label>
 					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="pulseRate" name="pulseRate" value="">
+          	<input type="number" step="0.01" class="form-control" id="heartRate" name="heartRate" value="">
 					</div>
-					<label for="pulseRate" class="form-control-label">BPM</label>
+					<label for="heartRate" class="form-control-label">BPM</label>
 				</div>
 				<div class="form-group row">
-					<label for="bloodPressure" class="col-2 col-form-label"><b>Blood pressure</b></label>
+					<label for="highBloodPressure" class="col-2 col-form-label"><b>High blood pressure</b></label>
 					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="bloodPressure" name="bloodPressure" value="">
+          	<input type="number" step="0.01" class="form-control" id="highBloodPressure" name="highBloodPressure" value="">
 					</div>
-					<label for="bloodPressure" class="form-control-label">mmHg</label>
+					<label for="highBloodPressure" class="form-control-label">mmHg</label>
+				</div>
+				<div class="form-group row">
+					<label for="lowBloodPressure" class="col-2 col-form-label"><b>Low blood pressure</b></label>
+					<div class="col-3">
+          	<input type="number" step="0.01" class="form-control" id="lowBloodPressure" name="lowBloodPressure" value="">
+					</div>
+					<label for="lowBloodPressure" class="form-control-label">mmHg</label>
+				</div>
+				<div class="form-group row">
+					<label for="weight" class="col-2 col-form-label"><b>Weight</b></label>
+					<div class="col-3">
+          	<input type="number" step="0.01" class="form-control" id="weight" name="weight" value="">
+					</div>
+					<label for="weight" class="form-control-label">g</label>
+				</div>
+				<div class="form-group row">
+					<label for="height" class="col-2 col-form-label"><b>Height</b></label>
+					<div class="col-3">
+          	<input type="number" step="0.01" class="form-control" id="height" name="height" value="">
+					</div>
+					<label for="height" class="form-control-label">cm</label>
+				</div>
+				<div class="form-group row">
+					<label for="state" class="col-2 col-form-label"><b>State</b></label>
+					<div class="col-3">
+          	<input type="number" step="0.01" class="form-control" id="state" name="state" value="">
+					</div>
 				</div>
 				<input type="submit" class="btn btn-primary" value="Edit"/>
       </form>
@@ -125,9 +152,9 @@
 			<h5>Upload lab report</h5>
 			<form id="labReportForm" enctype="multipart/form-data">
 				<div class="form-group row">
-					<label for="typeID" class="col-2 col-form-label"><b>Lab Report Type</b></label>
+					<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
 					<div class="col-5">
-						<select class="form-control" id="labReportTypes" name="typeID" required/>
+						<select class="form-control" id="labReportTypes" name="type" required/>
 				      <option value="1" selected>1</option>
 				    </select>
 					</div>

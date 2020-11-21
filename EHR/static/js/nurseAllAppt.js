@@ -37,18 +37,18 @@ $("#futureAppt").on('click', () => goUpdateTable("nurseFutureAppt"));
 
 // view past appointments
 $("#pastAppt").on('click', function(){
-  var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
+  var dateRange = jsonifyDateRange(new Date(), new Date(), -7);
   goUpdateTable("nursePastAppt", dateRange);
 });
 
 // view applications rejected by the loggedin nurse
 $("#rejectedApp").on('click', function(){
-  var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
+  var dateRange = jsonifyDateRange(new Date(), new Date(), -7);
   goUpdateTable("nurseRejectedApp", dateRange);
 });
 
-//change time range
-$("#timeRange").on('submit', function(){});
+//change date range
+$("#dateRange").on('submit', updateDateRange);
 
 
 // --------------------------event handlers----------------------------
@@ -76,49 +76,75 @@ function buttonAction(event) {
 * @param {string} route
 * @param {array} data - default null or jsonified date range
 */
-function goUpdateTable(route, data=null){
-  var type = data ? 'POST' : 'GET';
+function goUpdateTable(route, dateRange=null){
+  var type = dateRange ? 'POST' : 'GET';
   var btnTarget = (route == "nurseRejectedApp") ? '#application' : '#appointment';
   $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res, btnTarget);
     $("#overlay").addClass("d-none");
   };
-  sendRequest(route, type, data, updateTable);
-  setStartOrEndDate();
+  sendRequest(route, type, dateRange, updateTable);
+  setStartOrEndDate(dateRange ? dateRange.startDate : null, dateRange ? dateRange.endDate : null);
 }
 
 /**
-* @desc set the start or end date according to the tab
+* @desc update date range and stay in the current tab
+* @param {event} event - submit
 */
-function setStartOrEndDate(){
-  var today = getFullDate(new Date());
-  if ($(".nav-table.active").text() == "Ongoing appointments") {
-    switchInputValue (true, true, null, true);
-  } else if ($(".nav-table.active").text() == "Future appointments") {
-    switchInputValue (true, false, today, false);
-  } else if ($(".nav-table.active").text() == "Past appointments") {
-    switchInputValue (false, true, today, false);
-  } else {
-    switchInputValue (false, false, null, false);
-  }
+function updateDateRange(event){
+  event.preventDefault();
+  var dateRange = $(this).serializeArray();
+  console.log(dateRange);
+  var route = getRoute();
+  goUpdateTable(route, dateRange);
 }
 
 //------------------------------utilities-------------------------------
-
-function jsonifyDateRange(startDate, endDate, range=null){
-  if (range) {
-    endDate.setDate(startDate.getDate() + 7);
+function jsonifyDateRange(startDate, endDate, range=0){
+  if (range < 0) {
+    startDate.setDate(endDate.getDate() + range);
+  } else if (range > 0) {
+    endDate.setDate(startDate.getDate() + range);
   }
+
   var startDateStr = getFullDate(startDate);
   var endDateStr = getFullDate(endDate);
-  var data = {"startDate": startDateStr, "endDate": endDateStr};
-  return data;
+  var dateRange = {"startDate": startDateStr, "endDate": endDateStr};
+  return dateRange;
 }
 
-function switchInputValue (start, end, today, submit) {
-  $("#startDate").prop("disabled", start);
-  $("#endDate").prop("disabled", end);
-  $("#startDate").prop("value", today);
+function getRoute(){
+  if ($(".nav-table.active").text() == "Ongoing appointments") {
+    return "nurseOnGoingAppt";
+  } else if ($(".nav-table.active").text() == "Future appointments") {
+    return "nurseFutureAppt";
+  } else if ($(".nav-table.active").text() == "Past appointments") {
+    return "nursePastAppt";
+  } else {
+    return "nurseRejectedApp";
+  }
+}
+
+function setStartOrEndDate(startDate=null, endDate=null){
+  if (!startDate && !endDate) {
+    startDate = getFullDate(new Date());
+  }
+  if ($(".nav-table.active").text() == "Ongoing appointments") {
+    switchInputAttr (true, true, startDate, startDate, true);
+  } else if ($(".nav-table.active").text() == "Future appointments") {
+    switchInputAttr (true, false, startDate, endDate, false);
+  } else if ($(".nav-table.active").text() == "Past appointments") {
+    switchInputAttr (false, true, startDate, endDate, false);
+  } else {
+    switchInputAttr (false, false, startDate, endDate, false);
+  }
+}
+
+function switchInputAttr (start, end, startDate, endDate, submit) {
+  $("#startDate").prop("readonly", start);
+  $("#endDate").prop("readonly", end);
+  $("#startDate").prop("value", startDate);
+  $("#endDate").prop("value", endDate);
   $("#applyRange").prop("disabled", submit);
 }

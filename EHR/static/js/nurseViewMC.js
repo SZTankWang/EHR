@@ -7,12 +7,14 @@
 /**
 * @global instance of MCModal
 */
-var mcModal
+var mcModal;
+var mcTable;
 
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
   // initialize instance
   myModal = new MCModal();
+  myTable = new MCTable();
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res);
@@ -47,8 +49,12 @@ function buttonAction(event) {
   const mcData = {"mcID": mcID};
   var fillMCData = (res) => {
     mcModal.setBodyTemperature(res.preExam.bodyTemperature);
-    mcModal.setPulseRate(res.preExam.pulseRate);
-    mcModal.setBloodPressure(res.preExam.bloodPressure);
+    mcModal.setHeartRate(res.preExam.heartRate);
+    mcModal.setHighBloodPressure(res.preExam.highBloodPressure);
+    mcModal.setLowBloodPressure(res.preExam.lowBloodPressure);
+    mcModal.setWeight(res.preExam.weight);
+    mcModal.setHeight(res.preExam.height);
+    mcModal.setState(res.preExam.state);
     mcModal.setDiagnosis(res.diagnosis);
     mcModal.setPrescriptions(res.prescripitions);
     mcModal.setLabReportTypes(res.labReportTypes);

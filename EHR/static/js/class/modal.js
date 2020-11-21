@@ -54,7 +54,7 @@ class AppFullModal extends AppModal{
 * @desc modal for application and medical record
 * @page nurseViewAppt
 * @attribute medical record: appStatus, mcID,
-* preExam(bodyTemperature, pulseRate, bloodPressure),
+* preExam(bodyTemperature, heartRate, bloodPressure),
 * diagnosis, precriptions, labReports
 * @method setMCID, setPreExam, setDiagnosis, setPrescriptions, setLabReports
 */
@@ -64,8 +64,12 @@ class MCModal extends AppFullModal{
     this.appStatus = $("#appStatus");
     this.mcID = $("#mcID");
     this.bodyTemperature = $("#bodyTemperature");
-    this.pulseRate = $("#pulseRate");
-    this.bloodPressure = $("#bloodPressure");
+    this.heartRate = $("#heartRate");
+    this.highBoodPressure = $("#highBoodPressure");
+    this.lowBoodPressure = $("#lowBoodPressure");
+    this.weight = $("#weight");
+    this.height = $("#height");
+    this.state = $("#state");
     this.diagnosis = $("#diagnosis");
     this.prescriptions = $("#prescriptions");
     this.labReports = $("#labReports");
@@ -83,12 +87,28 @@ class MCModal extends AppFullModal{
     this.bodyTemperature.text(bodyTemperature);
   }
 
-  setPulseRate(pulseRate){
-    this.pulseRate.text(pulseRate);
+  setHeartRate(heartRate){
+    this.heartRate.text(heartRate);
   }
 
-  setBloodPressure(bloodPressure){
-    this.bloodPressure.text(bloodPressure);
+  setHighBloodPressure(highBloodPressure){
+    this.highBloodPressure.text(highBloodPressure);
+  }
+
+  setLowBloodPressure(lowBloodPressure){
+    this.lowBloodPressure.text(lowBloodPressure);
+  }
+
+  setWeight(weight){
+    this.weight.text(weight);
+  }
+
+  setHeight(height){
+    this.height.text(height);
+  }
+
+  setState(state){
+    this.state.text(state);
   }
 
   setDiagnosis(diagnosis){
@@ -112,7 +132,7 @@ class MCModal extends AppFullModal{
 * @desc page for application and medical record
 * @page nurseViewMC
 * @attribute medical record: appStatus, mcID,
-* preExam(bodyTemperature, pulseRate, bloodPressure),
+* preExam(bodyTemperature, heartRate, bloodPressure),
 * diagnosis, precriptions, labReports, labReportTypes
 * @method setMCID, setPreExam, setDiagnosis, setPrescriptions, setLabReports
 */
@@ -124,7 +144,7 @@ class MCPage extends MCModal{
 
   setLabReportTypes(labReportTypes){
     for (let i=0; i < labReportTypes.length; i++) {
-      this.labReportTypes.append(new Option(labReportTypes[i].typeName, labReportTypes[i].typeID));
+      this.labReportTypes.append(new Option(labReportTypes[i].type, labReportTypes[i].type));
     };
   }
 }
