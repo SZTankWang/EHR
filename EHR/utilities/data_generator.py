@@ -20,10 +20,11 @@ N_RECORD = 100
 BLOOD_TYPE = ['A','B','O','AB']
 TIME_SLOT_START_TIME = '0001-01-01-09-00-00' # only "09-00-00" part matters
 TIME_SLOT_START_DATE = '2020-11-20'
+MEDICINE_LIST = [ 'Vicodin', 'Simvastatin', 'Lisinopril', 'Levothyroxine', \
+				  'Azithromycin', 'Metformin', 'Lipitor', 'Amlodipine', \
+				  'Amoxicillin', 'Hydrochlorothiazide']
 
 def gen_hospital_data():
-
-
 	hospital_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/hospital_info.csv")
 	name_list, address_list = hospital_df["name"].tolist(), hospital_df["address"].tolist()
 	phone_list = ['{:8}'.format(random.randint(10000000,99999999)) for _ in range(N_RECORD)]
@@ -199,9 +200,24 @@ def gen_appt():
 						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"]),
 						date = timeslot_filter.one().slot_date,
 						time = helper.segid2time(timeslot_filter.one().slot_seg_id),
-						mc_id = mc_count+1 if mc_count else None		
+						mc_id = mc_count+1 if mc_count!=None else None		
 		)
+		if mc_count != None:
+			mc.appointment.append(appt)
 		db.session.add(appt)
+	db.session.commit()
+
+def gen_prescription():
+	mcid_list = [mc.id for mc in Medical_record.query.all()]
+	for _ in range(N_RECORD):
+		medicine = " & ".join(random.choices(MEDICINE_LIST, k=random.randint(0, len(MEDICINE_LIST))))
+		prscrpt = Prescription(
+				medicine=medicine,
+				dose = 0 if medicine=="" else random.randint(1,5),
+				comments = "Drink hot water, Take good pills",
+				mc_id = random.choice(mcid_list)
+		)
+		db.session.add(prscrpt)
 	db.session.commit()
 
 def practice_query():
@@ -215,12 +231,13 @@ def practice_query():
 def main():
 	# please do not change the following execution order
 	print("on it")
-	gen_hospital_data()
-	gen_dept_data()
-	gen_user_data()
-	gen_time_seg()
-	gen_time_slot()
-	gen_appt()
+	# gen_hospital_data()
+	# gen_dept_data()
+	# gen_user_data()
+	# gen_time_seg()
+	# gen_time_slot()
+	# gen_appt()
+	gen_prescription()
 
 main()
 	

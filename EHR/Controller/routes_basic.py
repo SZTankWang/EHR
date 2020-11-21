@@ -334,24 +334,32 @@ def nurseGoViewAppt(appID):
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @login_required
-def nurseviewAppt():
+def nurseViewAppt():
 
-	mcid = request.form['mcID']
-	mc = Medical_record.query.filter(Medical_record.id==mcid).first()
-	prescription_list = Prescription.query.filter(Prescription.mc_id==mcid).all()
+	mc_id = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 
-	# return make_response(
-	# 	jsonify("preExam":{
-	# 		{"bodyTemperature": mc.body_temperature,
-	# 		"pulseRate": mc.heart_rate,
-	# 		"bloodPressure": mc.blood_pressure},
-	# 		"diagnosis": mc.diagnosis,
-	# 		"prescriptions": [{} for prescr in ]
-	# 	prescriptions: [{medicine, comments, etc.}, {}, ...]
-	# labReportTypes:[{id:str, name:str}, {}, ...]
-	# labReports:[{lr_type: str, id:str, comments:str}, {}, ...]}
+	return make_response(
+		jsonify({
+			"preExam": 
+				{"bodyTemperature": mc.body_temperature,
+				"pulseRate": mc.heart_rate,
+				"bloodPressure": mc.blood_pressure},
 
-	return make_response(jsonify({'ret':0}))
+			"diagnosis": 
+				mc.diagnosis,
+
+			"prescriptions": 
+				[{"medicine": pres.medicine,
+				  "dose": pres.dose,
+				  "comments": pres.comments} for pres in prescription_list],
+
+			"labReportTypes": 
+				None,
+
+			"labReports":
+				None}))
 
 
 

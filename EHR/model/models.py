@@ -193,7 +193,7 @@ class Application(db.Model):
 	mc_id = db.Column(db.Integer(), db.ForeignKey('medical_record.id'))
 
 	#one-to-one relationship
-	mc = db.relationship('Medical_record', backref='appointment', uselist=False ,lazy=True)
+	mc = db.relationship('Medical_record', backref='appointment',lazy=True)
 	timeslot = db.relationship('Time_slot', backref='application', uselist=False, lazy=True)
 	
 	def __repr__(self):
@@ -230,8 +230,7 @@ class Medical_record(db.Model):
 	prescription = db.relationship('Prescription', backref='medical_record', lazy=True)
 
 	def __repr__(self):
-		return f'Medical_record < id: {self.id}, appt_id: {self.appt_id}, \
-			nurse_id: {self.nurse_id}, patient_id: {self.patient_id} >'
+		return f'Medical_record < id: {self.id}, patient_id: {self.patient_id} >'
 
 class Prescription(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
