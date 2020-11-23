@@ -18,7 +18,7 @@ $(document).ready(function() {
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res, "application");
-    $("#overlay").addClass("d-none");
+    // $("#overlay").addClass("d-none");
   };
   sendRequest("nursePendingApp", "GET", null, initTable);
 });
@@ -86,10 +86,10 @@ function goProcessApplication(event){
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
   var btnTarget = (route == "nursePendingApp") ? '#application' : '#appointment';
-  $("#overlay").removeClass("d-none");
+  // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res, btnTarget);
-    $("#overlay").addClass("d-none");
+    // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
 }

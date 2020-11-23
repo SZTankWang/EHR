@@ -6,9 +6,6 @@
 
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
-    $("#department").addAttr("disabled");
-    $("#doctor").addAttr("disabled");
-    $("#slot").addAttr("disabled");
     $("select").empty();
     $("#ret span").removeClass("visible");
     $("#ret span").addClass("invisible");
@@ -31,37 +28,55 @@ $("#createAppt").on("submit", createAppt);
 */
 function getAndDisplay(target){
   var route, type, data, display;
+  var option = new Option("", "");
+  option.disabled = true;
+  option.defaultSelected = true;
+
   if (target == "hospital") {
     route = "nurseGetDepartmentsForNurse";
     type = "GET";
     data = null;
+
     display = function(res){
+      $("#department").empty();
+      $("#department").append(option);
       for (let i=0; i < res.length; i++) {
         $("#department").append(new Option(res[i].deptName, res[i].deptID));
       }
-      $("#department").removeAttr("disabled");
     };
   } else {
     type = "POST";
-    var id = $(this).children(":selected").value();
-    data = {target + "ID": id};
+    idname = target + "ID";
+    data = {};
+    var id;
+
     if (target == "dept") {
+      id = $("#department").children(":selected").val();
+      data[idname] = id;
       route = "nurseGetDoctorsForDepartment";
+
       display = function(res){
+        $("#doctor").empty();
+        $("#doctor").append(option);
         for (let i=0; i < res.length; i++) {
           $("#doctor").append(new Option(res[i].doctorName, res[i].doctorID));
         }
-        $("#doctor").removeAttr("disabled");
+        // $("#doctor").attr("disabled", false);
       };
     } else {
+      id = $("#doctor").children(":selected").val();
+      data[idname] = id;
       route = "nurseGetSlotsForDoctor";
+
       display = function(res){
+        $("#slot").empty();
+        $("#slot").append(option);
         for (let i=0; i < res.length; i++) {
           $("#slot").append(new Option(res[i].slotDateTime, res[i].slotID))
         }
-        $("#slot").removeAttr("disabled");
       };
     }
+
   }
   sendRequest(route, type, data, display);
 }

@@ -67,62 +67,61 @@ def nurse_dept_appts(nurseID, direction=None, period=None, start_date=datetime.d
 	"""
 	check this nurse dept. all appointments, with specified time period
 	"""
-	deptID = Nurse.query.filter(Nurse.id==nurseID).first().department_id
+	deptID = Nurse.query.filter(Nurse.id == nurseID).first().department_id
 	if period:
 		same_dept_appts = Application.query.\
-						join(Doctor, Doctor.id==Application.doctor_id).\
-						join(Time_slot, Time_slot.id==Application.time_slot_id).\
-							filter(
-								Doctor.department_id==deptID,
-								Time_slot.slot_date>=start_date,
-								Time_slot.slot_date<=start_date+timedelta(days=period))
-	else:
+							join(Doctor, Doctor.id == Application.doctor_id).\
+							join(Time_slot, Time_slot.id == Application.time_slot_id).\
+								filter(
+									Doctor.department_id == deptID,
+									Time_slot.slot_date >= start_date,
+									Time_slot.slot_date <= start_date + timedelta(days = period))
+	else: #JZ
 		if direction == "future":
 			same_dept_appts = Application.query.\
-							join(Doctor, Doctor.id==Application.doctor_id).\
-							join(Time_slot, Time_slot.id==Application.time_slot_id).\
+							join(Doctor, Doctor.id == Application.doctor_id).\
+							join(Time_slot, Time_slot.id == Application.time_slot_id).\
 								filter(
-									Doctor.department_id==deptID,
-									Time_slot.slot_date>=start_date)
+									Doctor.department_id == deptID,
+									Time_slot.slot_date >= start_date)
 		elif direction == "past":
 			same_dept_appts = Application.query.\
-							join(Doctor, Doctor.id==Application.doctor_id).\
-							join(Time_slot, Time_slot.id==Application.time_slot_id).\
+							join(Doctor, Doctor.id == Application.doctor_id).\
+							join(Time_slot, Time_slot.id == Application.time_slot_id).\
 								filter(
-									Doctor.department_id==deptID,
-									Time_slot.slot_date<=start_date)
+									Doctor.department_id == deptID,
+									Time_slot.slot_date <= start_date)
 		else:
 			same_dept_appts = Application.query.\
-							join(Doctor, Doctor.id==Application.doctor_id).\
+							join(Doctor, Doctor.id == Application.doctor_id).\
 								filter(
-									Doctor.department_id==deptID)
+									Doctor.department_id == deptID)
 	return same_dept_appts
 
 def t_slotid2date(slot_id):
-	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
+	slot_date = Time_slot.query.filter(Time_slot.id == slot_id).first().slot_date
 	return slot_date
 
 def t_slot2time(slot_id):
-	slot_time = Time_segment.query.join(
-		Time_slot, Time_segment.t_seg_id==Time_slot.slot_seg_id
-	).filter(Time_slot.id==slot_id).first().t_seg_starttime
+	slot_time = Time_segment.query.\
+							join(Time_slot, Time_segment.t_seg_id == Time_slot.slot_seg_id).\
+								filter(Time_slot.id == slot_id).first().t_seg_starttime
 	return slot_time
 
 def nurse_hosp2dept(nurseID):
-	deptID = nurse.query.filter(nurse.id==nurseID).first().department_id
-	hospitalID= department.query.filter(department.id==deptID).first().hospital_id
-	dept_list,dept_name= hosp2dept(hospitalID)
+	deptID = Nurse.query.filter(Nurse.id == nurseID).first().department_id
+	hospitalID = Department.query.filter(Department.id == deptID).first().hospital_id
+	dept_list,dept_name = hosp2dept(hospitalID)
 	return dept_list,dept_name
 
 def hosp2dept(hospitalID):
-	dept_list = department.query.filter(department.hospital_id==hospitalID).all()
+	dept_list = Department.query.filter(Department.hospital_id == hospitalID).all()
 	return [dept_list[i].id for i in range(len(dept_list))],[dept_list[j].title for j in range(len(dept_list))]
 
 def dept2doc(deptID):
-	doctor_list= doctor.query.filter(doctor.department_id==deptID).all()
+	doctor_list = Doctor.query.filter(Doctor.department_id == deptID).all()
 	return [doctor_list[i].id for i in range(len(doctor_list))]
 
-def doc2slots(doctorID, period, start_date=datetime.date.today()):
-	return Time_slot.query.filter(Time_slot.doctor_id==docterID,Time_slot.slot_date>=start_date,
-					   Time_slot.slot_date<=start_date+timedelta(days=period)).all()
-
+def doc2slots(doctorID, period, start_date = datetime.date.today()):
+	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
+					   Time_slot.slot_date <= start_date + timedelta(days = period)).all()

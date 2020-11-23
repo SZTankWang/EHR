@@ -16,12 +16,14 @@ function jsonify(data){
 }
 
 function sendRequest(route, type, data, successHandler){
+  $("#overlay").removeClass("d-none");
   $.ajax({
     url: "http://localhost:5000/" + route,
     type: type,
     data: data,
     success: (res) => {
       successHandler(res);
+      $("#overlay").addClass("d-none");
     },
     error: (err) => {
       alert("request error");

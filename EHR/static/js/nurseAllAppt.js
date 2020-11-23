@@ -18,7 +18,7 @@ $(document).ready(function() {
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res, "appointment");
-    $("#overlay").addClass("d-none");
+    // $("#overlay").addClass("d-none");
   };
   sendRequest("nurseOnGoingAppt", "GET", null, initTable);
   setStartOrEndDate();
@@ -79,10 +79,10 @@ function buttonAction(event) {
 function goUpdateTable(route, dateRange=null){
   var type = dateRange ? 'POST' : 'GET';
   var btnTarget = (route == "nurseRejectedApp") ? '#application' : '#appointment';
-  $("#overlay").removeClass("d-none");
+  // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res, btnTarget);
-    $("#overlay").addClass("d-none");
+    // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, dateRange, updateTable);
   setStartOrEndDate(dateRange ? dateRange.startDate : null, dateRange ? dateRange.endDate : null);
