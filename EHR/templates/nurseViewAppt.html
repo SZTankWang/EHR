@@ -84,7 +84,7 @@
 		    </div>
 		  </div>
 			<hr>
-			<form id="editPreExam" >
+			<form id="editPreExam">
 				<h5>Pre-examination</h5>
 				<div class="form-group row">
           <label for="bodyTemperature" class="col-2 col-form-label"><b>Body temperature</b></label>
@@ -131,7 +131,8 @@
 				<div class="form-group row">
 					<label for="state" class="col-2 col-form-label"><b>State</b></label>
 					<div class="col-3">
-						<select class="form-control" id="doctor" name="doctorID" required/>
+						<select class="form-control" id="state" name="state"/>
+							<option value="" selected disabled></option>
 				      <option value="conscious">conscious</option>
 							<option value="coma">coma</option>
 				    </select>
@@ -161,7 +162,7 @@
 					<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
 					<div class="col-5">
 						<select class="form-control" id="labReportTypes" name="type" required/>
-				      <option value="1" selected>1</option>
+				      <option value="" disabled selected></option>
 				    </select>
 					</div>
 				</div>

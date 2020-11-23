@@ -7,10 +7,10 @@
 // load lab report
 $(".lr-btn").on("click", loadLabReport);
 // prevent default page refresh if lab report not loaded
-$(".preview-btn").on("click", function(event){
+$(".collapse").on("click", ".preview-btn", function(event){
   if ($(this).attr('href') == "") {
-    alert("Lab report empty");
     event.preventDefault();
+    alert("Lab report empty");
   }
 })
 // --------------------------event handlers----------------------------

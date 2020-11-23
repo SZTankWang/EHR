@@ -11,7 +11,6 @@ var mcPage;
 
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
-    $("select").empty();
     // initialize instance
     mcPage = new MCPage();
     // request and fill in comments
@@ -26,21 +25,21 @@ $(document).ready(function() {
     const mcData = {"mcID": mcID};
     var fillMCData = (res) => {
       if (res.ret == "0") {
-        console.log(res.preExam, res.preExam.bodyTemperature);
-        mcPage.setBodyTemperature(res.preExam["bodyTemperature"]);
-        mcPage.setHeartRate(res.preExam["heartRate"]);
-        mcPage.setHighBloodPressure(res.preExam["highBloodPressure"]);
-        mcPage.setLowBloodPressure(res.preExam["lowBloodPressure"]);
-        mcPage.setWeight(res.preExam["weight"]);
-        mcPage.setHeight(res.preExam["height"]);
-        mcPage.setState(res.preExam["state"]);
+        mcPage.setBodyTemperature(res.preExam.bodyTemperature);
+        mcPage.setHeartRate(res.preExam.heartRate);
+        mcPage.setHighBloodPressure(res.preExam.highBloodPressure);
+        mcPage.setLowBloodPressure(res.preExam.lowBloodPressure);
+        mcPage.setWeight(res.preExam.weight);
+        mcPage.setHeight(res.preExam.height);
+        mcPage.setState(res.preExam.state);
         mcPage.setDiagnosis(res.diagnosis);
-        mcPage.setPrescriptions(res.prescripitions);
-        mcPage.setLabReportTypes(res.labReportTypes);
-        mcPage.setLabReports(res.labReports);
+        if (res.prescriptions)
+          mcPage.setPrescriptions(res.prescriptions);
+        if (res.labReportTypes)
+          mcPage.setLabReportTypes(res.labReportTypes);
+        if (res.labReports)
+          mcPage.setLabReports(res.labReports);
       } else {
-        console.log("hiiiii");
-        console.log(res);
         alert(res.ret);
       }
     };
@@ -108,7 +107,7 @@ function sendFileRequest(route, type, data, successHandler){
 // refresh page if submission is successful
 function refreshOnSuccess(res){
   if (res.ret == "0") {
-    goToPage("nurseViewAppt/" + mcPage.appID.text(), 0)
+    goToPage("nurseGoViewAppt/" + mcPage.appID.text(), 0)
   }
 }
 

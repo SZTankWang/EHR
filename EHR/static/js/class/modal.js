@@ -65,11 +65,11 @@ class MCModal extends AppFullModal{
     this.mcID = $("#mcID");
     this.bodyTemperature = $("#bodyTemperature");
     this.heartRate = $("#heartRate");
-    this.highBoodPressure = $("#highBoodPressure");
-    this.lowBoodPressure = $("#lowBoodPressure");
+    this.highBloodPressure = $("#highBloodPressure");
+    this.lowBloodPressure = $("#lowBloodPressure");
     this.weight = $("#weight");
     this.height = $("#height");
-    this.state = $("#state");
+    this.state = $("#state option:selected");
     this.diagnosis = $("#diagnosis");
     this.prescriptions = $("#prescriptions");
     this.labReports = $("#labReports");
@@ -84,31 +84,33 @@ class MCModal extends AppFullModal{
   }
 
   setBodyTemperature(bodyTemperature){
-    this.bodyTemperature.text(bodyTemperature);
+    this.bodyTemperature.val(bodyTemperature);
   }
 
   setHeartRate(heartRate){
-    this.heartRate.text(heartRate);
+    this.heartRate.val(heartRate);
   }
 
   setHighBloodPressure(highBloodPressure){
-    this.highBloodPressure.text(highBloodPressure);
+    this.highBloodPressure.val(highBloodPressure);
   }
 
   setLowBloodPressure(lowBloodPressure){
-    this.lowBloodPressure.text(lowBloodPressure);
+    this.lowBloodPressure.val(lowBloodPressure);
   }
 
   setWeight(weight){
-    this.weight.text(weight);
+    this.weight.val(weight);
   }
 
   setHeight(height){
-    this.height.text(height);
+    this.height.val(height);
   }
 
   setState(state){
-    this.state.text(state);
+    var str = "option[value=" + state + "]";
+    $("#state " + str).attr('selected','selected');
+    this.state = $("#state option:selected");
   }
 
   setDiagnosis(diagnosis){

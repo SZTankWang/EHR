@@ -561,7 +561,7 @@ def nurseViewAppt():
 			"preExam":
 				{"bodyTemperature": str(mc.body_temperature),
 				"heartRate": str(mc.heart_rate),
-				"lowbloodPressure": str(mc.low_blood_pressure),
+				"lowBloodPressure": str(mc.low_blood_pressure),
 				"highBloodPressure": str(mc.high_blood_pressure),
 				"weight": str(mc.weight),
 				"height": str(mc.height),
@@ -571,7 +571,8 @@ def nurseViewAppt():
 				mc.diagnosis,
 
 			"prescriptions":
-				[{"medicine": pres.medicine,
+				[{"id": pres.id,
+				  "medicine": pres.medicine,
 				  "dose": pres.dose,
 				  "comments": pres.comments} for pres in prescription_list],
 
@@ -626,7 +627,7 @@ def nurseUploadLabReport():
 	nurse_id = current_user.get_id()
 
 	mc_id = request.form['mcID']
-	lr_type_id = request.form['typeID']
+	lr_type_id = request.form['type']
 	lab_report_file = request.files['labReport'].read()
 	comments = request.form['comments']
 
