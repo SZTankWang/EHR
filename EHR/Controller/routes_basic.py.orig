@@ -230,7 +230,7 @@ def doctorAvailSlot():
 @app.route('/getDoctorByDept', methods=['GET', 'POST'])
 @login_required
 def getDoctorByDept():
-	deptID = request.args.get('deptID')
+	deptID = request.form['deptID']
 	return dept_to_doc(deptID)
 
 #---------------------------Nurse--------------------------------
@@ -681,6 +681,10 @@ def nurseViewMC():
 	patient_id = request.form['patientID']
 	helper.load_id2name_map()
 	table = Application.query.filter(Application.patient_id==patient_id,Application.status==StatusEnum.finished).all()
+<<<<<<< HEAD
+
+=======
+>>>>>>> 7ffff2277099f1835af5e33e70d98fe90f9de3d3
 	return make_response(
 		jsonify({'patientID':str(patient_id),
 			'patientName':helper.id2name(patient_id),
@@ -693,6 +697,21 @@ def nurseViewMC():
 		for i in range(len(table))]}
 		       )
 	)
+
+
+	# return make_response(
+	# 	jsonify({'patientID':str(patient_id),
+	# 		'patientName':helper.id2name(patient_id},
+	# 	'appts':[{'appID':str(table[i].id),
+	# 	'mcID':table[i].mc_id,
+	# 	'date':table[i].date,
+	# 	'time':table[i].time,
+	# 	'doctor':helper.id2name(table[i].doctor_id),
+	# 	'symptoms':table[i].symptoms}
+	# 	for i in range(len(table))]}
+	# 	       )
+	# )
+	pass
 
 
 
