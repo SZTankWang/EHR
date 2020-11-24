@@ -26,7 +26,7 @@ def dept_to_doc(deptID):
 	return make_response(
 		jsonify(
 			[{"doctorID": doctor_list[i].id,
-			"doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].name,"department": doctor_list[i].title} for i in range(len(doctor_list))]),200)
+			"doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].department.hospital.name,"department": doctor_list[i].department.title} for i in range(len(doctor_list))]),200)
 #---public page---
 @app.route('/')
 def home():
@@ -232,6 +232,11 @@ def doctorAvailSlot():
 def getDoctorByDept():
 	deptID = request.args.get('deptID')
 	return dept_to_doc(deptID)
+
+@app.route('/viewDoctor',methods=['GET'])
+def viewDoctorByID():
+	return render_template('doctorPage.html')
+
 
 #---------------------------Nurse--------------------------------
 #---------------------------Nurse--------------------------------

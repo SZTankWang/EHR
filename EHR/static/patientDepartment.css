@@ -3,6 +3,7 @@
 }
 
 
+
 .appoint-button{
 	display:flex;
 	flex-direction: column;
@@ -178,6 +179,7 @@
 	background: white;
 /*	justify-content: space-between;
 */	overflow-y: scroll;
+	padding: 1rem;
 }
 
 #pagecount{
