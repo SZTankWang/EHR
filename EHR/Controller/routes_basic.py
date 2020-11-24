@@ -21,12 +21,12 @@ import datetime
 #-------------------General--------------------
 #-------------------General--------------------
 def dept_to_doc(deptID):
-	doctor_list = helper.dept2doc(deptID) ##put into helper
+	doctor_list = helper.dept2doc_all(deptID) ##put into helper
 	helper.load_id2name_map()
 	return make_response(
 		jsonify(
-			[{"doctorID": doctor_list[i],
-			"doctorName": helper.id2name(doctor_list[i])} for i in range(len(doctor_list))]),200)
+			[{"doctorID": doctor_list[i].id,
+			"doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].name,"department": doctor_list[i].title} for i in range(len(doctor_list))]),200)
 #---public page---
 @app.route('/')
 def home():

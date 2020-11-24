@@ -122,6 +122,10 @@ def dept2doc(deptID):
 	doctor_list = Doctor.query.filter(Doctor.department_id == deptID).all()
 	return [doctor_list[i].id for i in range(len(doctor_list))]
 
+def dept2doc_all(deptID):
+	info_list = Doctor.query.join(Department, Doctor.department_id == Department.id).\
+					join(Hospital,Department.hospital_id == Hospital.id).filter(Doctor.department_id == deptID).all()
+	return info_list
 def doc2slots(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period)).all()
