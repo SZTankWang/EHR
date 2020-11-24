@@ -20,7 +20,13 @@ import datetime
 #-------------------General--------------------
 #-------------------General--------------------
 #-------------------General--------------------
-
+def dept_to_doc(deptID):
+	doctor_list = helper.dept2doc(deptID) ##put into helper
+	helper.load_id2name_map()
+	return make_response(
+		jsonify(
+			[{"doctorID": doctor_list[i],
+			"doctorName": helper.id2name(doctor_list[i])} for i in range(len(doctor_list))]),200)
 #---public page---
 @app.route('/')
 def home():
@@ -221,7 +227,11 @@ def doctorAvailSlot():
 		jsonify(response),200
 	)
 
-
+@app.route('/getDoctorByDept', methods=['GET', 'POST'])
+@login_required
+def getDoctorByDept():
+	deptID = request.form['deptID']
+	return dept_to_doc(deptID)
 
 #---------------------------Nurse--------------------------------
 #---------------------------Nurse--------------------------------
@@ -438,12 +448,8 @@ def nurseGetDepartmentsForNurse():
 @login_required
 def nurseGetDoctorsForDepartment():
 	deptID = request.form['deptID']
-	doctor_list = helper.dept2doc(deptID) ##put into helper
-	helper.load_id2name_map()
-	return make_response(
-		jsonify(
-			[{"doctorID": doctor_list[i],
-			"doctorName": helper.id2name(doctor_list[i])} for i in range(len(doctor_list))]),200)
+	return dept_to_doc(deptID)
+
 
 
 @app.route('/nurseGetSlotsForDoctor',methods=['GET','POST'])
