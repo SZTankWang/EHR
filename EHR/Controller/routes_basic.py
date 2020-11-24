@@ -677,7 +677,7 @@ def nurseViewMC():
 	table = Application.query.filter(Application.patient_id==patientID,Application.status==StatusEnum.finished).all()
 	return make_response(
 		jsonify({'patientID':str(patient_id),
-			'patientName':helper.id2name(patient_id},
+			'patientName':helper.id2name(patient_id),
 		'appts':[{'appID':str(table[i].id),
 		'mcID':table[i].mc_id,
 		'date':table[i].date,
