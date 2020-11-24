@@ -24,7 +24,7 @@
 			<div class="d-flex justify-content-start">
 				<span class="navbar-brand mb-0 h1">WeCare</span>
 				<div class="navbar-nav">
-					<a class="nav-main nav-item nav-link" href="/nurseHome">Home</a>
+					<a class="nav-main nav-item nav-link active disabled" href="/nurseHome">Home</a>
 					<a class="nav-main nav-item nav-link" href="/nurseAllAppt">All appointments</a>
 				</div>
 			</div>
@@ -43,75 +43,52 @@
 					</div>
 				</form>
 				<div class="navbar-nav">
-			  	<a class="nav-item nav-link active disabled" href="#">User</a>
+			  	<a class="nav-item nav-link" href="/nurseSettings">User</a>
 			  	<a class="nav-item nav-link" href="/logout">Logout</a>
 				</div>
 			</div>
 		</nav>
 	</div>
 
-	<div class="container" id="content-wrapper" style="padding:1em;">
+	<div id="content-wrapper" style="padding:1em;">
+
 		<div id="content-header-wrapper">
-			<nav class="nav nav-tabs d-flex justify-content-center">
-				<div>
-					<h3>User Settings</h3>
+			<nav class="nav nav-tabs">
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link active disabled" id="onGoingAppt">On-going appointments</div>
+				</div>
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link" id="todayAppt">Today's appointments</div>
 				</div>
 			</nav>
 		</div>
 
-		<div id="content-wrapper" style="padding:1em;">
-			<form id="info" action="/doctorNurseUpdateInfo" method="POST">
-				<div class="form-group row">
-          <label for="hospitalID" class="col-2 col-form-label"><b>Hospital ID</b></label>
-					<div class="col-4">
-            <input type="text" class="form-control-plaintext" id="hospitalID" name="hospitalID" value="{{hospitalID}}" readonly>
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="deptID" class="col-2 col-form-label"><b>Department ID</b></label>
-					<div class="col-4">
-          	<input type="text" class="form-control-plaintext" id="deptID" name="deptID" value="{{deptID}}" readonly>
-					</div>
-				</div>
-				<!-- <div class="form-group row">
-					<label for="role" class="col-2 col-form-label"><b>Role</b></label>
-					<div class="col-4">
-          	<input type="text" class="form-control-plaintext" id="role" name="role" value="{{role}}" readonly>
-					</div>
-				</div> -->
-				<div class="form-group row">
-					<label for="firstName" class="col-2 col-form-label"><b>First Name</b></label>
-					<div class="col-4">
-						<input type="text" class="form-control" id="firstName" name="firstName" value="{{firstName}}">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="lastName" class="col-2 col-form-label"><b>Last Name</b></label>
-					<div class="col-4">
-						<input type="text" class="form-control" id="lastName" name="lastName" value="{{lastName}}">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="licenseID" class="col-2 col-form-label"><b>License ID</b></label>
-					<div class="col-4">
-						<input type="text" class="form-control" id="licenseID" name="licenseID" value="{{licenseID}}">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="email" class="col-2 col-form-label"><b>Email</b></label>
-					<div class="col-4">
-						<input type="text" class="form-control" id="email" name="email" value="{{email}}">
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="phone" class="col-2 col-form-label"><b>Phone</b></label>
-					<div class="col-4">
-						<input type="text" class="form-control" id="phone" name="phone" value="{{phone}}">
-					</div>
-				</div>
-				<input type="submit" class="btn btn-primary" value="Submit"/>
-      </form>
-    </div>
+		<!-- data table -->
+		<div class='table' id="table-container" style="padding-top:0.5em;">
+			<table id="main-table" style="width:100%;">
+			  <thead>
+			    <tr>
+			      <th scope="col" style="width:5em;">Application ID</th>
+						<th scope="col">Date</th>
+						<th scope="col">Time</th>
+						<th scope="col">Patient</th>
+						<th scope="col">Symptoms</th>
+						<th scope="col">Status</th>
+						<th scope="col"></th>
+			    </tr>
+			  </thead>
+			  <tbody></tbody>
+				<tfoot>
+					<th scope="col" style="width:5em;">Application ID</th>
+					<th scope="col">Date</th>
+					<th scope="col">Time</th>
+					<th scope="col">Patient</th>
+					<th scope="col">Symptoms</th>
+					<th scope="col">Status</th>
+					<th scope="col"></th>
+				</tfoot>
+			</table>
+		</div>
 
 	</div>
 
@@ -120,6 +97,8 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="/static/js/class/table.js"></script>
 	<script type="text/javascript" src="/static/js/function/util.js"></script>
+	<script type="text/javascript" src="/static/js/doctorHome.js"></script>
 </body>
 </html>

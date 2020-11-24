@@ -14,10 +14,10 @@ var myModal;
 $(document).ready(function() {
   // initialize instance
   myModal = new AppFullModal();
-  myTable = new HomeTable();
+  myTable = new NurseTable();
   // initialize table
   var initTable = (res) => {
-    myTable.initTable(res, "appointment");
+    myTable.initTable(res);
     // $("#overlay").addClass("d-none");
   };
   sendRequest("nurseOnGoingAppt", "GET", null, initTable);
@@ -58,14 +58,15 @@ $("#dateRange").on('submit', updateDateRange);
 * @this event target element - view button
 */
 function buttonAction(event) {
+  event.preventDefault();
   var data = myTable.table.row( $(this).parents('tr') ).data();
   if ($(".nav-table.active").text() == "Rejected applications") {
     myModal.setApp(data);
     var reqData = {"appID": data['appID']};
     var setComments = (res) => {myModal.setComments(res.comments)};
     sendRequest("nurseGetComments", "POST", reqData, setComments);
+    myModal.show();
   } else {
-    event.preventDefault();
     var appID = data['appID'];
     goToPage("nurseGoViewAppt/" + appID, 0);
   }
@@ -78,10 +79,9 @@ function buttonAction(event) {
 */
 function goUpdateTable(route, dateRange=null){
   var type = dateRange ? 'POST' : 'GET';
-  var btnTarget = (route == "nurseRejectedApp") ? '#application' : '#appointment';
   // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
-    myTable.updateTable(res, btnTarget);
+    myTable.updateTable(res);
     // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, dateRange, updateTable);

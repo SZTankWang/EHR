@@ -55,7 +55,7 @@ def register():
 	phone = request.form['phone']
 	email = request.form['email']
 	password = request.form['password']
-	if role != "patient":
+	if role == "nurse" or role == "doctor":
 		department = request.form['department']
 
 	user = User(id=id, first_name=first_name, last_name=last_name,
@@ -129,7 +129,9 @@ def loadHomePage():
 	if current_user.role.value == "nurse":
 		return render_template('nurseHome.html')
 	if current_user.role.value == "doctor":
-		pass
+		return render_template('doctorHome.html')
+	if current_user.role.value == "admin":
+		return render_template('admin.html')
 
 
 
@@ -458,7 +460,7 @@ def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
 	slot_list= helper.doc2slots(doctorID, 0, start_date=datetime.date.today())
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
-	#JZ: timedate????? soooooory
+	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
 			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")}
@@ -686,8 +688,8 @@ def nurseViewMC():
 			'patientName':helper.id2name(patient_id),
 		'appts':[{'appID':str(table[i].id),
 		'mcID':table[i].mc_id,
-		'date':table[i].date,
-		'time':table[i].time,
+		'date':table[i].date.strftime("%Y-%m-%d"),
+		'time':table[i].time.strftime("%H:%M"),
 		'doctor':helper.id2name(table[i].doctor_id),
 		'symptoms':table[i].symptoms}
 		for i in range(len(table))]}

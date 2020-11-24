@@ -68,7 +68,7 @@
 		    </div>
 		    <div class="row">
 					<div class="col-md-4"><span><b>Medical Record ID: </b></span><span id="mcID">{{mcID}}</span></div>
-					<div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor">{{doctor}}</span></div>
+					<div class="col-md-4"><span><b>Approver: </b></span><span id="approver">{{approver}}</span></div>
 					<div class="col-md-4"><span><b>Patient: </b></span><span id="patient">{{patient}}</span></div>
 		    </div>
 				<div class="row">
@@ -85,66 +85,34 @@
 		      <div class="col"><span><b>Comments: </b></span><span id="comments">{{comments}}</span></div>
 		    </div>
 		  </div>
+
 			<hr>
-			<form id="editPreExam">
-				<h5>Pre-examination</h5>
-				<div class="form-group row">
-          <label for="bodyTemperature" class="col-2 col-form-label"><b>Body temperature</b></label>
-					<div class="col-3">
-            <input type="number" step="0.01" class="form-control" id="bodyTemperature" name="bodyTemperature" value="">
-					</div>
-					<label for="bodyTemperature" class="form-control-label">&#8451;</label>
+			<h5>Pre-examination</h5>
+			<div class="container-fluid">
+				<div class="row">
+          <div class="col-6"><span><b>Body temperature: </b></span><span id="bodyTemperature"></span><span>&#8451;</span></div>
+					<div class="col-6"><span><b>Heart rate: </b></span><span id="heartRate"></span><span>BPM</span></div>
 				</div>
-				<div class="form-group row">
-					<label for="heartRate" class="col-2 col-form-label"><b>Heart rate</b></label>
-					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="heartRate" name="heartRate" value="">
-					</div>
-					<label for="heartRate" class="form-control-label">BPM</label>
+				<div class="row">
+					<div class="col-6"><span><b>High blood pressure: </b></span><span id="highBloodPressure"></span><span>mmHg</span></div>
+					<div class="col-6"><span><b>Low blood pressure: </b></span><span id="lowBloodPressure"></span><span>mmHg</span></div>
 				</div>
-				<div class="form-group row">
-					<label for="highBloodPressure" class="col-2 col-form-label"><b>High blood pressure</b></label>
-					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="highBloodPressure" name="highBloodPressure" value="">
-					</div>
-					<label for="highBloodPressure" class="form-control-label">mmHg</label>
+				<div class="row">
+					<div class="col-4"><span><b>Weight: </b></span><span id="weight"></span><span>g</span></div>
+					<div class="col-4"><span><b>Height: </b></span><span id="height"></span><span>cm</span></div>
+					<div class="col-4"><span><b>State: </b></span><span id="state"></span></div>
 				</div>
-				<div class="form-group row">
-					<label for="lowBloodPressure" class="col-2 col-form-label"><b>Low blood pressure</b></label>
-					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="lowBloodPressure" name="lowBloodPressure" value="">
-					</div>
-					<label for="lowBloodPressure" class="form-control-label">mmHg</label>
-				</div>
-				<div class="form-group row">
-					<label for="weight" class="col-2 col-form-label"><b>Weight</b></label>
-					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="weight" name="weight" value="">
-					</div>
-					<label for="weight" class="form-control-label">g</label>
-				</div>
-				<div class="form-group row">
-					<label for="height" class="col-2 col-form-label"><b>Height</b></label>
-					<div class="col-3">
-          	<input type="number" step="0.01" class="form-control" id="height" name="height" value="">
-					</div>
-					<label for="height" class="form-control-label">cm</label>
-				</div>
-				<div class="form-group row">
-					<label for="state" class="col-2 col-form-label"><b>State</b></label>
-					<div class="col-3">
-						<select class="form-control" id="state" name="state">
-							<option value="" selected disabled></option>
-				      <option value="conscious">conscious</option>
-							<option value="coma">coma</option>
-				    </select>
-					</div>
-				</div>
-				<input type="submit" class="btn btn-primary" value="Edit"/>
-      </form>
+      </div>
+
 			<hr>
 			<h5>Diagnosis</h5>
-		  <p id="diagnosis"></p>
+			<form id="editDiagnosis" class="container-fluid">
+				<div class="form-group row">
+					<textarea class="form-control col-8" id="diagnosis" name="diagnosis" rows="6"></textarea>
+				</div>
+				<input type="submit" class="btn btn-primary" value="Submit">
+			</form>
+
 			<hr>
 			<h5>
 				Prescriptions
@@ -190,6 +158,6 @@
 	<script type="text/javascript" src="/static/js/class/modal.js"></script>
 	<script type="text/javascript" src="/static/js/function/util.js"></script>
 	<script type="text/javascript" src="/static/js/function/apptAndMC.js"></script>
-	<script type="text/javascript" src="/static/js/nurseViewAppt.js"></script>
+	<script type="text/javascript" src="/static/js/doctorViewAppt.js"></script>
 </body>
 </html>

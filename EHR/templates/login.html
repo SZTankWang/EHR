@@ -238,12 +238,13 @@
 				success:function(data){
 					console.log(data);
 					showRegisterMessage(data);
-					if(data['ret']==0){
+					if(data['ret'] == 0){
 						setTimeout(goLogin,2000);
-					}
+					} else {
 						setTimeout(goRegister,2000);
 					}
-				});
+				}
+			});
 		}
 
 		//等待过程中改变表单颜色

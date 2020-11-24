@@ -15,6 +15,7 @@
 */
 class AppModal {
   constructor(){
+    this.myself = $("#application");
     this.appID = $("#appID");
     this.date = $("#date");
     this.time = $("#time");
@@ -30,6 +31,14 @@ class AppModal {
     this.doctor.text(data['doctor']);
     this.patient.text(data['patient']);
     this.symptoms.text(data['symptoms']);
+  }
+
+  show(){
+    this.myself.modal('show');
+  }
+
+  hide(){
+    this.myself.modal('hide');
   }
 }
 

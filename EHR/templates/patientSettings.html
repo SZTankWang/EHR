@@ -60,25 +60,7 @@
 		</div>
 
 		<div id="content-wrapper" style="padding:1em;">
-			<form id="info" action="/doctorNurseUpdateInfo" method="POST">
-				<div class="form-group row">
-          <label for="hospitalID" class="col-2 col-form-label"><b>Hospital ID</b></label>
-					<div class="col-4">
-            <input type="text" class="form-control-plaintext" id="hospitalID" name="hospitalID" value="{{hospitalID}}" readonly>
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="deptID" class="col-2 col-form-label"><b>Department ID</b></label>
-					<div class="col-4">
-          	<input type="text" class="form-control-plaintext" id="deptID" name="deptID" value="{{deptID}}" readonly>
-					</div>
-				</div>
-				<!-- <div class="form-group row">
-					<label for="role" class="col-2 col-form-label"><b>Role</b></label>
-					<div class="col-4">
-          	<input type="text" class="form-control-plaintext" id="role" name="role" value="{{role}}" readonly>
-					</div>
-				</div> -->
+			<form id="info" action="/patientUpdateInfo" method="POST">
 				<div class="form-group row">
 					<label for="firstName" class="col-2 col-form-label"><b>First Name</b></label>
 					<div class="col-4">
@@ -92,9 +74,9 @@
 					</div>
 				</div>
 				<div class="form-group row">
-					<label for="licenseID" class="col-2 col-form-label"><b>License ID</b></label>
+					<label for="licenseID" class="col-2 col-form-label"><b>National ID</b></label>
 					<div class="col-4">
-						<input type="text" class="form-control" id="licenseID" name="licenseID" value="{{licenseID}}">
+						<input type="text" class="form-control" id="licenseID" name="licenseID" value="{{nationalID}}">
 					</div>
 				</div>
 				<div class="form-group row">
@@ -107,6 +89,44 @@
 					<label for="phone" class="col-2 col-form-label"><b>Phone</b></label>
 					<div class="col-4">
 						<input type="text" class="form-control" id="phone" name="phone" value="{{phone}}">
+					</div>
+				</div>
+				<input type="submit" class="btn btn-primary" value="Submit"/>
+      </form>
+
+			<hr>
+			<h5>Health Information</h5>
+			<form id="healthInfo" action="/patientUpdateHealthInfo" method="POST">
+				<div class="form-group row">
+					<label for="age" class="col-2 col-form-label"><b>Age</b></label>
+					<div class="col-4">
+						<input type="number" class="form-control" id="age" name="age" value="{{age}}">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="gender" class="col-2 col-form-label"><b>Gender</b></label>
+					<div class="col-4">
+						<select class="form-control" id="gender" name="gender">
+							{% if gender == "male" %}
+								<option value="undefined">undefined</option>
+					      <option value="male" selected disabled>male</option>
+								<option value="female">female</option>
+							{% elif gender == "female" %}
+								<option value="undefined">undefined</option>
+								<option value="male">male</option>
+								<option value="female" selected disabled>female</option>
+							{% else %}
+								<option value="undefined" selected disabled>undefined</option>
+								<option value="male">male</option>
+								<option value="female">female</option>
+							{% endif %}
+				    </select>
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="allergies" class="col-2 col-form-label"><b>Allergies</b></label>
+					<div class="col-4">
+						<textarea class="form-control" id="allergies" name="allergies">{{allergies}}</textarea>
 					</div>
 				</div>
 				<input type="submit" class="btn btn-primary" value="Submit"/>

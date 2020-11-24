@@ -17,10 +17,12 @@ $(document).ready(function() {
   myTable = new MCTable();
   // initialize table
   var initTable = (res) => {
-    myTable.initTable(res);
+    myTable.initTable(res.appts);
     // $("#overlay").addClass("d-none");
   };
-  sendRequest("nurseViewMC", "GET", null, initTable);
+  var patientID = $("#patientID").text();
+  var data = {"patientID": patientID};
+  sendRequest("nurseViewMC", "POST", data, initTable);
 });
 
 // ---------------------capture user action--------------------------

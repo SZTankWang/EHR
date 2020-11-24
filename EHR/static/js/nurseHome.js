@@ -14,10 +14,10 @@ var myModal;
 $(document).ready(function() {
   // initialize instance
   myModal = new AppModal();
-  myTable = new HomeTable();
+  myTable = new NurseTable();
   // initialize table
   var initTable = (res) => {
-    myTable.initTable(res, "application");
+    myTable.initTable(res);
     // $("#overlay").addClass("d-none");
   };
   sendRequest("nursePendingApp", "GET", null, initTable);
@@ -45,11 +45,12 @@ $("#todayAppt").on("click", () => goUpdateTable("nurseTodayAppt"));
 * @this event target element - view button
 */
 function buttonAction(event) {
+  event.preventDefault();
   var data = myTable.table.row( $(this).parents('tr') ).data();
   if ($(".nav-table.active").text() == "Pending applications") {
     myModal.setApp(data);
+    myModal.show();
   } else {
-    event.preventDefault();
     var appID = data['appID'];
     goToPage("nurseGoViewAppt/" + appID, 0);
   }
@@ -85,10 +86,9 @@ function goProcessApplication(event){
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  var btnTarget = (route == "nursePendingApp") ? '#application' : '#appointment';
   // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
-    myTable.updateTable(res, btnTarget);
+    myTable.updateTable(res);
     // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
