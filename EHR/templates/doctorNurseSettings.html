@@ -29,7 +29,7 @@
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
-				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right: 1em;">
+				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right:1em;">
 					<div class="input-group">
 						<input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="search-input" placeholder="department, doctor, patient">
 							<div class="input-group-append">
@@ -43,77 +43,83 @@
 					</div>
 				</form>
 				<div class="navbar-nav">
-			  	<a class="nav-item nav-link" href="/nurseSettings">User</a>
+			  	<a class="nav-item nav-link active disabled" href="#">User</a>
 			  	<a class="nav-item nav-link" href="/logout">Logout</a>
 				</div>
 			</div>
 		</nav>
 	</div>
 
-	<div class="container" id="container-wrapper" style="padding:1em;">
+	<div class="container" id="content-wrapper" style="padding:1em;">
 		<div id="content-header-wrapper">
-			<nav class="nav nav-tabs row">
-				<div class="col-4">
-					<a class="btn btn-primary" id="goBack" onclick="history.back()">Back</a>
-				</div>
-				<div class="col">
-					<h3>Create a new appointment</h3>
+			<nav class="nav nav-tabs d-flex justify-content-center">
+				<div>
+					<h3>User Settings</h3>
 				</div>
 			</nav>
 		</div>
 
-		<div id="content-wrapper" style="padding:3em;">
-			<form id="createAppt">
+		<div id="content-wrapper" style="padding:1em;">
+			<form id="info" action="/doctorNurseUpdateInfo" method="POST">
 				<div class="form-group row">
-					<label for="patientID" class="col-2 col-form-label">Patient's National ID</label>
-					<div class="col-3">
-						<input type="text" class="form-control" id="patientID" name="patientID" required/>
-					</div>
-				</div>
-				<div class="form-group row">
-					<label for="deptID" class="col-2 col-form-label">Department</label>
-					<div class="col-3">
-						<select class="form-control" id="department" name="deptID" required/>
-				      <option value="" disabled selected></option>
-				    </select>
+          <label for="hospitalID" class="col-2 col-form-label"><b>Hospital ID</b></label>
+					<div class="col-4">
+            <input type="text" class="form-control-plaintext" id="hospitalID" name="hospitalID" value="{{hospitalID}}" readonly>
 					</div>
 				</div>
 				<div class="form-group row">
-					<label for="doctorID" class="col-2 col-form-label">Doctor</label>
-					<div class="col-3">
-						<select class="form-control" id="doctor" name="doctorID" required/>
-				      <option value="" disabled selected></option>
-				    </select>
+					<label for="deptID" class="col-2 col-form-label"><b>Department ID</b></label>
+					<div class="col-4">
+          	<input type="text" class="form-control-plaintext" id="deptID" name="deptID" value="{{deptID}}" readonly>
+					</div>
+				</div>
+				<!-- <div class="form-group row">
+					<label for="role" class="col-2 col-form-label"><b>Role</b></label>
+					<div class="col-4">
+          	<input type="text" class="form-control-plaintext" id="role" name="role" value="{{role}}" readonly>
+					</div>
+				</div> -->
+				<div class="form-group row">
+					<label for="firstName" class="col-2 col-form-label"><b>First Name</b></label>
+					<div class="col-4">
+						<input type="text" class="form-control" id="firstName" name="firstName" value="{{firstName}}">
 					</div>
 				</div>
 				<div class="form-group row">
-					<label for="slotID" class="col-2 col-form-label">Time Slot</label>
-					<div class="col-3">
-						<select class="form-control" id="slot" name="slotID" required/>
-				      <option value="" disabled selected></option>
-				    </select>
+					<label for="lastName" class="col-2 col-form-label"><b>Last Name</b></label>
+					<div class="col-4">
+						<input type="text" class="form-control" id="lastName" name="lastName" value="{{lastName}}">
 					</div>
 				</div>
-				<div class="form-group">
-					<label for="symptoms" class="form-label">Symptoms</label>
-					<div>
-						<textarea class="form-control" id="symptoms" name="symptoms" required/></textarea>
+				<div class="form-group row">
+					<label for="licenseID" class="col-2 col-form-label"><b>License ID</b></label>
+					<div class="col-4">
+						<input type="text" class="form-control" id="licenseID" name="licenseID" value="{{licenseID}}">
 					</div>
 				</div>
-				<button type="submit" class="btn btn-primary">Create</button>
-			</form>
+				<div class="form-group row">
+					<label for="email" class="col-2 col-form-label"><b>Email</b></label>
+					<div class="col-4">
+						<input type="text" class="form-control" id="email" name="email" value="{{email}}">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="phone" class="col-2 col-form-label"><b>Phone</b></label>
+					<div class="col-4">
+						<input type="text" class="form-control" id="phone" name="phone" value="{{phone}}">
+					</div>
+				</div>
+				<input type="submit" class="btn btn-primary" value="Submit"/>
+      </form>
+    </div>
 
-			<div class="invisible" id="ret">
-				<span>Error: failed to create the appointment</span>
-			</div>
-		</div>
 	</div>
+
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="/static/js/function/util.js"></script>
-	<script type="text/javascript" src="/static/js/nurseCreateAppt.js"></script>
 </body>
 </html>

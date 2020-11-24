@@ -17,15 +17,18 @@ class Table{
     this.table.rows.add(data);
     this.table.columns.adjust().draw();
   }
+
+  updateTable(data){
+    this.updateTableData(data);
+  }
 }
 
 /**
 * @desc table for nurseHome and nurseAllAppt
 * @method initTable - initialize the table
-* @method updateTable - update table data and switch button functionality
 */
-class HomeTable extends Table{
-  initTable(data, btnTarget){
+class NurseTable extends Table{
+  initTable(data){
     this.table = $("#main-table").DataTable({
       "data": data,
       "columns" : [
@@ -43,15 +46,36 @@ class HomeTable extends Table{
           "orderable": false,
           "searchable": false,
           "data": null,
-          "defaultContent": "<button type='button' class='modal-button btn btn-sm btn-outline-primary' data-toggle='modal' data-target='#" + btnTarget + "'>View</button>"
+          "defaultContent": "<button type='button' class='modal-button btn btn-sm btn-outline-primary'>View</button>"
       }]
     });
   }
+}
 
-  updateTable(data, btnTarget){
-    this.updateTableData(data);
-    $(".modal-button").each(function(){
-      $(this).attr('data-target',btnTarget);
+/**
+* @desc table for doctorHome and doctorAllAppt
+* @method initTable - initialize the table
+*/
+class DoctorTable extends Table{
+  initTable(data){
+    this.table = $("#main-table").DataTable({
+      "data": data,
+      "columns" : [
+          { "data" : "appID", "title": "Application ID" },
+          { "data" : "date", "title": "Date" },
+          { "data" : "time", "title": "Time" },
+          { "data" : "patient", "title": "Patient" },
+          { "data" : "symptoms", "title": "Symptoms" },
+          { "data" : "status", "title": "Status" },
+          { "data" : "", "title": "" }
+      ],
+      "columnDefs": [{
+          "targets": -1,
+          "orderable": false,
+          "searchable": false,
+          "data": null,
+          "defaultContent": "<button type='button' class='modal-button btn btn-sm btn-outline-primary'>View</button>"
+      }]
     });
   }
 }
@@ -59,7 +83,6 @@ class HomeTable extends Table{
 /**
 * @desc table for medical records
 * @method initTable - initialize the table
-* @method updateTable - update table data
 */
 class MCTable extends Table {
   initTable(data){
@@ -84,7 +107,4 @@ class MCTable extends Table {
     });
   }
 
-  updateTable(data){
-    this.updateTableData(data);
-  }
 }

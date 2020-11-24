@@ -76,7 +76,7 @@ class Admin(db.Model):
 	id = db.Column(db.String(100), db.ForeignKey('user.id'), primary_key=True, onupdate="CASCADE")
 	def __repr__(self):
 		return f'Admin < id: {self.id} >'
-	
+
 
 
 class Doctor(db.Model):
@@ -116,8 +116,10 @@ class Nurse(db.Model):
 		return check_password_hash(self.password_hash, password)
 
 class GenderEnum(enum.Enum):
-	male = 'male'
-	female = 'female'
+    male = 'male'
+    female = 'female'
+    undefined = 'undefined'
+
 
 class Patient(db.Model):
 	id = db.Column(db.String(100), db.ForeignKey('user.id'), primary_key=True, onupdate="CASCADE")
@@ -141,10 +143,10 @@ class Patient(db.Model):
 class Time_segment(db.Model):
 	t_seg_id = db.Column(db.Integer(), primary_key=True)
 	t_seg_starttime = db.Column(db.Time(), nullable=False)
-	
+
 	def __repr__(self):
 		return f'Time_segment < t_seg_id: {self.t_seg_id}, t_seg_starttime: {self.t_seg_starttime} >'
-	
+
 
 class Time_slot(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
@@ -195,7 +197,7 @@ class Application(db.Model):
 	#one-to-one relationship
 	mc = db.relationship('Medical_record', backref='appointment',lazy=True)
 	timeslot = db.relationship('Time_slot', backref='application', uselist=False, lazy=True)
-	
+
 	def __repr__(self):
 		return f'Application < id: {self.id}, app_timestamp: {self.app_timestamp}, \
 			status: {self.status}, time_slot_id: {self.time_slot_id}, approver_id: {self.approver_id}, \
@@ -280,5 +282,3 @@ class Lab_report(db.Model):
 		return f'Lab_report < id: {self.id}, (report_)type: {len(self.type)},\
 			mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
 				patient_id: {self.patient_id} >'
-
-
