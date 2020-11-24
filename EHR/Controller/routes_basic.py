@@ -235,8 +235,14 @@ def getDoctorByDept():
 	deptID = request.args.get('deptID')
 	return dept_to_doc(deptID)
 
-@app.route('/viewDoctor',methods=['GET'])
-def viewDoctorByID():
+
+'''
+	返回医生页面
+	参数：doctorID
+	返回：render_template(页面，信息)
+'''
+@app.route('/viewDoctor/<doctorID>',methods=['GET'])
+def viewDoctorByID(doctorID):
 	return render_template('doctorPage.html')
 
 
