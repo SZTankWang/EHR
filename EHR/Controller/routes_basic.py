@@ -681,7 +681,6 @@ def nurseViewMC():
 	patient_id = request.form['patientID']
 	helper.load_id2name_map()
 	table = Application.query.filter(Application.patient_id==patient_id,Application.status==StatusEnum.finished).all()
-
 	return make_response(
 		jsonify({'patientID':str(patient_id),
 			'patientName':helper.id2name(patient_id),
@@ -694,21 +693,6 @@ def nurseViewMC():
 		for i in range(len(table))]}
 		       )
 	)
-
-
-	# return make_response(
-	# 	jsonify({'patientID':str(patient_id),
-	# 		'patientName':helper.id2name(patient_id},
-	# 	'appts':[{'appID':str(table[i].id),
-	# 	'mcID':table[i].mc_id,
-	# 	'date':table[i].date,
-	# 	'time':table[i].time,
-	# 	'doctor':helper.id2name(table[i].doctor_id),
-	# 	'symptoms':table[i].symptoms}
-	# 	for i in range(len(table))]}
-	# 	       )
-	# )
-	pass
 
 
 
