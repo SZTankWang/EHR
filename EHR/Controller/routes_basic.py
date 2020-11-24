@@ -20,7 +20,13 @@ import datetime
 #-------------------General--------------------
 #-------------------General--------------------
 #-------------------General--------------------
-
+def dept_to_doc(deptID):
+	doctor_list = helper.dept2doc_all(deptID) ##put into helper
+	helper.load_id2name_map()
+	return make_response(
+		jsonify(
+			[{"doctorID": doctor_list[i].id,
+			"doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].department.hospital.name,"department": doctor_list[i].department.title} for i in range(len(doctor_list))]),200)
 #---public page---
 @app.route('/')
 def home():
@@ -221,7 +227,11 @@ def doctorAvailSlot():
 		jsonify(response),200
 	)
 
-
+@app.route('/getDoctorByDept', methods=['GET', 'POST'])
+@login_required
+def getDoctorByDept():
+	deptID = request.form['deptID']
+	return dept_to_doc(deptID)
 
 #---------------------------Nurse--------------------------------
 #---------------------------Nurse--------------------------------
@@ -438,12 +448,8 @@ def nurseGetDepartmentsForNurse():
 @login_required
 def nurseGetDoctorsForDepartment():
 	deptID = request.form['deptID']
-	doctor_list = helper.dept2doc(deptID) ##put into helper
-	helper.load_id2name_map()
-	return make_response(
-		jsonify(
-			[{"doctorID": doctor_list[i],
-			"doctorName": helper.id2name(doctor_list[i])} for i in range(len(doctor_list))]),200)
+	return dept_to_doc(deptID)
+
 
 
 @app.route('/nurseGetSlotsForDoctor',methods=['GET','POST'])
@@ -452,10 +458,10 @@ def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
 	slot_list= helper.doc2slots(doctorID, 0, start_date=datetime.date.today())
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
-	#JZ: timedate?????
+	#JZ: timedate????? soooooory
 	return make_response(
 		jsonify(
-			[{"slotID": slot_list[i],"slotDateTime": timdate.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")}
+			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
 
@@ -472,12 +478,21 @@ def nurseCreateAppt():
 		slot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
-		application = Application(id=appID,app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-		symptoms=symptom,status=StatusEnum.approved,reject_reason="",date=date,time=time,time_slot_id=time_slot_id,
-				doctor_id=doctor_id,approver_id=nurseID,patient_id=patient_id)
-		'''medical_record = Medical_record(id=mcID,body_temperature=body_temperature,low_blood_pressure=low_blood_pressure,
-					high_blood_pressure=high_blood_pressure,heart_rate=heart_rate,weight=weight,
-						height=height,state=state,diagnosis=diagnosis,patient_id=patient_id)'''
+		medical_record = Medical_record(patient_id=patient_id)
+		mc_id = medical_record.mc_id
+		application = Application(
+					id=appID,
+					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+					symptoms=symptom,
+					status=StatusEnum.approved,
+					reject_reason="",
+					date=date,
+					time=time,
+					time_slot_id=time_slot_id,
+					doctor_id=doctor_id,
+					approver_id=nurseID,
+					patient_id=patient_id,
+					mc_id=mc_id)
 		# update corresponding table
 		db.session.add(application)
 		db.session.add(medical_record)
@@ -655,7 +670,9 @@ def nurseUploadLabReport():
 def nurseGoViewMC():
 	patient_id = request.form['patientID']
 	helper.load_id2name_map()
-	return render_template('nurseViewMC.html',patient_id,helper.id2name(patient_id))
+	return render_template('nurseViewMC.html',
+				patientID=patient_id,
+				patientName=helper.id2name(patient_id))
 
 
 @app.route('/nurseViewMC', methods=['GET', 'POST'])
@@ -663,12 +680,20 @@ def nurseGoViewMC():
 def nurseViewMC():
 	patient_id = request.form['patientID']
 	helper.load_id2name_map()
-	table = Application.query.filter(Application.patient_id==patientID,Application.status==StatusEnum.approved).all()
+	table = Application.query.filter(Application.patient_id==patient_id,Application.status==StatusEnum.finished).all()
 	return make_response(
-		jsonify(patient_id,helper.id2name(patient_id),[{'appID':table[i].id,'mcID':table[i].mc_id,
-		'date':table[i].date,'time':table[i].time,'doctor':helper.id2name(table[i].doctor_id)} for i in range(len(table))]
+		jsonify({'patientID':str(patient_id),
+			'patientName':helper.id2name(patient_id),
+		'appts':[{'appID':str(table[i].id),
+		'mcID':table[i].mc_id,
+		'date':table[i].date,
+		'time':table[i].time,
+		'doctor':helper.id2name(table[i].doctor_id),
+		'symptoms':table[i].symptoms}
+		for i in range(len(table))]}
 		       )
 	)
+
 
 
 
