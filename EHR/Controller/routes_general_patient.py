@@ -248,7 +248,17 @@ def getDoctorByDept():
 '''
 @app.route('/viewDoctor/<doctorID>',methods=['GET'])
 def viewDoctorByID(doctorID):
-	return render_template('doctorPage.html')
+	doctor = Doctor.query.join(Department, Doctor.department_id == Department.id).\
+					join(Hospital,Department.hospital_id == Hospital.id).filter(Doctor.id == doctorID).first()
+	helper.load_id2name_map()
+	doctorName = id2name(doctorID)
+	hospital = doctor.department.hospital.name
+	department = doctor.department.title
+	return render_template('doctorPage.html',
+						doctorID = doctorID,
+						doctorName = doctorName,
+						hospital = hospital,
+						department = department)
 
 @app.route('/getDoctorSlot',methods=['GET','POST'])
 @login_required

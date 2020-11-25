@@ -244,7 +244,7 @@ def nurseGetDoctorsForDepartment():
 @login_required
 def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
-	slot_list = helper.doc2slots(doctorID, 0, start_date=datetime.date.today())
+	slot_list = helper.doc2slots_available(doctorID, 0, start_date=datetime.date.today())
 	date_list = [helper.t_slotid2date(slot_list[i].id) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
 	#JZ: datetime.combine???
