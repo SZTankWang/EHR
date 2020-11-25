@@ -551,7 +551,6 @@ def doctorTodayAppt():
 @app.route('/doctorAllAppt', methods=['GET', 'POST'])
 @login_required
 def doctorAllAppt():
-	doctorID = current_user.get_id()
 	return render_template('doctorAllAppt.html')
 
 
