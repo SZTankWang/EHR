@@ -265,6 +265,7 @@ def viewDoctorByID(doctorID):
 def getDoctorSlot():
 	doctorID = request.args.get('doctorID')
 	date = request.args.get('date')
+	date = datetime.datetime.strptime(date,'%Y-%m-%d')
 	slot_list = helper.doc2slots_available(doctorID, 0, start_date=date)
 	avail_num_list = [(slot_list[i].n_total-slot_list[i].n_booked) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]

@@ -11,17 +11,23 @@
 	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha512-aOG0c6nPNzGk+5zjwyJaoRUgCdOrfSDhmMID2u4+OIslr0GjpLKo7Xm0Ao3xmpM4T8AmIouRkqwj1nrdVsLKEQ==" crossorigin="anonymous" />
 	
-
+	<!-- moment.js 时间库 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
 </head>
 <body>
+	<form id="doctorInfo" style="display: none;">
+		<input type="text" id="doctorName" name="doctorName" value={{ doctorName }}>
+		<input type="text" id="doctorID" name="doctorID" value={{ doctorID }}>
+
+	</form>
 	<div class="pageContent">
 
 		<!-- 头像 -->
 		<div class="doctor-info-container avatar-container"></div>
 		<!-- 信息 -->
 		<div class="doctor-info-container">
-			<div><h3>doctorName</h3></div>
-			<div><p>Hospital</p> <p>Dept</p></div>
+			<div><h3>{{ doctorName }}</h3></div>
+			<div><p>{{ hospital }}</p>&nbsp&nbsp <p>{{ department }}</p></div>
 
 		</div>
 
@@ -121,13 +127,16 @@
 <script type="text/javascript" src="/static/js/patientAppt.js"></script>
 <script type="text/javascript">
 
-	$('#select-date').datepicker();
+	$('#select-date').datepicker({ minDate: 0, maxDate: "+7D" });
 
 	$('.book-btn').button();
 
 	$('#search').button();
 
 	$('#submit').button();
+
+	getDocSlot(moment().format("YYYY-MM-DD"));
+
 
 </script>
 </body>
