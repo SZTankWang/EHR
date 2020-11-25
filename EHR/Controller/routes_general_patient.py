@@ -249,3 +249,18 @@ def getDoctorByDept():
 @app.route('/viewDoctor/<doctorID>',methods=['GET'])
 def viewDoctorByID(doctorID):
 	return render_template('doctorPage.html')
+
+@app.route('/getDoctorSlot',methods=['GET','POST'])
+@login_required
+def getDoctorSlot():
+	doctorID = request.args.get('doctorID')
+	date = request.args.get('date')
+	slot_list = helper.doc2slots_available(doctorID, 0, start_date=date)
+	avail_num_list = [(slot_list[i].n_total-slot_list[i].n_booked) for i in range(len(slot_list))]
+	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
+	return make_response(
+		jsonify(
+			[{"slotID": str(slot_list[i].id),
+			"avail_num":str(avail_num_list[i]),
+			"slotTime": time_list[i].strftime("%H:%M")}
+			 for i in range(len(slot_list))]),200)
