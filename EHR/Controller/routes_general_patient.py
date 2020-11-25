@@ -130,7 +130,7 @@ def loadHomePage():
 #---go to home---
 @app.route('/loadAllApptPage', methods=['GET'])
 @login_required
-def loadHomePage():
+def loadAllApptPage():
 	# return render_template(f'{current_user.role.value}Home.html')
 	if current_user.role.value == "patient":
 		return render_template('patientHome.html')
