@@ -24,12 +24,12 @@
 			<div class="d-flex justify-content-start">
 				<span class="navbar-brand mb-0 h1">WeCare</span>
 				<div class="navbar-nav">
-					<a class="nav-main nav-item nav-link active disabled" href="/doctorHome">Home</a>
-					<a class="nav-main nav-item nav-link" href="/doctorAllAppt">All appointments</a>
+					<a class="nav-main nav-item nav-link" href="/doctorHome">Home</a>
+					<a class="nav-main nav-item nav-link active disabled" href="/doctorAllAppt">All appointments</a>
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
-				<form class="form-inline" action="/doctorSearch" method="POST" style="padding-right:1em;">
+				<form class="form-inline" action="/doctorSearch" method="POST" style="padding-right: 1em;">
 					<div class="input-group">
 						<input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="search-input" placeholder="department, doctor, patient">
 							<div class="input-group-append">
@@ -51,17 +51,27 @@
 	</div>
 
 	<div id="content-wrapper" style="padding:1em;">
-
 		<div id="content-header-wrapper">
 			<nav class="nav nav-tabs">
 				<div class="nav-item">
 					<div class="content-header nav-table nav-link active disabled" id="onGoingAppt">Ongoing appointments</div>
 				</div>
 				<div class="nav-item">
-					<div class="content-header nav-table nav-link" id="todayAppt">Today's appointments</div>
+					<div class="content-header nav-table nav-link" id="futureAppt">Future appointments</div>
+				</div>
+				<div class="nav-item">
+					<div class="content-header nav-table nav-link" id="pastAppt">Past appointments</div>
 				</div>
 			</nav>
 		</div>
+
+		<form id="dateRange">
+			<label for="startDate">Start Date</label>
+			<input id="startDate" type="date" value="" name="startDate">
+			<label for="endDate">End Date</label>
+			<input id="endDate" type="date" value="" name="endDate">
+			<input id="applyRange" type="submit" value="Apply">
+		</form>
 
 		<!-- data table -->
 		<div class='table' id="table-container" style="padding-top:0.5em;">
@@ -73,7 +83,6 @@
 						<th scope="col">Time</th>
 						<th scope="col">Patient</th>
 						<th scope="col">Symptoms</th>
-						<th scope="col">Status</th>
 						<th scope="col"></th>
 			    </tr>
 			  </thead>
@@ -84,7 +93,6 @@
 					<th scope="col">Time</th>
 					<th scope="col">Patient</th>
 					<th scope="col">Symptoms</th>
-					<th scope="col">Status</th>
 					<th scope="col"></th>
 				</tfoot>
 			</table>
@@ -99,6 +107,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="/static/js/class/table.js"></script>
 	<script type="text/javascript" src="/static/js/function/util.js"></script>
-	<script type="text/javascript" src="/static/js/doctorHome.js"></script>
+	<script type="text/javascript" src="/static/js/doctorAllAppt.js"></script>
 </body>
 </html>

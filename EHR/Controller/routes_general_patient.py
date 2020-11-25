@@ -20,13 +20,6 @@ import datetime
 #-------------------General--------------------
 #-------------------General--------------------
 #-------------------General--------------------
-def dept_to_doc(deptID):
-	doctor_list = helper.dept2doc_all(deptID) ##put into helper
-	helper.load_id2name_map()
-	return make_response(
-		jsonify(
-			[{"doctorID": doctor_list[i].id,
-			"doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].department.hospital.name,"department": doctor_list[i].department.title} for i in range(len(doctor_list))]),200)
 #---public page---
 @app.route('/')
 def home():
@@ -132,6 +125,19 @@ def loadHomePage():
 		return render_template('doctorHome.html')
 	if current_user.role.value == "admin":
 		return render_template('admin.html')
+
+
+#---go to home---
+@app.route('/loadAllApptPage', methods=['GET'])
+@login_required
+def loadHomePage():
+	# return render_template(f'{current_user.role.value}Home.html')
+	if current_user.role.value == "patient":
+		return render_template('patientHome.html')
+	if current_user.role.value == "nurse":
+		return render_template('nurseAllAppt.html')
+	if current_user.role.value == "doctor":
+		return render_template('doctorAllAppt.html')
 
 
 

@@ -129,3 +129,9 @@ def dept2doc_all(deptID):
 def doc2slots(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period)).all()
+
+def dept_to_doc(deptID):
+	doctor_list = dept2doc(deptID)
+	load_id2name_map()
+	return [{"doctorID": doctor_list[i],
+			"doctorName": id2name(doctor_list[i])} for i in range(len(doctor_list))]

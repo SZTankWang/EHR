@@ -1,7 +1,7 @@
 /**
 * @author Jingyi Zhu
 * @page nurseViewMC.html
-* @import util.js, apptAndMC.js
+* @import table.js, modal.js, util.js, apptAndMC.js
 */
 
 /**
@@ -22,7 +22,7 @@ $(document).ready(function() {
   };
   var patientID = $("#patientID").text();
   var data = {"patientID": patientID};
-  sendRequest("nurseViewMC", "POST", data, initTable);
+  sendRequest("doctorNurseViewMC", "POST", data, initTable);
 });
 
 // ---------------------capture user action--------------------------

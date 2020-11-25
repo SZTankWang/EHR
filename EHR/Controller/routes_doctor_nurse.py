@@ -232,7 +232,7 @@ def nurseGetDepartmentsForNurse():
 @login_required
 def nurseGetDoctorsForDepartment():
 	deptID = request.form['deptID']
-	return dept_to_doc(deptID)
+	return make_response(jsonify(helper.dept_to_doc(deptID)), 200)
 
 
 
@@ -245,7 +245,7 @@ def nurseGetSlotsForDoctor():
 	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
-			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")}
+			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.datetime.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
 
@@ -319,6 +319,9 @@ def nurseProcessApp():
 @login_required
 def nurseGoViewAppt(appID):
 	appt_res = Application.query.filter(Application.id==appID).first()
+	finished = False
+	if appt_res.status.value == "finished":
+		finished = True
 
 	helper.load_id2name_map()
 	return render_template('nurseViewAppt.html',
@@ -331,25 +334,7 @@ def nurseGoViewAppt(appID):
 		symptoms=appt_res.symptoms,
 		comments=appt_res.reject_reason,
 		mcID=appt_res.mc_id,
-		ongoing=True)
-
-@app.route('/nurseGoViewApptPast/<string:appID>', methods=['GET', 'POST'])
-@login_required
-def nurseGoViewApptPast(appID):
-	appt_res = Application.query.filter(Application.id==appID).first()
-
-	helper.load_id2name_map()
-	return render_template('nurseViewAppt.html',
-		appID=appt_res.id,
-		date=appt_res.date.strftime(helper.DATE_FORMAT),
-		time=appt_res.time.strftime(helper.TIME_FORMAT),
-		doctor=helper.id2name(appt_res.doctor_id),
-		patientID=appt_res.patient_id,
-		patient=helper.id2name(appt_res.patient_id),
-		symptoms=appt_res.symptoms,
-		comments=appt_res.reject_reason,
-		mcID=appt_res.mc_id,
-		ongoing=False)
+		finished=finished)
 
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
@@ -489,19 +474,19 @@ def nurseUploadLabReport():
 
 
 #---nurse view medical record---
-@app.route('/nurseGoViewMC', methods=['GET', 'POST'])
+@app.route('/doctorNurseGoViewMC', methods=['GET', 'POST'])
 @login_required
-def nurseGoViewMC():
+def goViewMC():
 	patient_id = request.form['patientID']
 	helper.load_id2name_map()
-	return render_template('nurseViewMC.html',
+	return render_template('doctorNurseViewMC.html',
 				patientID=patient_id,
 				patientName=helper.id2name(patient_id))
 
 
-@app.route('/nurseViewMC', methods=['GET', 'POST'])
+@app.route('/doctorNurseViewMC', methods=['GET', 'POST'])
 @login_required
-def nurseViewMC():
+def viewMC():
 	patient_id = request.form['patientID']
 	helper.load_id2name_map()
 	table = Application.query.filter(Application.patient_id==patient_id,Application.status==StatusEnum.finished).all()

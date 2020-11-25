@@ -73,7 +73,7 @@
 		    </div>
 				<div class="row">
 					<div class="col-md-8"><span><b>Application/Appointment Status: </b></span><span id="appStatus"></span></div>
-					<form action="/nurseGoViewMC" method="POST" class="col-md-4">
+					<form action="/doctorNurseGoViewMC" method="POST" class="col-md-4">
 						<input class="d-none" type="text" name="patientID" value="{{patientID}}" readonly>
 						<input type="submit" class="btn btn-sm btn-primary" id="viewMC" value="view patient's medical history">
 					</form>
@@ -87,7 +87,7 @@
 		  </div>
 
 			<hr>
-			{% if ongoing == False %}
+			{% if finished %}
 			<fieldset disabled>
 			{% else %}
 			<fieldset>

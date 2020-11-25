@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @page nurseAllAppt.js
+* @page doctorAllAppt.js
 * @import table.js, util.js
 */
 
@@ -8,19 +8,17 @@
 * @global instance of MyTable and MyModal
 */
 var myTable;
-var myModal;
 
 //-------------------------document loaded---------------------------
 $(document).ready(function() {
   // initialize instance
-  myModal = new AppFullModal();
-  myTable = new NurseTable();
+  myTable = new DoctorTable();
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res);
     // $("#overlay").addClass("d-none");
   };
-  sendRequest("nurseOnGoingAppt", "GET", null, initTable);
+  sendRequest("doctorFutureAppt", "GET", null, initTable);
   setStartOrEndDate();
 });
 
@@ -29,25 +27,16 @@ $(document).ready(function() {
 $('#main-table tbody').on( 'click', 'button', buttonAction);
 
 // ----------switch table content-------------
-// view ongoing applications
-$("#onGoingAppt").on('click', () => goUpdateTable("nurseOnGoingAppt"));
-
 // view future appointments
 $("#futureAppt").on('click', function(){
   var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
-  goUpdateTable("nurseFutureAppt", dateRange);
+  goUpdateTable("doctorFutureAppt", dateRange);
 });
 
 // view past appointments
 $("#pastAppt").on('click', function(){
   var dateRange = jsonifyDateRange(new Date(), new Date(), -7);
-  goUpdateTable("nursePastAppt", dateRange);
-});
-
-// view applications rejected by the loggedin nurse
-$("#rejectedApp").on('click', function(){
-  var dateRange = jsonifyDateRange(new Date(), new Date(), -7);
-  goUpdateTable("nurseRejectedApp", dateRange);
+  goUpdateTable("doctorPastAppt", dateRange);
 });
 
 //change date range
@@ -63,16 +52,8 @@ $("#dateRange").on('submit', updateDateRange);
 function buttonAction(event) {
   event.preventDefault();
   var data = myTable.table.row( $(this).parents('tr') ).data();
-  if ($(".nav-table.active").text() == "Rejected applications") {
-    myModal.setApp(data);
-    var reqData = {"appID": data['appID']};
-    var setComments = (res) => {myModal.setComments(res.comments)};
-    sendRequest("getComments", "POST", reqData, setComments);
-    myModal.show();
-  } else {
-    var appID = data['appID'];
-    goToPage("nurseGoViewAppt/" + appID, 0);
-  }
+  var appID = data['appID'];
+  goToPage("doctorGoViewAppt/" + appID, 0);
 }
 
 /**
@@ -99,6 +80,6 @@ function updateDateRange(event){
   event.preventDefault();
   var dateRange = $(this).serializeArray();
   dateRange = jsonify(dateRange);
-  var route = getRoute("nurse");
+  var route = getRoute("doctor");
   goUpdateTable(route, dateRange);
 }

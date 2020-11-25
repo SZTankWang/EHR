@@ -1,7 +1,7 @@
 /**
 * @author Jingyi Zhu
 * @page doctorViewAppt.html
-* @import util.js, apptAndMC.js
+* @import modal.js, util.js, apptAndMC.js
 */
 
 /**
@@ -23,65 +23,79 @@ $(document).ready(function() {
 
 
 // ---------------------capture user action--------------------------
+// edit diagnosis
+$("#diagnosisForm").on("submit", editDiagnosis);
+
 // add prescription
-$("#prescriptionForm").on("submit", editPreExam);
+$("#prescriptionForm").on("submit", addPrescription);
+
 // upload a lab report
-$("#labReportForm").on("submit", uploadLabReport);
+$("#labReportForm").on("submit", requestLabReport);
 
 
 // --------------------------event handlers----------------------------
 /**
-* @desc submit preExam edits
+* @desc finish appointment
 * @param {event} event - click
-* @this event target element - edit button
 */
-function editPreExam(event){
+function finish(event){
+  event.preventDefault();
+  var appID = myPage.appID.text();
+  var data = {'appID': appID};
+
+  var refresh = (res) => {refreshOnSuccess(res)};
+  sendRequest("doctorFinishAppt", "POST", data, refresh);
+}
+
+/**
+* @desc edit diagnosis
+* @param {event} event - submit
+* @this event target element - diagnosis form
+*/
+function editDiagnosis(event){
   event.preventDefault();
   var mcID = myPage.mcID.text();
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
   var refresh = (res) => {refreshOnSuccess(res)};
-  sendRequest("nurseEditPreExam", "POST", data, refresh);
+  sendRequest("doctorEditDiag", "POST", data, refresh);
+}
+
+
+/**
+* @desc submit prescription
+* @param {event} event - submit
+* @this event target element - prescription form
+*/
+function addPrescription(event){
+  event.preventDefault();
+  var mcID = myPage.mcID.text();
+  var data = jsonify($(this).serializeArray());
+  data.mcID = mcID;
+
+  var refresh = (res) => {refreshOnSuccess(res)};
+  sendRequest("doctorAddPrescrip", "POST", data, refresh);
 }
 
 /**
-* @desc upload a lab report
+* @desc request a lab report to be uploaded after examination
 * @param {event} event - submit
-* @this event target element - upload button
+* @this event target element - labReport form
 */
-function uploadLabReport(event){
+function requestLabReport(event){
   event.preventDefault();
   var mcID = myPage.mcID.text();
-  var data = new FormData($("#labReportForm")[0]);
-  data.append("mcID", mcID);
+  var data = jsonify($(this).serializeArray());
+  data.mcID = mcID;
 
   var refresh = (res) => {refreshOnSuccess(res)};
-  sendFileRequest("UploadLabReport", "POST", data, refresh);
-}
-
-// send upload lab report request
-function sendFileRequest(route, type, data, successHandler){
-  $.ajax({
-    url: "http://localhost:5000/nurse" + route,
-    type: type,
-    data: data,
-    success: (res) => {
-      successHandler(res);
-    },
-    error: (err) => {
-      alert("request error");
-      console.log(err);
-    },
-    cache: false,
-    processData: false,
-    contentType: false
-  })
+  sendRequest("doctorReqLabReport", "POST", data, refresh);
 }
 
 // refresh page if submission is successful
 function refreshOnSuccess(res){
   if (res.ret == "0") {
-    goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
+    goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)
   }
 }

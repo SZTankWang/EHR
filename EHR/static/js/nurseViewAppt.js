@@ -1,7 +1,7 @@
 /**
 * @author Jingyi Zhu
 * @page nurseViewAppt.html
-* @import util.js, apptAndMC.js
+* @import modal.js, util.js, apptAndMC.js
 */
 
 /**
@@ -33,7 +33,7 @@ $("#labReportForm").on("submit", uploadLabReport);
 /**
 * @desc submit preExam edits
 * @param {event} event - click
-* @this event target element - edit button
+* @this event target element - editPreExam form
 */
 function editPreExam(event){
   event.preventDefault();
@@ -57,13 +57,13 @@ function uploadLabReport(event){
   data.append("mcID", mcID);
 
   var refresh = (res) => {refreshOnSuccess(res)};
-  sendFileRequest("UploadLabReport", "POST", data, refresh);
+  sendFileRequest("nurseUploadLabReport", "POST", data, refresh);
 }
 
 // send upload lab report request
 function sendFileRequest(route, type, data, successHandler){
   $.ajax({
-    url: "http://localhost:5000/nurse" + route,
+    url: "http://localhost:5000/" + route,
     type: type,
     data: data,
     success: (res) => {
