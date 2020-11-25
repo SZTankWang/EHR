@@ -244,12 +244,13 @@ def nurseGetDoctorsForDepartment():
 @login_required
 def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
-	slot_list= helper.doc2slots(doctorID, 0, start_date=datetime.date.today())
+	slot_list = helper.doc2slots(doctorID, 0, start_date=datetime.date.today())
+	date_list = [helper.t_slotid2date(slot_list[i].id) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
 	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
-			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.datetime.combine(time_list[i][0],time_list[i][1]).strftime("%Y-%m-%d %H:%M")}
+			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
 
