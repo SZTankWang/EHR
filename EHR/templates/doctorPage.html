@@ -3,88 +3,131 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>预约医生</title>
+	<title>doctorPage</title>
 	<link rel="stylesheet" href="/static/bookDoctor.css">
-		<!-- CSS -->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.css">
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+	<!-- jquery UI  -->
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha512-aOG0c6nPNzGk+5zjwyJaoRUgCdOrfSDhmMID2u4+OIslr0GjpLKo7Xm0Ao3xmpM4T8AmIouRkqwj1nrdVsLKEQ==" crossorigin="anonymous" />
+	
+
 </head>
 <body>
-	<div id="bookDoctor" >
-		<button type="button" class="btn btn-primary"data-toggle="modal" data-target="#doctorModal">点我</button>
+	<div class="pageContent">
+
+		<!-- 头像 -->
+		<div class="doctor-info-container avatar-container"></div>
+		<!-- 信息 -->
+		<div class="doctor-info-container">
+			<div><h3>doctorName</h3></div>
+			<div><p>Hospital</p> <p>Dept</p></div>
+
+		</div>
+
 	</div>
-	<!-- Modal -->
-	<div class="modal fade" id="doctorModal" tabindex="-1" aria-labelledby="doctorModal" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" >
-	    <div class="modal-content">
-	      <div class="modal-header">
 
-	        <h5 class="modal-title" id="">Doctor</h5>
-	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"style="color:white">
-	          <span aria-hidden="true">&times;</span>
-	        </button>
-	      </div>
-	      <div class="modal-body">
-	        <div class="modal-body-sub-container" id='doctor-info-container'>
-	        	<div class="doctor-info-sub-container" id='doctor-avatar'>
-	        	</div>
-	        	<div class="doctor-info-sub-container" id='doctor-description'>
-	        		<div class="description">
-	        			<div id="name">name</div>
-	        			<div id="position">position</div>
-	        		</div>
-	        		<div class="description">
-	        			<div id="hospital">hospital</div>
-	        			<div id="department">department</div>
-	        		</div>
+	<!-- 预约时间段展示 -->
+	<div class="pageContent booking-part">
+		<div class="booking-part-inner-wrapper">
+			<h2>Book an appointment</h2>
+			<div class="input-fields-wrapper">
+				<p>Date<input type="text" id="select-date"></p>
+				<button id="search">search</button>
+			</div>
+			<div class="time-slot-container">
 
-	        	</div>
-	        </div>
-	        <div class="modal-body-sub-container" id='doctor-time-slot'>
-	        	<div class="title">Time Slot</div>
-	        	<div id="timeslot-container">
-					<table id="timeslot"></table>
+				<!-- 时间段列表 -->
+				<ul>
+
+					<!-- 单个时间段 -->
+					<li>
+						<div class="time-slot-row">
+
+							<div class="time-slot-info time"><h4>time</h4></div>
+							<div class="wrapper">
+							<div class="time-slot-info availSpace">剩余位置</div>
+							<div class="time-slot-info reserve"><button class="book-btn" onclick="openModal()" data-toggle="modal" data-target="#myModal">make an appointment</button></div>
+							</div>
+						
+						</div>
+					</li>
+				
+				</ul>
+			</div>		
+		</div>
+
+
+	</div>
+
+
+	<div class="book-dialog" title="confirm appointment">
+		<div class="dialog-content-container">
+
+			<!-- 预约时间 -->
+			<div class="dialog-content">
+				<div class="dialog-content-row">
+					<div>
+						<h4>hospital</h4>
+					</div>
+					<div>
+						<h4>department</h4>	
+					</div>
+					
+				</div>
+				<div class="dialog-content-row">
+					<div>
+						<p>doctor</p>
+					</div>
+					<div>
+						<p>date</p>		
+					</div>
+					
+				</div>
+
+			</div>
+			
+			<!-- 预约人信息 -->
+			<div class="dialog-content input-part">
+				<h3>Confirm your information</h3>
+				<div class="dialog-content-row">
+					<p>name <input type="text" class="input-name"></p>
 
 				</div>
-	        </div>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary">Save changes</button>
-	      </div>
-	    </div>
-	  </div>
+				<div class="dialog-content-row">
+					<p>phone <input type="text" class="input-phone"></p>
+				</div>
+			</div>
+
+			<!-- 病情描述 -->
+			<div class="dialog-content input-part">
+				<label for="synopsis">
+					<h3>Synoposis</h3>
+				</label>
+				
+				<div class="dialog-content-row">
+					<textarea id="synopsis" cols="30" rows="5"></textarea>
+				</div>
+			</div>
+
+			<div class="dialog-content">
+				<button id="submit">submit</button>
+			</div>
+		</div>
+
 	</div>
 
 
-<!-- jQuery and JS bundle w/ Popper.js -->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
-<script>
-	$('#doctorModal').on('shown.bs.modal',function(){
+<script type="text/javascript" src="/static/js/patientAppt.js"></script>
+<script type="text/javascript">
 
-		console.log('hi');
-		$('#timeslot').bootstrapTable('resetView');
-		
-});
-	var weeks = [];
+	$('#select-date').datepicker();
 
-	function renderTable(){
-		$.ajax({
-			url:'http://localhost:5000/doctorSchedule',
-			type:'GET',
-			success:function(data){
-				
-			}
-		})
-	}
+	$('.book-btn').button();
 
+	$('#search').button();
 
-	$('#timeslot').bootstrapTable({
-		ajax:"getAppoitmentInfo",
-})
-
+	$('#submit').button();
 
 </script>
 </body>

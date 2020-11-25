@@ -173,8 +173,7 @@ def goToHospitalList():
 @app.route('/searchHospital', methods=['GET'])
 def searchHospital():
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
-	partial_hpt_name = request.args.get('hospital')
-
+	partial_hpt_name = request.args.get('searchKey')
 	search_name = "%{}%".format(partial_hpt_name)
 
 	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).offset(n_offset).limit(page_count).all()
@@ -232,5 +231,15 @@ def doctorAvailSlot():
 @app.route('/getDoctorByDept', methods=['GET', 'POST'])
 @login_required
 def getDoctorByDept():
-	deptID = request.form['deptID']
+	deptID = request.args.get('deptID')
 	return dept_to_doc(deptID)
+
+
+'''
+	返回医生页面
+	参数：doctorID
+	返回：render_template(页面，信息)
+'''
+@app.route('/viewDoctor/<doctorID>',methods=['GET'])
+def viewDoctorByID(doctorID):
+	return render_template('doctorPage.html')

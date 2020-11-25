@@ -1,96 +1,173 @@
-
-html,body {
-    height: 100%;
+:root{
 	font-family: Helvetica;
-
-}
-body {
-    margin: 0;
-}
-#bookDoctor {
-    height: 100%;
-/*    padding: 0;
-*/    margin: 0;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.modal-header{
-	background:#2D79D6;
+
+body{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding:1rem;
+}
+
+.pageContent{
+/*	border:1px solid grey;
+*/	min-height:10vh;
+border:1px solid #f1f1f1;
+	width:100%;
+	display: inherit;
+	flex-direction: row;
+/*	justify-content: space-between;
+*/	padding:1rem;
+}
+
+.booking-part{
+	flex-direction: column;
+	align-items: center;
+}
+
+.doctor-info-container{
+	height:5rem;
+	min-width: 10rem;
+/*	border:1px solid grey;
+*/	display: inherit;
+	flex-direction: column;
+	padding:0.6rem;
+	margin-left:1rem;
+}
+
+.doctor-info-container>div>p{
+	display: inline;
+}
+
+.avatar-container{
+	background-image: url('/static/doctor.svg');
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+}
+
+
+.time-slot-container{
+	display: flex;
+	flex-direction:row;
+	border:1px solid #f1f1f1;
+	width:100%;
+	height:20rem;
+	margin-top:2rem;
+	padding:0.6rem;
+	overflow-y: scroll;
+}
+
+.time-slot-container>ul{
+	width:100%;
+	padding:0;
+	margin:0;
+}
+
+.time-slot-container>ul>li{
+	list-style:none;
+
+}
+
+.time-slot-row{
+	width:98%;
+	height:2.5rem;
+	background:#E7EAEF;
+	display: flex;
+	flex-direction:row;
+	align-items: center;
+	justify-content: space-between;
+	padding:0.5rem;
+	margin-top:1rem;
+}
+
+
+
+
+.wrapper{
+	display: flex;
+	flex-direction: row;
+	width:fit-content;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.time{
+	margin-left:5rem;
+}
+
+.availSpace{
+	margin-right:4rem;
+}
+
+#select-date{
+	height:2rem;
+	font-size: 1rem;
+	margin-left:0.8rem;
+}
+
+#search{
+	margin-left:3rem;
+}
+
+.input-fields-wrapper{
+	width:100%;
+	height:4rem;
+	border:1px solid #f1f1f1;
+	display: inherit;
+	flex-direction: row;
+	align-items: center;
+	padding-left:1rem;
+}
+
+button.book-btn{
+	background:#2A82F1;
 	color:white;
 }
 
-.modal-body{
+.booking-part-inner-wrapper{
+	display: flex;
+	flex-direction: column;
+	width:80%;
+
+}
+
+
+/*对话框*/
+.book-dialog{
+	display: none;
+}
+
+.dialog-content-container{
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* justify-content: space-between; */
-	height:50vh;
-/*	width: 50vw;
-*/}
-
-.modal-body-sub-container{
-/*	width:45vw;
-*/	height: 15vh;
-	width:90%;
-	border:1px solid #D7D7D7;
-	padding:1%;
+	width:100%;
+	height:100%;
 }
 
-#doctor-info-container{
-	height:10vh;
+.dialog-content{
+	width:100%;
+	height:fit-content;
+	border:1px solid #f1f1f1;
+	display: inherit;
+	flex-direction: inherit;
+	margin-top:2rem;
+
+}
+
+.input-part{
+	padding-left:1rem;
+	padding-bottom: 1rem;
+}
+
+.dialog-content-row{
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+
 }
 
-.doctor-info-sub-container{
-	height:fit-content;
-}
-
-#doctor-avatar{
-	background-image: url('../static/doctorAvatar.svg');
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	background-position-x: -2vw;
-	height:8vh;
-	width:8vw;
-}
-
-#doctor-description{
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width:10vw;
-}
-
-.description{
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-/*	justify-content: space-between;
-*/	width:100%;
-}
-
-#position{
-	margin-left:1.9vw;
-}
-
-#department{
-	margin-left:0.8vw;
-}
-
-#doctor-time-slot{
-	height:fit-content;
-	margin-top:8vh;
-}
-
-.title{
-	border-left: 3px solid #2D79D6;
-	padding-left: 0.3rem;
+.dialog-content-row > div{
+	margin-left:1rem;
 }
