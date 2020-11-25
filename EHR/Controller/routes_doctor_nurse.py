@@ -250,7 +250,7 @@ def nurseGetSlotsForDoctor():
 	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
-			[{"slotID": str(slot_list[i]),"slotDateTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
+			[{"slotID": str(slot_list[i].id),"slotDateTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
 
