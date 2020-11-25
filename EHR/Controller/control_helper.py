@@ -7,6 +7,7 @@ from operator import and_
 
 TIME_FORMAT = "%H:%M"
 DATE_FORMAT = "%Y-%m-%d"
+id_name_map = {}
 
 def paginate(db_obj):
 	try:
@@ -51,11 +52,10 @@ def day2slotid(period: int, start_day=datetime.date.today()):
 def segid2time(t_seg_id):
 	return Time_segment.query.filter(Time_segment.t_seg_id==t_seg_id).one().t_seg_starttime
 
-id_name_map = None
 def load_id2name_map():
-	global id_name_map
-	id_name_map = {u.id: u.first_name + " "+u.last_name \
-					for u in User.query.all()}
+	users = User.query.all()
+	for u in users:
+		id_name_map[u.id] = u.first_name + " "+u.last_name
 
 def id2name(this_id:int)->String:
 	# person = User.query.filter(User.id==this_id).first()

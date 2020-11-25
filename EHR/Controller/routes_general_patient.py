@@ -128,9 +128,9 @@ def loadHomePage():
 
 
 #---go to home---
-@app.route('/loadAllApptPage', methods=['GET'])
+@app.route('/loadAllAppt', methods=['GET'])
 @login_required
-def loadAllApptPage():
+def loadAllAppt():
 	# return render_template(f'{current_user.role.value}Home.html')
 	if current_user.role.value == "patient":
 		return render_template('patientHome.html')

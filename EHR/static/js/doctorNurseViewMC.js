@@ -53,10 +53,9 @@ function buttonAction(event) {
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  var btnTarget = (route == "PendingApp") ? '#application' : '#appointment';
   // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
-    myTable.updateTable(res, btnTarget);
+    myTable.updateTable(res);
     // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
