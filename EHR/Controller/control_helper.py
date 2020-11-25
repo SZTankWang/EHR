@@ -123,9 +123,11 @@ def dept2doc(deptID):
 	return [doctor_list[i].id for i in range(len(doctor_list))]
 
 def dept2doc_all(deptID):
-	info_list = Doctor.query.join(Department, Doctor.department_id == Department.id).\
+	doctor_list = Doctor.query.join(Department, Doctor.department_id == Department.id).\
 					join(Hospital,Department.hospital_id == Hospital.id).filter(Doctor.department_id == deptID).all()
-	return info_list
+	load_id2name_map()
+	return [{"doctorID": doctor_list[i].id,
+		 "doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].department.hospital.name,"department": doctor_list[i].department.title} for i in range(len(doctor_list))]
 def doc2slots(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period)).all()
