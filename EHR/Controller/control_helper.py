@@ -138,7 +138,7 @@ def doc2slots_available(doctorID, period, start_date = datetime.date.today()):
 					   Time_slot.slot_date <= start_date + timedelta(days = period),Time_slot.n_total>Time_slot.n_booked).all()
 
 def doc2appts(doctorID,period, start_date = datetime.date.today()):
-	return Application.query.filter(Application.doctor_id = doctorID, Application.status = StatusEnum.approved,Application.date = start_date).all()
+	return Application.query.filter(Application.doctor_id == doctorID, Application.status == StatusEnum.approved,Application.date == start_date).all()
 
 def dept_to_doc(deptID):
 	doctor_list = dept2doc(deptID)
