@@ -21,7 +21,7 @@ db.session.commit()
 
 from EHR.model import models
 
-from EHR.Controller import routes_basic
+from EHR.Controller import routes_general_patient, routes_doctor_nurse
 # except:
 # 	app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:1234@127.0.0.1/wecare"
 # 	db = SQLAlchemy(app)
@@ -29,6 +29,3 @@ from EHR.Controller import routes_basic
 # if __name__ == '__main__':
 # 	print("starting ehr system...")
 # 	app.run(debug=False,host='127.0.0.1',port=8080)
-
-
-

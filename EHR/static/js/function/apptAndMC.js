@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @desc utilities for nurseViewAppt and nurseViewMC
+* @desc utilities for nurseViewAppt, nurseViewMC and doctorViewAppt
 */
 
 // ---------------------capture user action--------------------------
@@ -18,7 +18,7 @@ $(".collapse").on("click", ".preview-btn", function(event){
 * @desc load lab report if the lab report card is clicked
 * @this event target element - lab report card
 */
-function loadLabReport(){
+function loadLabReport() {
   const targetCard = $(this).attr("data-target");
   const button = $(targetCard+" a");
   if (button.attr('href') == ""){

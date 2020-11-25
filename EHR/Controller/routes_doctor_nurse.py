@@ -17,224 +17,6 @@ from EHR.Controller import control_helper as helper
 import datetime
 
 
-#-------------------General--------------------
-#-------------------General--------------------
-#-------------------General--------------------
-def dept_to_doc(deptID):
-	doctor_list = helper.dept2doc_all(deptID) ##put into helper
-	helper.load_id2name_map()
-	return make_response(
-		jsonify(
-			[{"doctorID": doctor_list[i].id,
-			"doctorName": helper.id2name(doctor_list[i].id),"hospital": doctor_list[i].department.hospital.name,"department": doctor_list[i].department.title} for i in range(len(doctor_list))]),200)
-#---public page---
-@app.route('/')
-def home():
-	if current_user.is_authenticated:
-		return redirect(url_for('loadHomePage'))
-	return render_template('index.html')
-
-
-#---register---
-@app.route('/register', methods=['POST'])
-def register():
-	"""
-		patient: register by (national)id
-		doctor/nurse: register by (license)id
-	"""
-	if current_user.is_authenticated:
-		return redirect(url_for('loadHomePage'))
-	id = request.form['id']
-
-	if User.query.filter_by(id=id).first() != None:
-		return make_response(jsonify({'ret':1,'message':'You already registered!'}))
-	role = request.form['role']
-	first_name = request.form['firstName']
-	last_name = request.form['lastName']
-
-	phone = request.form['phone']
-	email = request.form['email']
-	password = request.form['password']
-	if role == "nurse" or role == "doctor":
-		department = request.form['department']
-
-	user = User(id=id, first_name=first_name, last_name=last_name,
-				role=role, email=email, phone=phone, password_hash=generate_password_hash(password))
-	try:
-		db.session.add(user)
-		# update corresponding table
-		if role == "patient":
-			patient = Patient(id=id)
-			db.session.add(patient)
-		elif role == "doctor":
-			doctor = Doctor(id=id, department_id = department)
-			db.session.add(doctor)
-		elif role == "nurse":
-			nurse = Nurse(id=id, department_id = department)
-			db.session.add(nurse)
-		db.session.commit()
-		helper.load_id2name_map()
-		return make_response(jsonify({"ret":0, 'message':""}), 200)
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message':"error"}))
-
-
-#---login---
-@app.route('/login', methods=['GET','POST'])
-def login():
-	"""
-		patient login with: national id + password
-		doctor/patient login with: license id + password
-	"""
-	if request.method == 'GET':
-		if current_user.is_authenticated:
-			return redirect(url_for('loadHomePage'))
-		return render_template('login.html')
-	if request.method == 'POST':
-		if not current_user.is_authenticated:
-			id = request.form['id']
-			password = request.form['password']
-			try:
-				user = User.query.get(id)
-				if not user:
-					# flash("Unregistered ID or wrong password")
-					return make_response(jsonify({"ret": "Unregistered user"}))
-				if not user.check_password(password):
-					return make_response(jsonify({"ret": "Incorrect password"}))
-				login_user(user)
-				# update roster
-				helper.load_id2name_map()
-			except:
-				# flash("Unknown error, sorry!")
-				return make_response(jsonify({"ret": "Unknown error"}))
-		return make_response(jsonify({"ret":0, "role":current_user.role.value, "id": current_user.id}))
-		#redirect(url_for(f'{current_user.role.value}Home'))
-
-
-#---logout---
-@app.route('/logout', methods=['GET'])
-def logout():
-	logout_user()
-	return redirect(url_for('home'))
-
-
-#---go to home---
-@app.route('/loadHomePage', methods=['GET'])
-@login_required
-def loadHomePage():
-	# return render_template(f'{current_user.role.value}Home.html')
-	if current_user.role.value == "patient":
-		return render_template('patientHome.html')
-	if current_user.role.value == "nurse":
-		return render_template('nurseHome.html')
-	if current_user.role.value == "doctor":
-		return render_template('doctorHome.html')
-	if current_user.role.value == "admin":
-		return render_template('admin.html')
-
-
-
-#--------------------Patient---------------------
-#--------------------Patient---------------------
-#--------------------Patient---------------------
-
-#---get hospital list data---
-@app.route('/hospitalData', methods=['GET','POST'])
-def hospitalData():
-	# try:
-	if request.method == "GET":
-		return redirect(url_for('goToHospitalList'))
-	# curr_page = int(request.form['currPage'])
-	# page_size = int(request.form['pageSize'])
-
-	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
-
-	rawHospitals = Hospital.query.offset(n_offset).limit(page_count).all()
-
-	hospital_ids = [res.id for res in rawHospitals]
-	hospital_names = [res.name for res in rawHospitals]
-	hospital_addresses = [res.address for res in rawHospitals]
-	hospital_phones = [res.phone for res in rawHospitals]
-	# return data
-	return make_response(jsonify(
-		[{"id":hospital_ids[i],
-		  "name": hospital_names[i],
-		  "address": hospital_addresses[i],
-		  "phone": hospital_phones[i],
-		  'n_tot_records': n_tot_records,
-		  'n_tot_page': n_tot_page} for i in range(len(rawHospitals))]), 200)
-
-
-@app.route('/hospitalListPage',methods=['GET'])
-def goToHospitalList():
-	return render_template('hospitalListPage.html')
-
-@app.route('/searchHospital', methods=['GET'])
-def searchHospital():
-	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
-	partial_hpt_name = request.args.get('hospital')
-
-	search_name = "%{}%".format(partial_hpt_name)
-
-	rawHospitals = Hospital.query.filter(Hospital.name.like(search_name)).offset(n_offset).limit(page_count).all()
-
-	return make_response(jsonify(
-		[{"id":rawHospitals[i].id,
-		  "name": rawHospitals[i].name,
-		  'phone': rawHospitals[i].phone,
-		  'address': rawHospitals[i].address,
-		  'description': rawHospitals[i].description,
-		  'n_tot_page': n_tot_page,
-		  'n_tot_records': n_tot_records} for i in range(len(rawHospitals))]), 200)
-
-@app.route('/goToHospital/<hospitalID>',methods=['GET'])
-@login_required
-def goToHospital(hospitalID):
-	department_ID,department_name = helper.hosp2dept(hospitalID)
-	return render_template("patientDepartment.html",hospital_ID=hospitalID,
-	department_list=[{'departmentID':department_ID[i],
-	'departmentName':department_name[i]} for i in range(len(department_ID))])
-
-@app.route('/doctorAvailSlot', methods=['POST', 'GET'])
-def doctorAvailSlot():
-	doctorID = request.args.get('doctorID')
-	today = datetime.date.today()
-	avail_7d_slots = Time_slot.query.filter(
-					# future 7 days
-					Time_slot.slot_date>=today,
-					Time_slot.slot_date<=today+timedelta(days=100),
-					Time_slot.doctor_id==doctorID,
-					Time_slot.n_total>Time_slot.n_booked
-	).order_by(Time_slot.slot_date).all()
-	avail_slots_list =[{'date': v.slot_date,
-				'time_seg_id': v.slot_seg_id,
-				'n_left_slot': v.n_total-v.n_booked} for v in avail_7d_slots]
-
-	counter=0
-	response = []
-	cur_day = today
-
-	for d in range(7):
-		cur_day = today + timedelta(days=d)
-		cur_res = {'date': cur_day, 'morning':0, 'afternoon': 0}
-		while counter<len(avail_slots_list) and avail_slots_list[counter]['date'] == cur_day:
-			short = avail_slots_list[counter]
-			cur_res['morning'] += 1 if short['time_seg_id']<=3 else 0
-			cur_res['afternoon'] += 1 if short['time_seg_id']>3 else 0
-			counter += 1
-
-		response.append(cur_res)
-	return make_response(
-		jsonify(response),200
-	)
-
-@app.route('/getDoctorByDept', methods=['GET', 'POST'])
-@login_required
-def getDoctorByDept():
-	deptID = request.form['deptID']
-	return dept_to_doc(deptID)
-
 #---------------------------Nurse--------------------------------
 #---------------------------Nurse--------------------------------
 #---------------------------Nurse--------------------------------
@@ -532,14 +314,6 @@ def nurseProcessApp():
 	return make_response({'ret':0})
 
 
-#---nurse get comments util---
-@app.route('/nurseGetComments', methods=['GET','POST'])
-def nurseGetComments():
-	app_id = request.form['appID']
-	appt = Application.query.filter(Application.id==app_id).one()
-	return make_response(jsonify({"comments":appt.reject_reason}))
-
-
 #---nurse view appointment---
 @app.route('/nurseGoViewAppt/<string:appID>', methods=['GET', 'POST'])
 @login_required
@@ -557,7 +331,25 @@ def nurseGoViewAppt(appID):
 		symptoms=appt_res.symptoms,
 		comments=appt_res.reject_reason,
 		mcID=appt_res.mc_id,
-		appStatus=appt_res.status.value)
+		ongoing=True)
+
+@app.route('/nurseGoViewApptPast/<string:appID>', methods=['GET', 'POST'])
+@login_required
+def nurseGoViewApptPast(appID):
+	appt_res = Application.query.filter(Application.id==appID).first()
+
+	helper.load_id2name_map()
+	return render_template('nurseViewAppt.html',
+		appID=appt_res.id,
+		date=appt_res.date.strftime(helper.DATE_FORMAT),
+		time=appt_res.time.strftime(helper.TIME_FORMAT),
+		doctor=helper.id2name(appt_res.doctor_id),
+		patientID=appt_res.patient_id,
+		patient=helper.id2name(appt_res.patient_id),
+		symptoms=appt_res.symptoms,
+		comments=appt_res.reject_reason,
+		mcID=appt_res.mc_id,
+		ongoing=False)
 
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
@@ -569,41 +361,71 @@ def nurseViewAppt():
 		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 	lab_reports = mc.lab_reports
-	lab_r_types = Lab_report_type.query.all()
+	if bool(request.form['type']):
+		lab_r_types = Lab_report_type.query.all()
 
-	return make_response(
-		jsonify({
-			"ret": "0",
+		return make_response(
+			jsonify({
+				"ret": "0",
 
-			"preExam":
-				{"bodyTemperature": str(mc.body_temperature),
-				"heartRate": str(mc.heart_rate),
-				"lowBloodPressure": str(mc.low_blood_pressure),
-				"highBloodPressure": str(mc.high_blood_pressure),
-				"weight": str(mc.weight),
-				"height": str(mc.height),
-				"state": mc.state.value},
+				"preExam":
+					{"bodyTemperature": str(mc.body_temperature),
+					"heartRate": str(mc.heart_rate),
+					"lowBloodPressure": str(mc.low_blood_pressure),
+					"highBloodPressure": str(mc.high_blood_pressure),
+					"weight": str(mc.weight),
+					"height": str(mc.height),
+					"state": mc.state.value},
 
-			"diagnosis":
-				mc.diagnosis,
+				"diagnosis":
+					mc.diagnosis,
 
-			"prescriptions":
-				[{"id": pres.id,
-				  "medicine": pres.medicine,
-				  "dose": pres.dose,
-				  "comments": pres.comments} for pres in prescription_list],
+				"prescriptions":
+					[{"id": pres.id,
+					  "medicine": pres.medicine,
+					  "dose": pres.dose,
+					  "comments": pres.comments} for pres in prescription_list],
 
-			"labReportTypes":
-				[{"type": lrt.type.value,
-				  "description": lrt.description
-					} for lrt in lab_r_types],
+				"labReportTypes":
+					[{"type": lrt.type.value,
+					  "description": lrt.description
+						} for lrt in lab_r_types],
 
-			"labReports":
-				[{"lr_type": lr.lr_type.value,
-				"id": lr.id,
-				"comments": lr.comments} for lr in lab_reports]
-		})
-	)
+				"labReports":
+					[{"lr_type": lr.lr_type.value,
+					"id": lr.id,
+					"comments": lr.comments} for lr in lab_reports]
+			})
+		)
+	else:
+		return make_response(
+			jsonify({
+				"ret": "0",
+
+				"preExam":
+					{"bodyTemperature": str(mc.body_temperature),
+					"heartRate": str(mc.heart_rate),
+					"lowBloodPressure": str(mc.low_blood_pressure),
+					"highBloodPressure": str(mc.high_blood_pressure),
+					"weight": str(mc.weight),
+					"height": str(mc.height),
+					"state": mc.state.value},
+
+				"diagnosis":
+					mc.diagnosis,
+
+				"prescriptions":
+					[{"id": pres.id,
+					  "medicine": pres.medicine,
+					  "dose": pres.dose,
+					  "comments": pres.comments} for pres in prescription_list],
+
+				"labReports":
+					[{"lr_type": lr.lr_type.value,
+					"id": lr.id,
+					"comments": lr.comments} for lr in lab_reports]
+			})
+		)
 
 
 @app.route('/nursePreviewLR', methods=['GET', 'POST'])
@@ -697,21 +519,61 @@ def nurseViewMC():
 	)
 
 
+#---------------------------Doctor--------------------------------
+#---------------------------Doctor--------------------------------
+#---------------------------Doctor--------------------------------
+#TODO
+#TODO
+#TODO
+
+#---doctor home page---
+@app.route('/doctorHome', methods=['GET', 'POST'])
+@login_required
+def doctorHome():
+	return render_template('doctorHome.html')
+
+
+@app.route('/doctorOnGoingAppt', methods=['GET', 'POST'])
+@login_required
+def doctorOnGoingAppt():
+	pass
+
+
+@app.route('/doctorTodayAppt', methods=['GET', 'POST'])
+@login_required
+def doctorTodayAppt():
+	pass
+
+
+#---doctor all appointments page---
+@app.route('/doctorAllAppt', methods=['GET', 'POST'])
+@login_required
+def doctorAllAppt():
+	return render_template('doctorAllAppt.html')
+
+
+@app.route('/doctorFutureAppt', methods=['GET', 'POST'])
+@login_required
+def doctorFutureAppt():
+	pass
+
+
+@app.route('/doctorPastAppt', methods=['GET', 'POST'])
+@login_required
+def doctorPastAppt():
+	pass
 
 
 
 
 
-#---------------------scratch--------------------------
-#---------------------scratch--------------------------
-#---------------------scratch--------------------------
-#JZ
-# @app.route('/nurseGoViewMC', methods=['GET','POST'])
-# def nurseGoViewMC():
-# 	#TODO
-# 	return render_template("nurseViewMC.html")
-#
-# @app.route('/nurseViewMC', methods=['GET','POST'])
-# def nurseViewMC():
-# 	#TODO
-# 	return make_response(jsonify([{"appID":"1", "mcID":"1", "date":"1", "time":"1", "doctor":"1", "symptoms":"1"}]))
+#---------------------------Util--------------------------------
+#---------------------------Util--------------------------------
+#---------------------------Util--------------------------------
+
+#---get comments util---
+@app.route('/getComments', methods=['GET','POST'])
+def getComments():
+	app_id = request.form['appID']
+	appt = Application.query.filter(Application.id==app_id).one()
+	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))

@@ -72,7 +72,7 @@
 					<div class="col-md-4"><span><b>Patient: </b></span><span id="patient">{{patient}}</span></div>
 		    </div>
 				<div class="row">
-					<div class="col-md-8"><span><b>Application/Appointment Status: </b></span><span id="appStatus">{{appStatus}}</span></div>
+					<div class="col-md-8"><span><b>Application/Appointment Status: </b></span><span id="appStatus"></span></div>
 					<form action="/nurseGoViewMC" method="POST" class="col-md-4">
 						<input class="d-none" type="text" name="patientID" value="{{patientID}}" readonly>
 						<input type="submit" class="btn btn-sm btn-primary" id="viewMC" value="view patient's medical history">
@@ -106,12 +106,18 @@
 
 			<hr>
 			<h5>Diagnosis</h5>
+			{% if ongoing == False %}
+			<fieldset disabled>
+			{% else %}
+			<fieldset>
+			{% endif %}
 			<form id="editDiagnosis" class="container-fluid">
 				<div class="form-group row">
 					<textarea class="form-control col-8" id="diagnosis" name="diagnosis" rows="6"></textarea>
 				</div>
 				<input type="submit" class="btn btn-primary" value="Submit">
 			</form>
+			</fieldset>
 
 			<hr>
 			<h5>
@@ -120,13 +126,41 @@
 			</h5>
 			<div id="prescriptions" class="collapse"></div>
 			<hr>
+			<h5>Add prescription</h5>
+			<div class="container-fluid">
+				{% if ongoing == False %}
+				<fieldset disabled>
+				{% else %}
+				<fieldset>
+				{% endif %}
+				<form id="prescriptionForm" enctype="multipart/form-data">
+					<div class="form-group row">
+						<label class="col-10 col-form-label" for="medicine"><b>Medicine</b></label>
+					  <input class="form-control" type="text" id="medicine" name="medicine" required>
+					</div>
+					<div class="form-group row">
+						<label class="col-10 col-form-label" for="dose"><b>Dose</b></label>
+					  <input class="form-control" type="text" id="dose" name="dose" required>
+					</div>
+					<div class="form-group row">
+						<label class="col-10 col-form-label" for="comments"><b>Comments</b></label>
+					  <textarea class="form-control" id="comments" name="comments"></textarea>
+					</div>
+					<input type="submit" id="addPrescription" class="btn btn-primary" value="Upload"/>
+	      </form>
+				</fieldset>
+			</div>
+			<hr>
 			<h5>
 				Lab reports
 				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReports" aria-expanded="false" aria-controls="labReports">Show</button>
 			</h5>
 			<div id="labReports" class="collapse"></div>
-			<hr>
-			<h5>Upload lab report</h5>
+			<!-- {% if ongoing == False %}
+			<fieldset disabled>
+			{% else %}
+			<fieldset>
+			{% endif %}
 			<form id="labReportForm" enctype="multipart/form-data">
 				<div class="form-group row">
 					<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
@@ -146,6 +180,7 @@
 				</div>
 				<input type="submit" id="uploadReport" class="btn btn-primary" value="Upload"/>
       </form>
+			</fieldset> -->
     </div>
 
 	</div>

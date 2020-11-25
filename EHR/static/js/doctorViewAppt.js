@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @page nurseViewAppt.html
+* @page doctorViewAppt.html
 * @import util.js, apptAndMC.js
 */
 
@@ -23,8 +23,8 @@ $(document).ready(function() {
 
 
 // ---------------------capture user action--------------------------
-// edit preExam data
-$("#PreExamForm").on("submit", editPreExam);
+// add prescription
+$("#prescriptionForm").on("submit", editPreExam);
 // upload a lab report
 $("#labReportForm").on("submit", uploadLabReport);
 
@@ -85,22 +85,3 @@ function refreshOnSuccess(res){
     goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
   }
 }
-
-// "form#labReportForm"
-// $.ajax({
-//   url: "http://localhost:5000/nurseUploadLabReport",
-//   type: 'POST',
-//   data: data,
-//   success: function(res){
-//     console.log(res);
-//     if (res.ret == "0") {
-//       window.location.replace("http://localhost:5000/nurseViewAppt/" + $("#appID").text());
-//     }
-//   },
-//   error: function(err) {
-//     console.log(err);
-//   },
-//   cache: false,
-//   processData: false,
-//   contentType: false
-// })

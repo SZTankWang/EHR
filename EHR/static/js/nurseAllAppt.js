@@ -64,11 +64,15 @@ function buttonAction(event) {
     myModal.setApp(data);
     var reqData = {"appID": data['appID']};
     var setComments = (res) => {myModal.setComments(res.comments)};
-    sendRequest("nurseGetComments", "POST", reqData, setComments);
+    sendRequest("getComments", "POST", reqData, setComments);
     myModal.show();
   } else {
     var appID = data['appID'];
-    goToPage("nurseGoViewAppt/" + appID, 0);
+    if ($(".nav-table.active").text() == "Past appointments") {
+      goToPage("nurseGoViewApptPast/" + appID, 0);
+    } else {
+      goToPage("nurseGoViewAppt/" + appID, 0);
+    }
   }
 }
 

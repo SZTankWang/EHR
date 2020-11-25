@@ -137,6 +137,38 @@ class MCModal extends AppFullModal{
       this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments));
     };
   }
+
+  loadAppInfo(appID){
+    const appData = {"appID": appID};
+    var fillAppData = (res) => {
+      this.setAppStatus(res.status);
+      this.setComments(res.comments);
+    };
+    sendRequest("getComments", "POST", appData, fillAppData);
+  }
+
+  loadMCInfo(mcID) {
+    const mcData = {"mcID": mcID, "type": "False"};
+    var fillMCData = (res) => {
+      if (res.ret == "0") {
+        this.setBodyTemperature(res.preExam.bodyTemperature);
+        this.setHeartRate(res.preExam.heartRate);
+        this.setHighBloodPressure(res.preExam.highBloodPressure);
+        this.setLowBloodPressure(res.preExam.lowBloodPressure);
+        this.setWeight(res.preExam.weight);
+        this.setHeight(res.preExam.height);
+        this.setState(res.preExam.state);
+        this.setDiagnosis(res.diagnosis);
+        if (res.prescriptions)
+          this.setPrescriptions(res.prescriptions);
+        if (res.labReports)
+          this.setLabReports(res.labReports);
+      } else {
+        alert(res.ret);
+      }
+    };
+    sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
+  }
 }
 
 /**
@@ -157,5 +189,30 @@ class MCPage extends MCModal{
     for (let i=0; i < labReportTypes.length; i++) {
       this.labReportTypes.append(new Option(labReportTypes[i].type, labReportTypes[i].type));
     };
+  }
+
+  loadMCInfo(mcID) {
+    const mcData = {"mcID": mcID, "type": "True"};
+    var fillMCData = (res) => {
+      if (res.ret == "0") {
+        this.setBodyTemperature(res.preExam.bodyTemperature);
+        this.setHeartRate(res.preExam.heartRate);
+        this.setHighBloodPressure(res.preExam.highBloodPressure);
+        this.setLowBloodPressure(res.preExam.lowBloodPressure);
+        this.setWeight(res.preExam.weight);
+        this.setHeight(res.preExam.height);
+        this.setState(res.preExam.state);
+        this.setDiagnosis(res.diagnosis);
+        if (res.prescriptions)
+          this.setPrescriptions(res.prescriptions);
+        if (res.labReportTypes)
+          this.setLabReportTypes(res.labReportTypes);
+        if (res.labReports)
+          this.setLabReports(res.labReports);
+      } else {
+        alert(res.ret);
+      }
+    };
+    sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
   }
 }
