@@ -575,7 +575,11 @@ def nurseGoViewAppt(appID):
 @login_required
 def nurseViewAppt():
 	mc_id = request.form['mcID']
+	mc_id2 = request.args.get('mcID')
+	print("mc_id:", mc_id)
+	print("mc_id2", request.form)
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	print(mc)
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
@@ -707,22 +711,23 @@ def nurseViewMC():
 		       )
 	)
 
+@app.route('/nurseSettings', methods=['GET'])
+def nurseSettings():
+	nurse_id = current_user.get_id()
+	hospital_id = 1
+	helper.load_id2name_map()
 
+	nurse_user = Nurse.query.join(User, User.id==Nurse.id).filter(User.id==nurse_id).first()
+	print("nurse_user:", nurse_user.columns)
+	print("dept.id", nurse_user.department_id)
+	full_name = helper.id2name(nurse_id)
+	f_name, l_name = full_name.split(" ")
 
-
-
-
-
-#---------------------scratch--------------------------
-#---------------------scratch--------------------------
-#---------------------scratch--------------------------
-#JZ
-# @app.route('/nurseGoViewMC', methods=['GET','POST'])
-# def nurseGoViewMC():
-# 	#TODO
-# 	return render_template("nurseViewMC.html")
-#
-# @app.route('/nurseViewMC', methods=['GET','POST'])
-# def nurseViewMC():
-# 	#TODO
-# 	return make_response(jsonify([{"appID":"1", "mcID":"1", "date":"1", "time":"1", "doctor":"1", "symptoms":"1"}]))
+	return render_template('doctorNurseSettings.html', 
+					hospitalID=hospital_id,
+					deptID=nurse_user.department_id, 
+					firstName=f_name,
+					lastName=l_name, 
+					licenseID=nurse_user.id, 
+					email=nurse_user.email, 
+					phone=nurse_user.phone)
