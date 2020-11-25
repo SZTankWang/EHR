@@ -1,7 +1,7 @@
 /**
 * @author Jingyi Zhu
 * @page nurseHome.html
-* @import util.js
+* @import table.js, util.js
 */
 
 /**

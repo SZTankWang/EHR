@@ -4,9 +4,11 @@ from EHR.model.models import *
 import math
 import datetime
 from operator import and_
+from enum import Enum
 
 TIME_FORMAT = "%H:%M"
 DATE_FORMAT = "%Y-%m-%d"
+id_name_map = {}
 
 def paginate(db_obj):
 	try:
@@ -30,32 +32,14 @@ def day2slotid(period: int, start_day=datetime.date.today()):
 											  Time_slot.slot_date>=start_day)).all()]
 	return next_d_slotid
 
-# No Longer Necessary! since we added date and time in Application
-# slotid2date = {}
-# def load_slots():
-# 	global slotid2date
-# 	slots = Time_slot.query.all()
-# 	segid2time = {seg.t_seg_id: seg.t_seg_starttime for seg in Time_segment.query.all()}
-
-# 	for slot in slots:
-# 		slotid2date[slot.id] = {"slot_date": slot.slot_date,
-# 								"seg_starttime": segid2time[slot.slot_seg_id]}
-# 	# print("slotid2date:", slotid2date)
-
-# def slot2time(slot_id:int):
-# 	load_slots()
-# 	slot_date = slotid2date[slot_id]['slot_date']
-# 	seg_starttime = slotid2date[slot_id]['seg_starttime']
-# 	return slot_date, seg_starttime
 
 def segid2time(t_seg_id):
 	return Time_segment.query.filter(Time_segment.t_seg_id==t_seg_id).one().t_seg_starttime
 
-id_name_map = None
 def load_id2name_map():
-	global id_name_map
-	id_name_map = {u.id: u.first_name + " "+u.last_name \
-					for u in User.query.all()}
+	users = User.query.with_entities(User.id, User.first_name, User.last_name)
+	for u in users:
+		id_name_map[u.id] = u.first_name + " " + u.last_name
 
 def id2name(this_id:int)->String:
 	# person = User.query.filter(User.id==this_id).first()
@@ -63,11 +47,12 @@ def id2name(this_id:int)->String:
 	return person_name
 
 
-def nurse_dept_appts(nurseID, direction=None, period=None, start_date=datetime.date.today()):
+def dept_appts(user, direction=None, period=None, start_date=datetime.date.today()):
 	"""
 	check this nurse dept. all appointments, with specified time period
 	"""
-	deptID = Nurse.query.filter(Nurse.id == nurseID).first().department_id
+
+	deptID = Nurse.query.filter(Nurse.id == user.id).first().department_id
 	if period:
 		same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\
@@ -129,3 +114,9 @@ def dept2doc_all(deptID):
 def doc2slots(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period)).all()
+
+def dept_to_doc(deptID):
+	doctor_list = dept2doc(deptID)
+	load_id2name_map()
+	return [{"doctorID": doctor_list[i],
+			"doctorName": id2name(doctor_list[i])} for i in range(len(doctor_list))]

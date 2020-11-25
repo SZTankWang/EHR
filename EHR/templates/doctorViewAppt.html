@@ -24,12 +24,12 @@
 			<div class="d-flex justify-content-start">
 				<span class="navbar-brand mb-0 h1">WeCare</span>
 				<div class="navbar-nav">
-					<a class="nav-main nav-item nav-link" href="/nurseHome">Home</a>
-					<a class="nav-main nav-item nav-link" href="/nurseAllAppt">All appointments</a>
+					<a class="nav-main nav-item nav-link" href="/doctorHome">Home</a>
+					<a class="nav-main nav-item nav-link" href="/doctorAllAppt">All appointments</a>
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
-				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right:1em;">
+				<form class="form-inline" action="/doctorSearch" method="POST" style="padding-right:1em;">
 					<div class="input-group">
 						<input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="search-input" placeholder="department, doctor, patient">
 							<div class="input-group-append">
@@ -43,7 +43,7 @@
 					</div>
 				</form>
 				<div class="navbar-nav">
-			  	<a class="nav-item nav-link" href="/nurseSettings">User</a>
+			  	<a class="nav-item nav-link" href="/doctorSettings">User</a>
 			  	<a class="nav-item nav-link" href="/logout">Logout</a>
 				</div>
 			</div>
@@ -54,8 +54,13 @@
 		<div id="content-header-wrapper">
 			<nav class="nav nav-tabs d-flex justify-content-center">
 				<div>
-					<h3>Appointment and Medical Record</h3>
+					<h3>Appointment</h3>
 				</div>
+				{% if not finished %}
+				<div style="padding-left:1em;">
+					<a class="btn btn-primary" id="finish" onclick="finish()">Finish</a>
+				</div>
+				{% endif %}
 			</nav>
 		</div>
 
@@ -72,8 +77,8 @@
 					<div class="col-md-4"><span><b>Patient: </b></span><span id="patient">{{patient}}</span></div>
 		    </div>
 				<div class="row">
-					<div class="col-md-8"><span><b>Application/Appointment Status: </b></span><span id="appStatus">{{appStatus}}</span></div>
-					<form action="/nurseGoViewMC" method="POST" class="col-md-4">
+					<div class="col-md-8"><span><b>Application/Appointment Status: </b></span><span id="appStatus"></span></div>
+					<form action="/doctorNurseGoViewMC" method="POST" class="col-md-4">
 						<input class="d-none" type="text" name="patientID" value="{{patientID}}" readonly>
 						<input type="submit" class="btn btn-sm btn-primary" id="viewMC" value="view patient's medical history">
 					</form>
@@ -106,12 +111,18 @@
 
 			<hr>
 			<h5>Diagnosis</h5>
-			<form id="editDiagnosis" class="container-fluid">
+			{% if finished %}
+			<fieldset disabled>
+			{% else %}
+			<fieldset>
+			{% endif %}
+			<form id="diagnosisForm" class="container-fluid">
 				<div class="form-group row">
 					<textarea class="form-control col-8" id="diagnosis" name="diagnosis" rows="6"></textarea>
 				</div>
-				<input type="submit" class="btn btn-primary" value="Submit">
+				<input type="submit" id="editDiagnosis" class="btn btn-primary" value="Submit">
 			</form>
+			</fieldset>
 
 			<hr>
 			<h5>
@@ -119,6 +130,33 @@
 				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#prescriptions" aria-expanded="false" aria-controls="prescriptions">Show</button>
 			</h5>
 			<div id="prescriptions" class="collapse"></div>
+
+			<hr>
+			<h5>Add prescription</h5>
+			<div class="container-fluid">
+				{% if finished %}
+				<fieldset disabled>
+				{% else %}
+				<fieldset>
+				{% endif %}
+				<form id="prescriptionForm" enctype="multipart/form-data">
+					<div class="form-group row">
+						<label class="col-form-label col-2" for="medicine"><b>Medicine/Treatment</b></label>
+					  <input class="form-control col-6" type="text" id="medicine" name="medicine" required>
+					</div>
+					<div class="form-group row">
+						<label class="col-form-label col-2" for="dose"><b>Dose</b></label>
+					  <input class="form-control col-6" type="text" id="dose" name="dose" required>
+					</div>
+					<div class="form-group row">
+						<label class="col-form-label col-10" for="comments"><b>Comments</b></label>
+					  <textarea class="form-control col-8" id="comments" name="comments"></textarea>
+					</div>
+					<input type="submit" id="addPrescription" class="btn btn-primary" value="Add"/>
+	      </form>
+				</fieldset>
+			</div>
+
 			<hr>
 			<h5>
 				Lab reports
@@ -126,26 +164,32 @@
 			</h5>
 			<div id="labReports" class="collapse"></div>
 			<hr>
-			<h5>Upload lab report</h5>
-			<form id="labReportForm" enctype="multipart/form-data">
-				<div class="form-group row">
-					<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
-					<div class="col-5">
-						<select class="form-control" id="labReportTypes" name="type" required/>
-				      <option value="" disabled selected></option>
-				    </select>
+			<h5>
+				Request a lab report
+			</h5>
+			<div class="container-fluid">
+				{% if finished %}
+				<fieldset disabled>
+				{% else %}
+				<fieldset>
+				{% endif %}
+				<form id="labReportForm">
+					<div class="form-group row">
+						<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
+						<div class="col-5">
+							<select class="form-control" id="labReportTypes" name="type" required/>
+					      <option value="" disabled selected></option>
+					    </select>
+						</div>
 					</div>
-				</div>
-				<div class="form-group row">
-					<label class="col-10 col-form-label" for="labReport"><b>Choose a lab report</b></label>
-				  <input class="form-control" type="file" id="labReport" name="labReport" required>
-				</div>
-				<div class="form-group row">
-					<label class="col-10 col-form-label" for="comments"><b>Comments</b></label>
-				  <textarea class="form-control" id="comments" name="comments"></textarea>
-				</div>
-				<input type="submit" id="uploadReport" class="btn btn-primary" value="Upload"/>
-      </form>
+					<div class="form-group row">
+						<label class="col-form-label col-10" for="comments"><b>Comments</b></label>
+					  <textarea class="form-control col-8" id="comments" name="comments"></textarea>
+					</div>
+					<input type="submit" id="uploadReport" class="btn btn-primary" value="Request"/>
+	      </form>
+				</fieldset>
+			</div>
     </div>
 
 	</div>

@@ -24,12 +24,12 @@
 			<div class="d-flex justify-content-start">
 				<span class="navbar-brand mb-0 h1">WeCare</span>
 				<div class="navbar-nav">
-					<a class="nav-main nav-item nav-link" href="/nurseHome">Home</a>
-					<a class="nav-main nav-item nav-link" href="/nurseAllAppt">All appointments</a>
+					<a class="nav-main nav-item nav-link" href="/loadHome">Home</a>
+					<a class="nav-main nav-item nav-link" href="/loadAllAppt">All appointments</a>
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
-				<form class="form-inline" action="/nurseSearch" method="POST" style="padding-right:1em;">
+				<form class="form-inline" action="/doctorSearch" method="POST" style="padding-right:1em;">
 					<div class="input-group">
 						<input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" id="search-input" placeholder="department, doctor, patient">
 							<div class="input-group-append">
@@ -43,7 +43,7 @@
 					</div>
 				</form>
 				<div class="navbar-nav">
-			  	<a class="nav-item nav-link" href="/nurseSettings">User</a>
+			  	<a class="nav-item nav-link" href="/doctorSettings">User</a>
 			  	<a class="nav-item nav-link" href="/logout">Logout</a>
 				</div>
 			</div>
@@ -137,49 +137,42 @@
 							<div class="row">
 			          <div class="col-md-3"><b>Body temperature</b></div>
 								<div class="col-md-auto" id="bodyTemperature">
-			            233
 								</div>
 								<div class="col-md-auto">&#8451;</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>Heart rate</b></div>
 								<div class="col-md-auto" id="pulseRate">
-			          	233
 								</div>
 								<div class="col-md-auto">BPM</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>High blood pressure</b></div>
 								<div class="col-md-auto" id="highBloodPressure">
-			          	233
 								</div>
 								<div class="col-md-auto">mmHg</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>Low blood pressure</b></div>
 								<div class="col-md-auto" id="lowBloodPressure">
-			          	233
 								</div>
 								<div class="col-md-auto">mmHg</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>Weight</b></div>
 								<div class="col-md-auto" id="weight">
-			          	233
 								</div>
 								<div class="col-md-auto">g</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>Height</b></div>
 								<div class="col-md-auto" id="height">
-			          	233
 								</div>
 								<div class="col-md-auto">cm</div>
 							</div>
 							<div class="row">
 								<div class="col-md-3"><b>State</b></div>
 								<div class="col-md-auto" id="state">
-			          	233
 								</div>
 							</div>
 							<hr>
@@ -214,6 +207,6 @@
 	<script type="text/javascript" src="/static/js/class/modal.js"></script>
 	<script type="text/javascript" src="/static/js/function/util.js"></script>
 	<script type="text/javascript" src="/static/js/function/apptAndMC.js"></script>
-	<script type="text/javascript" src="/static/js/nurseViewMC.js"></script>
+	<script type="text/javascript" src="/static/js/doctorNurseViewMC.js"></script>
 </body>
 </html>
