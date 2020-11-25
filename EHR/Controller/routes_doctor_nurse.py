@@ -118,6 +118,10 @@ def nurseOnGoingAppt():
 @app.route('/nurseFutureAppt', methods=['GET', 'POST'])
 @login_required
 def nurseFutureAppt():
+	## TODO
+	## TODO
+	## TODO
+	## TODO: POST method
 	nurse_id = current_user.get_id()
 	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
