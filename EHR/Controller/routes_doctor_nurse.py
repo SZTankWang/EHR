@@ -526,19 +526,32 @@ def doctorHome():
 @app.route('/doctorOnGoingAppt', methods=['GET', 'POST'])
 @login_required
 def doctorOnGoingAppt():
+	doctorID = current_user.get_id()
 	pass
-
 
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():
-	pass
+	doctorID = current_user.get_id()
+	appt_list = helper.doc2appts(doctorID,0)
+	helper.load_id2name_map()
+	return make_response(
+		jsonify([{"appID":str(appt_list[i].id),
+				"date":appt_list[i].date.strftime(helper.DATE_FORMAT),
+				"time":appt_list[i].time.strftime(helper.TIME_FORMAT),
+				"nurse":helper.id2name(appt_list[i].approver_id),
+				"patient":helper.id2name(appt_list[i].patient_id),
+				"symptoms":appt_list[i].symptoms}
+		for i in range(len(appt_list))]
+		       )
+	)
 
 
 #---doctor all appointments page---
 @app.route('/doctorAllAppt', methods=['GET', 'POST'])
 @login_required
 def doctorAllAppt():
+	doctorID = current_user.get_id()
 	return render_template('doctorAllAppt.html')
 
 
