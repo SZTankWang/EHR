@@ -43,7 +43,7 @@ def nursePendingApp():
 	next7d_slotid = helper.day2slotid(period=7)
 	nurse_id = current_user.get_id()
 	# nurse_id = '17711783'
-	pending_app = helper.nurse_dept_appts(nurseID=nurse_id, period=7).\
+	pending_app = helper.dept_appts(user=current_user, period=7).\
 									filter(
 										Application.status==StatusEnum.pending,
 										Application.time_slot_id.in_(next7d_slotid)).all()
@@ -66,7 +66,7 @@ def nurseTodayAppt():
 	# nurseID = "44116022"    # a nurseID that returns something,
 	# 						for testing purpose, set the 'period' to 20
 	# department ID of current nurse
-	today_depts_appts = helper.nurse_dept_appts(nurseID, period=0).all()
+	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
 
 	helper.load_id2name_map()
 	def response_generator(app):
@@ -92,7 +92,7 @@ def nurseOnGoingAppt():
 	# nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
 
 	# filter1: today's appts； filter2: status=approved
-	today_approved_appts = helper.nurse_dept_appts(nurseID=nurse_id, period=0).\
+	today_approved_appts = helper.dept_appts(user=current_user, period=0).\
 		filter(
 			Application.status==StatusEnum.approved
 			).all()
@@ -125,7 +125,7 @@ def nurseFutureAppt():
 	nurse_id = current_user.get_id()
 	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
-	future_appts = helper.nurse_dept_appts(nurse_id, direction="future").all()
+	future_appts = helper.dept_appts(user=current_user, direction="future").all()
 
 	helper.load_id2name_map()
 	def response_generator(app):
@@ -150,10 +150,10 @@ def nursePastAppt():
 	nurse_id = current_user.get_id()
 	if request.form['startDate']:
 		start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
-		apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
+		apps = helper.dept_appts(user=current_user, period=(end_date-start_date).days,\
 			 start_date=start_date).filter(Application.status==StatusEnum.finished)
 	else: # if startDate is None then get all past appts
-		apps = helper.nurse_dept_appts(nurseID=nurse_id, direction="past",\
+		apps = helper.dept_appts(user=current_user, direction="past",\
 			 start_date=end_date).filter(Application.status==StatusEnum.finished)
 
 	helper.load_id2name_map()
@@ -187,17 +187,17 @@ def nurseRejectedApp():
 
 	if start_date:
 		if end_date:
-			apps = helper.nurse_dept_appts(nurseID=nurse_id, period=(end_date-start_date).days,\
+			apps = helper.dept_appts(user=current_user, period=(end_date-start_date).days,\
 			 	start_date=start_date).filter(Application.status==StatusEnum.rejected)
 		else:
-			apps = helper.nurse_dept_appts(nurseID=nurse_id, direction="future", period=(end_date-start_date).days,\
+			apps = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days,\
 			 	start_date=start_date).filter(Application.status==StatusEnum.rejected)
 	else:
 		if end_date:
-			apps = helper.nurse_dept_appts(nurseID=nurse_id, direction="past", period=(end_date-start_date).days,\
+			apps = helper.dept_appts(user=current_user, direction="past", period=(end_date-start_date).days,\
 			 	start_date=end_date).filter(Application.status==StatusEnum.rejected)
 		else:
-			apps = helper.nurse_dept_appts(nurseID=nurse_id).filter(Application.status==StatusEnum.rejected)
+			apps = helper.dept_appts(user=current_user).filter(Application.status==StatusEnum.rejected)
 
 	helper.load_id2name_map()
 	return make_response(
@@ -346,7 +346,11 @@ def nurseGoViewAppt(appID):
 @login_required
 def nurseViewAppt():
 	mc_id = request.form['mcID']
+	mc_id2 = request.args.get('mcID')
+	print("mc_id:", mc_id)
+	print("mc_id2", request.form)
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	print(mc)
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
@@ -500,13 +504,91 @@ def viewMC():
 			'patientName':helper.id2name(patient_id),
 		'appts':[{'appID':str(table[i].id),
 		'mcID':table[i].mc_id,
-		'date':table[i].date.strftime("%Y-%m-%d"),
-		'time':table[i].time.strftime("%H:%M"),
+		'date':table[i].date.strftime(helper.DATE_FORMAT),
+		'time':table[i].time.strftime(helper.TIME_FORMAT),
 		'doctor':helper.id2name(table[i].doctor_id),
 		'symptoms':table[i].symptoms}
 		for i in range(len(table))]}
 		       )
 	)
+
+#--- Nurse edit personal information ---
+@app.route('/nurseSettings', methods=['GET'])
+@app.route('/doctorSettings', methods=['GET'])
+@app.route('/patientSettings', methods=['GET'])
+def Settings():
+	id = current_user.get_id()
+	hospital_id = 1
+	user, role_user = None, None
+	print(current_user.role)
+
+	if current_user.role == RoleEnum.patient:
+		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
+		return render_template("patientSettings.html", 
+					firstName=user.first_name,
+					lastName=user.last_name, 
+					patientID=role_user.id, 
+					email=user.email, 
+					age=role_user.age)
+
+	elif current_user.role == RoleEnum.nurse:
+		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
+	elif current_user.role == RoleEnum.doctor:
+		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+	
+	return render_template("doctorNurseSettings.html",
+					 hospitalID=hospital_id,
+					deptID=role_user.department_id,
+					firstName=user.first_name,
+					lastName=user.last_name,
+					licenseID=user.id,
+					email=user.email,
+					phone=user.phone)
+
+@app.route('/patientUpdateHealthInfo', methods=['POST'])
+def patientUpdateHealthInfo():
+	age = request.form['age']
+	gender = request.form['gender']
+	allergies = request.form['allergies']
+
+	p_id = current_user.get_id()
+	_, role_user = db.session.query(User, Patient).join(User).filter(User.id==p_id).first()
+	role_user.gender = gender 
+	role_user.allergies = allergies
+	role_user.age = age 
+
+	db.session.commit()
+	return make_response(jsonify({"ret": 0}))
+
+#---------------------------Nurse-Doctor--------------------------------
+#---------------------------Nurse-Doctor--------------------------------
+#---------------------------Nurse-Doctor--------------------------------
+@app.route('/doctorNurseUpdateInfo', methods=['POST'])
+@app.route('/patientUpdateInfo', methods=['POST'])
+def UpdateInfo():
+	f_name = request.form['firstName']
+	l_name = request.form['lastName']
+	id = request.form['licenseID'] if 'licenseID' in request.form else request.form['nationalID']
+	email = request.form['email']
+	phone = request.form['phone']
+	user = None
+	if current_user.role == RoleEnum.doctor:
+		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+	elif current_user.role == RoleEnum.nurse:
+		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
+	elif current_user.role == RoleEnum.patient:
+		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
+	if not user:
+		return make_response(jsonify({'ret':0}))
+
+	user.id = id
+	user.first_name = f_name
+	user.last_name = l_name 
+	user.email = email
+	user.phone = phone 
+
+	db.session.commit()
+	return make_response(jsonify({'ret':0}))
 
 
 #---------------------------Doctor--------------------------------
@@ -569,6 +651,7 @@ def doctorPastAppt():
 
 
 
+
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
@@ -579,3 +662,4 @@ def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
+
