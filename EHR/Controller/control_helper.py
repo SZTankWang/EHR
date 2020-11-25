@@ -128,12 +128,17 @@ def dept2doc_all(deptID):
 	load_id2name_map()
 	return [{"doctorID": doctor_list[i].id,
 		 "doctorName": id2name(doctor_list[i].id),"hospital": doctor_list[i].department.hospital.name,"department": doctor_list[i].department.title} for i in range(len(doctor_list))]
+
 def doc2slots(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period)).all()
+
 def doc2slots_available(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period),Time_slot.n_total>Time_slot.n_booked).all()
+
+def doc2appts(doctorID,period, start_date = datetime.date.today()):
+	return Application.query.filter(Application.doctor_id == doctorID, Application.status == StatusEnum.approved,Application.date == start_date).all()
 
 def dept_to_doc(deptID):
 	doctor_list = dept2doc(deptID)
