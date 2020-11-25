@@ -238,7 +238,7 @@ def doctorAvailSlot():
 @login_required
 def getDoctorByDept():
 	deptID = request.args.get('deptID')
-	return dept_to_doc(deptID)
+	return make_response(jsonify(helper.dept2doc_all(deptID)))
 
 
 '''
