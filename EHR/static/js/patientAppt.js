@@ -87,7 +87,10 @@
 		frame.setAttribute('scrolling','no');
 		frame.setAttribute('frameBorder',0);
 		$('#card-list').append(frame);
-		frame.setAttribute('src','http://localhost:5000/viewDoctor');
+		frame.setAttribute('src','http://localhost:5000/viewDoctor/'+doctorID);
+
+		//返回栏设置为可见
+		document.getElementById("close-frame-container").style.display="block";
 	}
 
 
@@ -102,4 +105,25 @@
 
 
 		});
+	}
+
+	// 根据日期获取排版
+	function getDocSlot(date){
+		var doctorID = $('#doctorID').val();
+		$.ajax({
+			url:"http://localhost:5000/getDoctorSlot",
+			data:{
+				'date':date,
+				'doctorID':doctorID
+					},
+			success:function(data){
+				console.log(data);
+			}
+		})
+	}
+
+
+	//点击返回 返回到医生列表
+	function closeFrame(){
+		$('#card-list').empty();
 	}
