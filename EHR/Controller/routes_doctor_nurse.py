@@ -1,3 +1,4 @@
+from sys import exec_prefix
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
 import collections
 from datetime import timedelta
@@ -688,9 +689,6 @@ def doctorPastAppt():
 
 
 
-
-
-
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
@@ -701,3 +699,35 @@ def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
+
+@app.route('/addHospital',methods=['GET', 'POST'])
+def addHospital():
+	# try:
+	hospital_id = request.form['hospitalID']
+	print("resquest.form", request.form)
+	name = request.form['name']
+	phone = request.form['phone']
+	address = request.form['address']
+	description = request.form['description']
+
+	# except:
+	# 	return make_response(jsonify({
+	# 		"ret":1, "message": "Missing attributes"
+	# 	}))
+
+	hos = Hospital(
+		name=name,
+		phone=phone,
+		address=address,
+		description=description
+	)
+	# try:
+	db.session.add(hos)
+	db.session.commit()
+	# except: 
+	# 	db.session.rollback()
+	# 	return make_response(jsonify({'ret':1, 'message': "error"}))
+
+	return make_response(jsonify({'ret':0}))
+	
+
