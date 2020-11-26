@@ -15,9 +15,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script>
 </head>
 <body>
+
+	<!-- 医生信息 -->
 	<form id="doctorInfo" style="display: none;">
 		<input type="text" id="doctorName" name="doctorName" value={{ doctorName }}>
 		<input type="text" id="doctorID" name="doctorID" value={{ doctorID }}>
+		<input type="text" id="hospital" name="hospital" value={{ hospital }}>
+		<input type="text" id="department" name="department" value={{ department }}>
 
 	</form>
 	<div class="pageContent">
@@ -39,15 +43,15 @@
 			<h2>Book an appointment</h2>
 			<div class="input-fields-wrapper">
 				<p>Date<input type="text" id="select-date"></p>
-				<button id="search">search</button>
+				<button id="search" onclick="searchSlotByDate()">search</button>
 			</div>
 			<div class="time-slot-container">
 
 				<!-- 时间段列表 -->
-				<ul>
+				<ul id="time-slot-list">
 
 					<!-- 单个时间段 -->
-					<li>
+<!-- 					<li>
 						<div class="time-slot-row">
 
 							<div class="time-slot-info time"><h4>time</h4></div>
@@ -57,8 +61,11 @@
 							</div>
 						
 						</div>
-					</li>
-				
+					</li> -->
+									
+
+
+
 				</ul>
 			</div>		
 		</div>
@@ -66,7 +73,7 @@
 
 	</div>
 
-
+	<!-- 预约对话框 -->
 	<div class="book-dialog" title="confirm appointment">
 		<div class="dialog-content-container">
 
@@ -74,16 +81,16 @@
 			<div class="dialog-content">
 				<div class="dialog-content-row">
 					<div>
-						<h4>hospital</h4>
+						<h4>{{hospital}}</h4>
 					</div>
 					<div>
-						<h4>department</h4>	
+						<h4>{{department}}</h4>	
 					</div>
 					
 				</div>
 				<div class="dialog-content-row">
 					<div>
-						<p>doctor</p>
+						<p>{{doctorName}}</p>
 					</div>
 					<div>
 						<p>date</p>		
