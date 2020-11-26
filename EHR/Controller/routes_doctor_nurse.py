@@ -580,27 +580,33 @@ def UpdateInfo():
 	try:
 		f_name = request.form['firstName']
 		l_name = request.form['lastName']
-		id = request.form['id']
+		old_id = current_user.get_id()
+		new_id = request.form['id']
 		email = request.form['email']
 		phone = request.form['phone']
+		role_user = None
 		user = None
 		if current_user.role == RoleEnum.doctor:
-			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==old_id).first()
 		elif current_user.role == RoleEnum.nurse:
-			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
+			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==old_id).first()
 		elif current_user.role == RoleEnum.patient:
-			user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-		if not user:
-			return make_response(jsonify({'ret':1}))
+			user, role_user = db.session.query(User, Patient).join().filter(User.id==old_id).first()
+		if not role_user or not user:
+			return make_response(jsonify({'ret':"user not found"}))
 
-		user.id = id
+		# user.id = new_id
+		# print("user.id", user.id)
 		user.first_name = f_name
-		user.last_name = l_name
-		user.email = email
+		user.last_name= l_name
+		user.email= email
 		user.phone = phone
-
 		db.session.commit()
-		return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": id, "email": email, "phone": phone}), 200)
+
+		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
+		return make_response(jsonify({'ret':0, 'firstName': f_name,
+									'lastName': l_name, 'id': new_id,
+									"email": email, 'phone': phone}), 200)
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret':1}))
