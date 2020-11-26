@@ -7,13 +7,13 @@
 
 // ---------------------capture user action--------------------------
 // add a new hospital
-$("#addHospital").on("submit", (event) => {event.preventDefault(); submitForm("addHospital");});
+$("#addHospital").on("submit", addHospital);
 // add a new department
-$("#addDepartment").on("submit", (event) => {event.preventDefault(); submitForm("addDepartment");});
+$("#addDepartment").on("submit", addDepartment);
 // add a new lab report type
-$("#addLabReportType").on("submit", (event) => {event.preventDefault(); submitForm("addLabReportType");});
+$("#addLabReportType").on("submit", addLabReportType);
 // update doctor/nurse affiliation
-$("#updateAffiliation").on("submit", (event) => {event.preventDefault(); submitForm("updateAffiliation");});
+$("#updateAffiliation").on("submit", updateAffiliation);
 
 
 // --------------------------event handlers----------------------------
@@ -21,7 +21,8 @@ $("#updateAffiliation").on("submit", (event) => {event.preventDefault(); submitF
 * @desc submit form
 * @param {string} route
 */
-function submitForm(route){
+function addHospital(event){
+  event.preventDefault();
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
@@ -29,5 +30,53 @@ function submitForm(route){
       alert(res.ret);
     }
   };
-  sendRequest(route, "POST", data, callBack);
+  sendRequest("addHospital", "POST", data, callBack);
+}
+
+/**
+* @desc submit form
+* @param {string} route
+*/
+function addDepartment(event){
+  event.preventDefault();
+  var data = jsonify($(this).serializeArray());
+
+  var callBack = (res) => {
+    if (res.ret != "0") {
+      alert(res.ret);
+    }
+  };
+  sendRequest("addDepartment", "POST", data, callBack);
+}
+
+/**
+* @desc submit form
+* @param {string} route
+*/
+function addLabReportType(event){
+  event.preventDefault();
+  var data = jsonify($(this).serializeArray());
+
+  var callBack = (res) => {
+    if (res.ret != "0") {
+      alert(res.ret);
+    }
+  };
+  sendRequest("addLabReportType", "POST", data, callBack);
+}
+
+/**
+* @desc submit form
+* @param {string} route
+*/
+function updateAffiliation(event){
+  event.preventDefault();
+  var data = jsonify($(this).serializeArray());
+
+  var callBack = (res) => {
+    if (res.ret != "0") {
+      alert(res.ret);
+    }
+  };
+  sendRequest("updateAffiliation", "POST", data, callBack);
 }

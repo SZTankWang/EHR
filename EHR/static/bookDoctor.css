@@ -93,8 +93,8 @@ border:1px solid #f1f1f1;
 }
 
 .time{
-	margin-left:5rem;
-}
+/*	margin-left:5rem;
+*/}
 
 .availSpace{
 	margin-right:4rem;
@@ -171,3 +171,4 @@ button.book-btn{
 .dialog-content-row > div{
 	margin-left:1rem;
 }
+

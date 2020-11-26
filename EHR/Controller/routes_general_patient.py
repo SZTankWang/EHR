@@ -268,10 +268,11 @@ def getDoctorSlot():
 	date = datetime.datetime.strptime(date,'%Y-%m-%d')
 	slot_list = helper.doc2slots_available(doctorID, 0, start_date=date)
 	avail_num_list = [(slot_list[i].n_total-slot_list[i].n_booked) for i in range(len(slot_list))]
+	date_list = [helper.t_slotid2date(slot_list[i].id) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
 	return make_response(
 		jsonify(
 			[{"slotID": str(slot_list[i].id),
 			"avail_num":str(avail_num_list[i]),
-			"slotTime": time_list[i].strftime("%H:%M")}
+			"slotTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
