@@ -549,6 +549,7 @@ def Settings():
 @app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
 def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
+	print("patient id:", p_id)
 	if request.method == "GET":
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
 		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
@@ -557,13 +558,16 @@ def patientUpdateHealthInfo():
 		gender = request.form['gender']
 		blood_type = request.form['bloodType']
 		allergies = request.form['allergies']
+		db.session.query(Patient).filter(Patient.id==p_id).update(
+			{
+				Patient.id: p_id,
+				Patient.gender: gender,
+				Patient.allergies: allergies,
+				Patient.age: age,
+				Patient.blood_type: blood_type,
 
-		_, role_user = db.session.query(User, Patient).join(User).filter(User.id==p_id).first()
-		role_user.gender = gender
-		role_user.allergies = allergies
-		role_user.age = age
-		role_user.blood_type = blood_type
-
+			}, synchronize_session=False
+		)
 		db.session.commit()
 		return make_response(jsonify({"ret": 0, "age": age, "gender": gender, "bloodType": blood_type, "allergies": allergies}))
 
