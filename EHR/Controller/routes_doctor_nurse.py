@@ -524,18 +524,18 @@ def Settings():
 
 	if current_user.role == RoleEnum.patient:
 		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-		return render_template("patientSettings.html", 
+		return render_template("patientSettings.html",
 					firstName=user.first_name,
-					lastName=user.last_name, 
-					patientID=role_user.id, 
-					email=user.email, 
-					age=role_user.age)
+					lastName=user.last_name,
+					nationalID=role_user.id,
+					email=user.email,
+					phone=user.phone)
 
 	elif current_user.role == RoleEnum.nurse:
 		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
 	elif current_user.role == RoleEnum.doctor:
 		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
-	
+
 	return render_template("doctorNurseSettings.html",
 					 hospitalID=hospital_id,
 					deptID=role_user.department_id,
@@ -545,20 +545,27 @@ def Settings():
 					email=user.email,
 					phone=user.phone)
 
-@app.route('/patientUpdateHealthInfo', methods=['POST'])
+###TODO
+@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
 def patientUpdateHealthInfo():
-	age = request.form['age']
-	gender = request.form['gender']
-	allergies = request.form['allergies']
-
 	p_id = current_user.get_id()
-	_, role_user = db.session.query(User, Patient).join(User).filter(User.id==p_id).first()
-	role_user.gender = gender 
-	role_user.allergies = allergies
-	role_user.age = age 
+	if request.method == "GET":
+		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
+	if request.method == "POST":
+		age = request.form['age']
+		gender = request.form['gender']
+		blood_type = request.form['bloodType']
+		allergies = request.form['allergies']
 
-	db.session.commit()
-	return make_response(jsonify({"ret": 0}))
+		_, role_user = db.session.query(User, Patient).join(User).filter(User.id==p_id).first()
+		role_user.gender = gender
+		role_user.allergies = allergies
+		role_user.age = age
+		role_user.blood_type = blood_type
+
+		db.session.commit()
+		return make_response(jsonify({"ret": 0, "age": age, "gender": gender, "bloodType": blood_type, "allergies": allergies}))
 
 #---------------------------Nurse-Doctor--------------------------------
 #---------------------------Nurse-Doctor--------------------------------
@@ -566,29 +573,33 @@ def patientUpdateHealthInfo():
 @app.route('/doctorNurseUpdateInfo', methods=['POST'])
 @app.route('/patientUpdateInfo', methods=['POST'])
 def UpdateInfo():
-	f_name = request.form['firstName']
-	l_name = request.form['lastName']
-	id = request.form['licenseID'] if 'licenseID' in request.form else request.form['nationalID']
-	email = request.form['email']
-	phone = request.form['phone']
-	user = None
-	if current_user.role == RoleEnum.doctor:
-		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
-	elif current_user.role == RoleEnum.nurse:
-		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
-	elif current_user.role == RoleEnum.patient:
-		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-	if not user:
-		return make_response(jsonify({'ret':0}))
+	try:
+		f_name = request.form['firstName']
+		l_name = request.form['lastName']
+		id = request.form['id']
+		email = request.form['email']
+		phone = request.form['phone']
+		user = None
+		if current_user.role == RoleEnum.doctor:
+			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+		elif current_user.role == RoleEnum.nurse:
+			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
+		elif current_user.role == RoleEnum.patient:
+			user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
+		if not user:
+			return make_response(jsonify({'ret':1}))
 
-	user.id = id
-	user.first_name = f_name
-	user.last_name = l_name 
-	user.email = email
-	user.phone = phone 
+		user.id = id
+		user.first_name = f_name
+		user.last_name = l_name
+		user.email = email
+		user.phone = phone
 
-	db.session.commit()
-	return make_response(jsonify({'ret':0}))
+		db.session.commit()
+		return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": id, "email": email, "phone": phone}), 200)
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1}))
 
 
 #---------------------------Doctor--------------------------------
@@ -662,4 +673,3 @@ def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
-
