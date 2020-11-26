@@ -1,28 +1,63 @@
 /**
 * @author Jingyi Zhu
-* @page admin.html
-* @import util.js
+* @page patientSettings.html
+* @import util.js, settingsForm.js
 */
+
+/**
+* @global instance of Settings and HealthInfo
+*/
+var myForm;
+var myHealthInfo;
+
+//-------------------------document loaded---------------------------
+$(document).ready(function() {
+  // initialize instance
+  myForm = new Settings();
+  myHealthInfo = new HealthInfo();
+  sendRequest("patientUpdateHealthInfo", "GET", null, (res) => myHealthInfo.update(res))
+});
 
 
 // ---------------------capture user action--------------------------
 // update general info
-$("#info").on("submit", (event) => {event.preventDefault(); submitForm("patientUpdateInfo");});
+$("#info").on("submit", submitInfo);
 // update health info
-$("#healthInfo").on("submit", (event) => {event.preventDefault(); submitForm("patientUpdateHealthInfo");});
+$("#healthInfo").on("submit", submitHealthInfo);
 
 // --------------------------event handlers----------------------------
 /**
 * @desc submit form
 * @param {string} route
 */
-function submitForm(route){
+function submitInfo(event){
+  event.preventDefault();
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret != "0") {
-      alert(res.ret);
+    if (res.ret == "0") {
+      myForm.update(res);
+    } else {
+      alert("Failed to submit");
     }
   };
-  sendRequest(route, "POST", data, callBack);
+  sendRequest("patientUpdateInfo", "POST", data, callBack);
+}
+
+/**
+* @desc submit form
+* @param {string} route
+*/
+function submitHealthInfo(route, data){
+  event.preventDefault();
+  var data = jsonify($(this).serializeArray());
+
+  var callBack = (res) => {
+    if (res.ret == "0") {
+      myHealthInfo.update(res);
+    } else {
+      alert("Failed to submit");
+    }
+  };
+  sendRequest("patientUpdateHealthInfo", "POST", data, callBack);
 }

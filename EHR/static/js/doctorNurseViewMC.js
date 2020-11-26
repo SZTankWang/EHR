@@ -1,6 +1,6 @@
 /**
 * @author Jingyi Zhu
-* @page nurseViewMC.html
+* @page doctorNurseViewMC.html
 * @import table.js, modal.js, util.js, apptAndMC.js
 */
 
