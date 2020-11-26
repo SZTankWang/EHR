@@ -1,10 +1,6 @@
 /**
 * @author Jingyi Zhu
 * @desc HTML modal wrappers
-* @method setApp - set application data
-* @method setCommets - set comments
-* @method setMCID - set medical record
-* @method ...
 */
 
 /**
@@ -61,7 +57,7 @@ class AppFullModal extends AppModal{
 
 /**
 * @desc modal for application and medical record
-* @page nurseViewAppt
+* @page nurseViewMC
 * @attribute medical record: appStatus, mcID,
 * preExam(bodyTemperature, heartRate, bloodPressure),
 * diagnosis, precriptions, labReports
@@ -173,7 +169,7 @@ class MCModal extends AppFullModal{
 
 /**
 * @desc page for application and medical record
-* @page nurseViewMC
+* @page nurseViewAppt
 * @attribute medical record: appStatus, mcID,
 * preExam(bodyTemperature, heartRate, bloodPressure),
 * diagnosis, precriptions, labReports, labReportTypes
