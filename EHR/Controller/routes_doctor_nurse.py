@@ -623,9 +623,27 @@ def doctorHome():
 @app.route('/doctorOnGoingAppt', methods=['GET', 'POST'])
 @login_required
 def doctorOnGoingAppt():
+	helper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
-	pass
+	nowtime = datetime.datetime.now()
+	appt_list = helper.doc2appts(doctorID, 0)
 
+	now_approved_appts = []
+	for appt in appt_list:
+		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
+		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
+			now_approved_appts.append(appt)
+	return make_response(
+		jsonify(
+			[{
+				"appID": appt.id,
+				"date": appt.date.strftime(helper.DATE_FORMAT),
+				"time": appt.time.strftime(helper.TIME_FORMAT),
+				"patient": helper.id2name(appt.approver_id),
+				"patient": helper.id2name(appt.patient_id),
+				"symptoms": appt.symptoms} for appt in now_approved_appts]
+	))
+	
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():
