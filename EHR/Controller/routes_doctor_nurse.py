@@ -549,6 +549,7 @@ def Settings():
 @app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
 def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
+	print("patient id:", p_id)
 	if request.method == "GET":
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
 		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
@@ -557,13 +558,16 @@ def patientUpdateHealthInfo():
 		gender = request.form['gender']
 		blood_type = request.form['bloodType']
 		allergies = request.form['allergies']
+		db.session.query(Patient).filter(Patient.id==p_id).update(
+			{
+				Patient.id: p_id,
+				Patient.gender: gender,
+				Patient.allergies: allergies,
+				Patient.age: age,
+				Patient.blood_type: blood_type,
 
-		_, role_user = db.session.query(User, Patient).join(User).filter(User.id==p_id).first()
-		role_user.gender = gender
-		role_user.allergies = allergies
-		role_user.age = age
-		role_user.blood_type = blood_type
-
+			}, synchronize_session=False
+		)
 		db.session.commit()
 		return make_response(jsonify({"ret": 0, "age": age, "gender": gender, "bloodType": blood_type, "allergies": allergies}))
 
@@ -576,27 +580,33 @@ def UpdateInfo():
 	try:
 		f_name = request.form['firstName']
 		l_name = request.form['lastName']
-		id = request.form['id']
+		old_id = current_user.get_id()
+		new_id = request.form['id']
 		email = request.form['email']
 		phone = request.form['phone']
+		role_user = None
 		user = None
 		if current_user.role == RoleEnum.doctor:
-			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==old_id).first()
 		elif current_user.role == RoleEnum.nurse:
-			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
+			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==old_id).first()
 		elif current_user.role == RoleEnum.patient:
-			user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-		if not user:
-			return make_response(jsonify({'ret':1}))
+			user, role_user = db.session.query(User, Patient).join().filter(User.id==old_id).first()
+		if not role_user or not user:
+			return make_response(jsonify({'ret':"user not found"}))
 
-		user.id = id
+		# user.id = new_id
+		# print("user.id", user.id)
 		user.first_name = f_name
-		user.last_name = l_name
-		user.email = email
+		user.last_name= l_name
+		user.email= email
 		user.phone = phone
-
 		db.session.commit()
-		return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": id, "email": email, "phone": phone}), 200)
+
+		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
+		return make_response(jsonify({'ret':0, 'firstName': f_name,
+									'lastName': l_name, 'id': new_id,
+									"email": email, 'phone': phone}), 200)
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret':1}))
@@ -619,9 +629,27 @@ def doctorHome():
 @app.route('/doctorOnGoingAppt', methods=['GET', 'POST'])
 @login_required
 def doctorOnGoingAppt():
+	helper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
-	pass
+	nowtime = datetime.datetime.now()
+	appt_list = helper.doc2appts(doctorID, 0)
 
+	now_approved_appts = []
+	for appt in appt_list:
+		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
+		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
+			now_approved_appts.append(appt)
+	return make_response(
+		jsonify(
+			[{
+				"appID": appt.id,
+				"date": appt.date.strftime(helper.DATE_FORMAT),
+				"time": appt.time.strftime(helper.TIME_FORMAT),
+				"patient": helper.id2name(appt.approver_id),
+				"patient": helper.id2name(appt.patient_id),
+				"symptoms": appt.symptoms} for appt in now_approved_appts]
+	))
+	
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():

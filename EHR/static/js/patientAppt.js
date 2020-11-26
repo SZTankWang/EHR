@@ -45,6 +45,16 @@
 	})
 
 
+	function getActiveDept(){
+		$('.dept-btn').each(function(){
+			if($(this).hasClass('active')){
+				var selectDept = $(this).attr('id');
+				console.log(selectDept);
+				loadDoctorByDept(selectDept);
+			}
+		})
+	}
+
 
 	/*
 		根据选中科室ID加载医生列表
@@ -84,7 +94,7 @@
 		var frame = document.createElement('iframe');
 		frame.setAttribute('id',doctorID);
 		frame.setAttribute('style','width:100%;height:100%;overflow-x:hidden;');
-		frame.setAttribute('scrolling','no');
+		frame.setAttribute('scrolling','yes');
 		frame.setAttribute('frameBorder',0);
 		$('#card-list').append(frame);
 		frame.setAttribute('src','http://localhost:5000/viewDoctor/'+doctorID);
@@ -107,7 +117,7 @@
 		});
 	}
 
-	// 根据日期获取排版
+	// 根据日期获取排班
 	function getDocSlot(date){
 		var doctorID = $('#doctorID').val();
 		$.ajax({
@@ -117,13 +127,33 @@
 				'doctorID':doctorID
 					},
 			success:function(data){
+				$('#time-slot-list').empty();
 				console.log(data);
+				for(var i=0;i<data.length;i++){
+					renderTimeSlot(data[i]);
+				}
+				$('.book-btn').button();
 			}
 		})
 	}
 
 
+	function renderTimeSlot(data){
+		var temp = '<!-- 单个时间段 --><li id='+data['slotID']+'><div class="time-slot-row"><div class="time-slot-info time"><h4>'+data['slotTime']+'</h4></div><div class="wrapper"><div class="time-slot-info availSpace">Available Space: '+data['avail_num']+'</div><div class="time-slot-info reserve"><button class="book-btn" onclick="openModal()" data-toggle="modal" data-target="#myModal">make an appointment</button></div></div></div></li>';
+		
+		$('#time-slot-list').append(temp);
+	}
+
 	//点击返回 返回到医生列表
 	function closeFrame(){
 		$('#card-list').empty();
+		document.getElementById('close-frame-container').style.display='none';
+		getActiveDept();
+	}
+
+	function searchSlotByDate(){
+		var date = $('#select-date').datepicker("getDate");
+		date = moment(date).format("YYYY-MM-DD");
+		console.log(date);
+		getDocSlot(date);
 	}
