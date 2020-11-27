@@ -14,7 +14,7 @@ def load_user(id):
     return User.query.get(id)
 class Hospital(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
-	name = db.Column(db.String(100), nullable=False)
+	name = db.Column(db.String(100), nullable=False, unique=True)
 	phone = db.Column(db.String(20))
 	address = db.Column(db.Text(), nullable=False)
 	description = db.Column(db.Text())
@@ -266,7 +266,7 @@ class Lab_report_type(db.Model):
 
 class Lab_report(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
-	file = db.Column(db.LargeBinary())
+	file_path = db.Column(db.Text())
 	comments = db.Column(db.Text())
 	#foreign key
 	lr_type = db.Column(db.Enum(labReportTypeEnum), \

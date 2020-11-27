@@ -32,9 +32,11 @@ def gen_hospital_data():
 	start_index = Hospital.query.count()
 	for i in range(start_index, start_index+N_RECORD):
 		h = Hospital(id=i+1, name=name_list[i], phone=phone_list[i], address=address_list[i])
-		db.session.add(h)
-	db.session.commit()
-
+		try:
+			db.session.add(h)
+			db.session.commit()
+		except:
+			continue
 def get_dept_list():
 	res = requests.get("https://www.netdoctor.co.uk/health-services/nhs/a4502/a-to-z-of-hospital-departments/")
 	soup = BeautifulSoup(res.content, 'html.parser')
@@ -242,7 +244,7 @@ def gen_report_type():
 	db.session.commit()
 
 def gen_lab_reports():
-	rp_file = open("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/sample_lab_report.pdf", "rb").read()
+	# rp_file = open("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/sample_lab_report.pdf", "rb").read()
 	mc_ids = [mc.id for mc in Medical_record.query.all()]
 	nurse_ids = [n.id for n in Nurse.query.all()]
 	patient_ids = [p.id for p in Patient.query.all()]
@@ -254,7 +256,7 @@ def gen_lab_reports():
 			mc_id = random.choice(mc_ids),
 			uploader_id = random.choice(nurse_ids),
 			patient_id = random.choice(patient_ids),
-			file=rp_file
+			file_path=None
 		)
 		db.session.add(lb)
 	db.session.commit()
@@ -277,7 +279,7 @@ def main():
 	# gen_appt()
 	# gen_prescription()
 	# gen_report_type()
-	gen_lab_reports()
+	# gen_lab_reports()
 
 main()
 	

@@ -1,11 +1,13 @@
 from sys import exec_prefix
+
+from flask.globals import current_app
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
 import collections
 from datetime import timedelta
 from itertools import count
 from time import strftime
-from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response
-from flask.signals import appcontext_tearing_down
+from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response, abort
+from flask.signals import appcontext_tearing_down, request_finished
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 from numpy.core.arrayprint import TimedeltaFormat
@@ -16,6 +18,7 @@ from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import datetime
+import os 
 
 
 #---------------------------Nurse--------------------------------
@@ -412,7 +415,7 @@ def nurseGetLabReports():
 def nursePreviewLR():
 	lr_id = request.form['lrID']
 	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
-
+	return make_response(jsonify({'file_path': mc.file_path}))
 
 #---nurse edit appointment/medical record---
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
@@ -446,20 +449,29 @@ def nurseUploadLabReport():
 	nurse_id = current_user.get_id()
 
 	mc_id = request.form['mcID']
-	lr_type_id = request.form['type']
-	lab_report_file = request.files['labReport'].read()
+	lr_type_str = request.form['type']
+	lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
+	lab_report_file = request.files['labReport']
+	lr_fname = lab_report_file.filename
+	mc_addr = None
+	if lr_fname != "":
+		file_ext = os.path.splitext(lr_fname)[1]
+		if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+			abort(400)
+		mc_addr = os.path.join(helper.MC_PREFIX, mc_id+file_ext)
+		lab_report_file.save(mc_addr)
 	comments = request.form['comments']
 
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	patient_id = mc.patient_id
 
 	lab_report = Lab_report(
-		comments=comments,
-		lr_type = lr_type_id,
-		uploader_id=nurse_id,
-		patient_id=patient_id,
-		mc_id=mc_id,
-		file=lab_report_file
+		comments = comments,
+		lr_type = lr_type,
+		uploader_id = nurse_id,
+		patient_id = patient_id,
+		mc_id = mc_id,
+		file_path = mc_addr
 	)
 	mc.lab_reports.append(lab_report)
 	db.session.add(lab_report)
@@ -733,30 +745,42 @@ def getComments():
 
 @app.route('/addHospital',methods=['GET', 'POST'])
 def addHospital():
-	# try:
-	name = request.form['name']
-	phone = request.form['phone']
-	address = request.form['address']
-	description = request.form['description']
 
-	# except:
-	# 	return make_response(jsonify({
-	# 		"ret":1, "message": "Missing attributes"
-	# 	}))
-	hospital_id = None
+	name = helper.get_from_form(request, 'name')
+	phone = helper.get_from_form(request, 'phone')
+	address = helper.get_from_form(request, 'address')
+	description = helper.get_from_form(request, 'description')
+
+	# check for duplicated hospital name
+	res = Hospital.query.filter(Hospital.name == name).all()
+	if res != []:
+		return make_response(jsonify({'ret':1, 'msg':'Duplicated Hospital Name'}))
 
 	hos = Hospital(
-		id=hospital_id,
 		name=name,
 		phone=phone,
 		address=address,
 		description=description
 	)
-	# try:
-	db.session.add(hos)
-	db.session.commit()
-	# except:
-	# 	db.session.rollback()
-	# 	return make_response(jsonify({'ret':1, 'message': "error"}))
+	try:
+		db.session.add(hos)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message': "Database error"}))
 
 	return make_response(jsonify({'ret':0}))
+
+# @app.route('/addLabReportType', methods=['Post', 'GET'])
+# def addLabReportType():
+# 	lr_type_value = helper.get_from_form(request, 'type')
+# 	lr_type_value = "Good Test"
+# 	lr_type_name = lr_type_value.lower().replace(" ", "_")
+# 	class labReportTypeEnum(enum.Enum):
+# 		lr_type_name = lr_type_value
+# 	lr_type = Lab_report_type(
+# 		type = labReportTypeEnum.lr_type_name
+# 	)
+# 	db.session.add(lr_type)
+# 	db.session.commit()
+# 	return make_response(jsonify({'ret':0}))
