@@ -260,7 +260,6 @@ def nurseGetSlotsForDoctor():
 def nurseCreateAppt():
 	try:
 		nurseID = current_user.get_id()
-		appID = request.form['id']
 		symptom = request.form['symptoms']
 		time_slot_id = request.form['slotID']
 		doctor_id = request.form['doctorID']
@@ -271,14 +270,13 @@ def nurseCreateAppt():
 		medical_record = Medical_record(patient_id=patient_id)
 		mc_id = medical_record.mc_id
 		application = Application(
-					id=appID,
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 					symptoms=symptom,
 					status=StatusEnum.approved,
 					reject_reason="",
 					date=date,
 					time=time,
-					time_slot_id=time_slot_id,g
+					time_slot_id=time_slot_id,
 					doctor_id=doctor_id,
 					approver_id=nurseID,
 					patient_id=patient_id,
