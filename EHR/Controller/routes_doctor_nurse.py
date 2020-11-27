@@ -343,8 +343,9 @@ def nurseGoViewAppt(appID):
 
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
+@app.route('/doctorViewAppt', methods=['GET','POST'])
 @login_required
-def nurseViewAppt():
+def doctorNurseViewAppt():
 	if request.method == "POST":
 		mc_id = request.form['mcID']
 	elif request.method == "GET":
@@ -354,71 +355,43 @@ def nurseViewAppt():
 		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 	lab_reports = mc.lab_reports
-	if bool(request.form['type']):
+
+	ret = {
+		"ret": "0",
+
+		"preExam":
+			{"bodyTemperature": str(mc.body_temperature),
+			"heartRate": str(mc.heart_rate),
+			"lowBloodPressure": str(mc.low_blood_pressure),
+			"highBloodPressure": str(mc.high_blood_pressure),
+			"weight": str(mc.weight),
+			"height": str(mc.height),
+			"state": mc.state.value},
+
+		"diagnosis":
+			mc.diagnosis,
+
+		"prescriptions":
+			[{"id": pres.id,
+			  "medicine": pres.medicine,
+			  "dose": pres.dose,
+			  "comments": pres.comments} for pres in prescription_list],
+
+		"labReports":
+			[{"lr_type": lr.lr_type.value,
+			"id": lr.id,
+			"comments": lr.comments} for lr in lab_reports]
+	}
+
+	getLabReportTypes = bool(request.form['type'])
+	if getLabReportTypes:
 		lab_r_types = Lab_report_type.query.all()
 
-		return make_response(
-			jsonify({
-				"ret": "0",
+		ret["labReportTypes"] = [{"type": lrt.type.value,
+		  "description": lrt.description
+			} for lrt in lab_r_types]
 
-				"preExam":
-					{"bodyTemperature": str(mc.body_temperature),
-					"heartRate": str(mc.heart_rate),
-					"lowBloodPressure": str(mc.low_blood_pressure),
-					"highBloodPressure": str(mc.high_blood_pressure),
-					"weight": str(mc.weight),
-					"height": str(mc.height),
-					"state": mc.state.value},
-
-				"diagnosis":
-					mc.diagnosis,
-
-				"prescriptions":
-					[{"id": pres.id,
-					  "medicine": pres.medicine,
-					  "dose": pres.dose,
-					  "comments": pres.comments} for pres in prescription_list],
-
-				"labReportTypes":
-					[{"type": lrt.type.value,
-					  "description": lrt.description
-						} for lrt in lab_r_types],
-
-				"labReports":
-					[{"lr_type": lr.lr_type.value,
-					"id": lr.id,
-					"comments": lr.comments} for lr in lab_reports]
-			})
-		)
-	else:
-		return make_response(
-			jsonify({
-				"ret": "0",
-
-				"preExam":
-					{"bodyTemperature": str(mc.body_temperature),
-					"heartRate": str(mc.heart_rate),
-					"lowBloodPressure": str(mc.low_blood_pressure),
-					"highBloodPressure": str(mc.high_blood_pressure),
-					"weight": str(mc.weight),
-					"height": str(mc.height),
-					"state": mc.state.value},
-
-				"diagnosis":
-					mc.diagnosis,
-
-				"prescriptions":
-					[{"id": pres.id,
-					  "medicine": pres.medicine,
-					  "dose": pres.dose,
-					  "comments": pres.comments} for pres in prescription_list],
-
-				"labReports":
-					[{"lr_type": lr.lr_type.value,
-					"id": lr.id,
-					"comments": lr.comments} for lr in lab_reports]
-			})
-		)
+	return make_response(jsonify(ret))
 
 @app.route('/nurseGetLabReports', methods=['POST'])
 def nurseGetLabReports():
@@ -697,6 +670,53 @@ def doctorFutureAppt():
 @login_required
 def doctorPastAppt():
 	pass
+
+
+
+#---doctor schedule page---
+@app.route('/doctorSchedule', methods=['GET', 'POST'])
+@login_required
+def doctorSchedule():
+	return render_template('doctorSchedule.html')
+
+
+#---doctor view appt---
+@app.route('/doctorGoViewAppt/<string:appID>', methods=['GET', 'POST'])
+@login_required
+def doctorGoViewAppt(appID):
+	appt_res = Application.query.filter(Application.id==appID).first()
+	finished = False
+	if appt_res.status.value == "finished":
+		finished = True
+
+	return render_template('doctorViewAppt.html',
+		appID=appt_res.id,
+		date=appt_res.date.strftime(helper.DATE_FORMAT),
+		time=appt_res.time.strftime(helper.TIME_FORMAT),
+		approverID=appt_res.approver_id,
+		patientID=appt_res.patient_id,
+		patient=helper.id2name(appt_res.patient_id),
+		symptoms=appt_res.symptoms,
+		comments=appt_res.reject_reason,
+		mcID=appt_res.mc_id,
+		finished=finished)
+
+
+@app.route('/doctorGetPrescrip', methods=['POST'])
+def doctorGetPrescrip():
+	mc_id = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
+	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
+	return make_response(jsonify({
+		"ret": 0,
+		"prescriptions":
+			[{"id": pres.id,
+			  "medicine": pres.medicine,
+			  "dose": pres.dose,
+			  "comments": pres.comments} for pres in prescription_list]
+		}))
 
 
 

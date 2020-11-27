@@ -74,10 +74,21 @@ class MCModal extends AppFullModal{
     this.lowBloodPressure = $("#lowBloodPressure");
     this.weight = $("#weight");
     this.height = $("#height");
-    this.state = $("#state option:selected");
+    this.state = $("#state");
     this.diagnosis = $("#diagnosis");
     this.prescriptions = $("#prescriptions");
     this.labReports = $("#labReports");
+  }
+
+  checkAndSet(element, data) {
+    if (element.is("input")) {
+      if (element != "") {
+        element.attr("disabled", true);
+      }
+      element.val(data);
+    } else {
+      element.text(data);
+    }
   }
 
   setAppStatus(appStatus){
@@ -89,37 +100,41 @@ class MCModal extends AppFullModal{
   }
 
   setBodyTemperature(bodyTemperature){
-    this.bodyTemperature.val(bodyTemperature);
+    this.checkAndSet(this.bodyTemperature, bodyTemperature);
   }
 
   setHeartRate(heartRate){
-    this.heartRate.val(heartRate);
+    this.checkAndSet(this.heartRate, heartRate);
   }
 
   setHighBloodPressure(highBloodPressure){
-    this.highBloodPressure.val(highBloodPressure);
+    this.checkAndSet(this.highBloodPressure, highBloodPressure);
   }
 
   setLowBloodPressure(lowBloodPressure){
-    this.lowBloodPressure.val(lowBloodPressure);
+    this.checkAndSet(this.lowBloodPressure, lowBloodPressure);
   }
 
   setWeight(weight){
-    this.weight.val(weight);
+    this.checkAndSet(this.weight, weight);
   }
 
   setHeight(height){
-    this.height.val(height);
+    this.checkAndSet(this.height, height);
   }
 
   setState(state){
-    var str = "option[value=" + state + "]";
-    $("#state " + str).attr('selected','selected');
-    this.state = $("#state option:selected");
+    if (this.state.is("select")) {
+      var str = "option[value=" + state + "]";
+      $("#state " + str).attr('selected','selected');
+      this.state = $("#state option:selected");
+    } else {
+      this.state.text(state);
+    }
   }
 
   setDiagnosis(diagnosis){
-    this.diagnosis.text(diagnosis)
+    this.diagnosis.text(diagnosis);
   }
 
   setPrescriptions(prescripitions){
@@ -163,13 +178,13 @@ class MCModal extends AppFullModal{
         alert(res.ret);
       }
     };
-    sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
+    sendRequest("doctorNurseViewAppt", "POST", mcData, fillMCData);
   }
 }
 
 /**
 * @desc page for application and medical record
-* @page nurseViewAppt
+* @page doctorNurseViewAppt
 * @attribute medical record: appStatus, mcID,
 * preExam(bodyTemperature, heartRate, bloodPressure),
 * diagnosis, precriptions, labReports, labReportTypes
@@ -187,7 +202,7 @@ class MCPage extends MCModal{
     };
   }
 
-  loadMCInfo(mcID) {
+  loadMCInfo(mcID, route) {
     const mcData = {"mcID": mcID, "type": "True"};
     var fillMCData = (res) => {
       if (res.ret == "0") {
@@ -209,6 +224,6 @@ class MCPage extends MCModal{
         alert(res.ret);
       }
     };
-    sendRequest("nurseViewAppt", "POST", mcData, fillMCData);
+    sendRequest(route, "POST", mcData, fillMCData);
   }
 }

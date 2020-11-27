@@ -18,7 +18,7 @@ $(document).ready(function() {
     myPage.loadAppInfo(appID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
-    myPage.loadMCInfo(mcID);
+    myPage.loadMCInfo(mcID, "nurseViewAppt");
 });
 
 
@@ -57,7 +57,6 @@ function uploadLabReport(event){
 
   var refresh = (res) => {
     if (!res.ret) {
-      console.log(res);
       sendRequest("nurseGetLabReports", "POST", {"mcID": mcID},
       (res) => {
         if (!res.ret) {

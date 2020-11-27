@@ -205,8 +205,8 @@ class Application(db.Model):
 				time: {self.time} >'
 
 class stateEnum(enum.Enum):
-	conscious = "conscious"
-	coma = "coma"
+    conscious = "conscious"
+    coma = "coma"
 
 class Medical_record(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
