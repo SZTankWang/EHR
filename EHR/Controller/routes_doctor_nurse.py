@@ -286,8 +286,8 @@ def nurseCreateAppt():
 		# update corresponding table
 		db.session.add(application)
 		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
-		if timeslot.n_booked > 0:
-			timeslot.n_booked = timeslot.n_booked - 1
+		if timeslot.n_booked < timeslot.n_total:
+			timeslot.n_booked = timeslot.n_booked + 1
 		else:
 			db.session.rollback()
 			return make_response(jsonify({'ret':1, 'message':"no available slots!"}))
