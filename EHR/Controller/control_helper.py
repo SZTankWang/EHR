@@ -52,7 +52,13 @@ def dept_appts(user, direction=None, period=None, start_date=datetime.date.today
 	check this nurse dept. all appointments, with specified time period
 	"""
 
-	deptID = Nurse.query.filter(Nurse.id == user.id).first().department_id
+	deptID = None
+
+	if user.role == RoleEnum.nurse:
+		deptID = Nurse.query.filter(Nurse.id == user.id).first().department_id
+	elif user.role == RoleEnum.doctor:
+		deptID = Nurse.query.filter(Doctor.id == user.id).first().department_id
+
 	if period:
 		same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\

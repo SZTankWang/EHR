@@ -62,10 +62,10 @@ def nursePendingApp():
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 @login_required # Otherwise, we cannot get current_user's id
-def nurseTodayAppt():
+def nurseTodayAppt(): 
 	nurseID = current_user.get_id()
 	# nurseID = "44116022"    # a nurseID that returns something,
-	# 						for testing purpose, set the 'period' to 20
+	# 							for testing purpose, set the 'period' to 20
 	# department ID of current nurse
 	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
 
@@ -122,7 +122,7 @@ def nurseFutureAppt():
 	## TODO
 	## TODO
 	## TODO
-	## TODO: POST method
+	## TODO: POST method          
 	nurse_id = current_user.get_id()
 	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
