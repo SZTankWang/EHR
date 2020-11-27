@@ -41,8 +41,7 @@ function editPreExam(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  var refresh = (res) => {refreshOnSuccess(res)};
-  sendRequest("nurseEditPreExam", "POST", data, refresh);
+  sendRequest("nurseEditPreExam", "POST", data, ()=>{});
 }
 
 /**

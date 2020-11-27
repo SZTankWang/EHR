@@ -262,9 +262,9 @@ def nurseCreateAppt():
 		nurseID = current_user.get_id()
 		appID = request.form['id']
 		symptom = request.form['symptoms']
-		time_slot_id = request.form['time_slot_id']
-		doctor_id = request.form['doctor_id']
-		patient_id = request.form['patient_id']
+		time_slot_id = request.form['slotID']
+		doctor_id = request.form['doctorID']
+		patient_id = request.form['patientID']
 		slot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
@@ -348,10 +348,7 @@ def nurseGoViewAppt(appID):
 def nurseViewAppt():
 	mc_id = request.form['mcID']
 	mc_id2 = request.args.get('mcID')
-	print("mc_id:", mc_id)
-	print("mc_id2", request.form)
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
-	print(mc)
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
@@ -650,7 +647,7 @@ def doctorOnGoingAppt():
 				"patient": helper.id2name(appt.patient_id),
 				"symptoms": appt.symptoms} for appt in now_approved_appts]
 	))
-	
+
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():
@@ -724,10 +721,8 @@ def addHospital():
 	# try:
 	db.session.add(hos)
 	db.session.commit()
-	# except: 
+	# except:
 	# 	db.session.rollback()
 	# 	return make_response(jsonify({'ret':1, 'message': "error"}))
 
 	return make_response(jsonify({'ret':0}))
-	
-
