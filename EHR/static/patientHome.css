@@ -26,8 +26,9 @@ body{
 
 #background-container{
 	display: flex;
-	height:30vh;
+	/* height:30vh; */
 	background-image: url(https://source.unsplash.com/C9XxB96hEEM);
+	height:100vh;
 /*	background-position: 50% 15%;
 */	background-repeat: no-repeat;
 	background-size: 100% 100%;
@@ -198,4 +199,3 @@ body{
 	margin-bottom:5%;
 
 }
-
