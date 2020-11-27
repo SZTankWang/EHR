@@ -205,8 +205,8 @@ class Application(db.Model):
 				time: {self.time} >'
 
 class stateEnum(enum.Enum):
-	conscious = "conscious"
-	coma = "coma"
+    conscious = "conscious"
+    coma = "coma"
 
 class Medical_record(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
@@ -279,6 +279,6 @@ class Lab_report(db.Model):
 		db.ForeignKey('patient.id'), nullable=False)
 
 	def __repr__(self):
-		return f'Lab_report < id: {self.id}, (report_)type: {len(self.type)},\
+		return f'Lab_report < id: {self.id}, (report_)type: {len(self.lr_type)},\
 			mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
 				patient_id: {self.patient_id} >'

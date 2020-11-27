@@ -18,7 +18,7 @@ $(document).ready(function() {
     myPage.loadAppInfo(appID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
-    myPage.loadMCInfo(mcID);
+    myPage.loadMCInfo(mcID, "doctorViewAppt");
 });
 
 
@@ -58,8 +58,7 @@ function editDiagnosis(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  var refresh = (res) => {refreshOnSuccess(res)};
-  sendRequest("doctorEditDiag", "POST", data, refresh);
+  sendRequest("doctorEditDiag", "POST", data, ()=>{});
 }
 
 
@@ -74,7 +73,20 @@ function addPrescription(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  var refresh = (res) => {refreshOnSuccess(res)};
+  // var refresh = (res) => {refreshOnSuccess(res)};
+  var refresh = (res) => {
+    if (!res.ret) {
+      console.log(res);
+      sendRequest("doctorGetPrescrip", "POST", {"mcID": mcID},
+      (res) => {
+        if (!res.ret) {
+          myPage.setPrescriptions(res.prescriptions);
+        } else {
+          alert(res.ret);
+        }
+      });
+    }
+  };
   sendRequest("doctorAddPrescrip", "POST", data, refresh);
 }
 
@@ -89,13 +101,12 @@ function requestLabReport(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  var refresh = (res) => {refreshOnSuccess(res)};
-  sendRequest("doctorReqLabReport", "POST", data, refresh);
+  sendRequest("doctorReqLabReport", "POST", data, () => {});
 }
 
 // refresh page if submission is successful
-function refreshOnSuccess(res){
-  if (res.ret == "0") {
-    goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)
-  }
-}
+// function refreshOnSuccess(res){
+//   if (res.ret == "0") {
+//     goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)
+//   }
+// }

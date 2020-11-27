@@ -96,7 +96,7 @@ function createAppt(event){
     }
     $("#ret span").removeClass("invisible");
     $("#ret span").addClass("visible");
-    goToPage("nurseHome", 300);
+    goToPage("nurseHome", 1000);
   };
   sendRequest("nurseCreateAppt", "POST", data, afterCreateAppt);
 }
