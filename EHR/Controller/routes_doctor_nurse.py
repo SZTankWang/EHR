@@ -278,7 +278,7 @@ def nurseCreateAppt():
 					reject_reason="",
 					date=date,
 					time=time,
-					time_slot_id=time_slot_id,
+					time_slot_id=time_slot_id,g
 					doctor_id=doctor_id,
 					approver_id=nurseID,
 					patient_id=patient_id,
