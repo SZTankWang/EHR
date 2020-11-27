@@ -279,6 +279,6 @@ class Lab_report(db.Model):
 		db.ForeignKey('patient.id'), nullable=False)
 
 	def __repr__(self):
-		return f'Lab_report < id: {self.id}, (report_)type: {len(self.type)},\
+		return f'Lab_report < id: {self.id}, (report_)type: {len(self.lr_type)},\
 			mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
 				patient_id: {self.patient_id} >'

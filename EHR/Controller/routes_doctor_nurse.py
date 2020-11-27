@@ -278,7 +278,7 @@ def nurseCreateAppt():
 					reject_reason="",
 					date=date,
 					time=time,
-					time_slot_id=time_slot_id,g
+					time_slot_id=time_slot_id,
 					doctor_id=doctor_id,
 					approver_id=nurseID,
 					patient_id=patient_id,
@@ -346,8 +346,10 @@ def nurseGoViewAppt(appID):
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @login_required
 def nurseViewAppt():
-	mc_id = request.form['mcID']
-	mc_id2 = request.args.get('mcID')
+	if request.method == "POST":
+		mc_id = request.form['mcID']
+	elif request.method == "GET":
+		mc_id = request.args.get('mcID')
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
@@ -418,6 +420,20 @@ def nurseViewAppt():
 					"comments": lr.comments} for lr in lab_reports]
 			})
 		)
+
+@app.route('/nurseGetLabReports', methods=['POST'])
+def nurseGetLabReports():
+	mc_id = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
+	return make_response(jsonify({
+		"ret": 0,
+		"labReports":
+			[{"lr_type": lr.lr_type.value,
+			"id": lr.id,
+			"comments": lr.comments} for lr in mc.lab_reports]
+		}))
 
 
 @app.route('/nursePreviewLR', methods=['GET', 'POST'])
@@ -547,10 +563,9 @@ def Settings():
 @app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
 def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
-	print("patient id:", p_id)
 	if request.method == "GET":
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender.value, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
 	if request.method == "POST":
 		age = request.form['age']
 		gender = request.form['gender']
@@ -700,8 +715,6 @@ def getComments():
 @app.route('/addHospital',methods=['GET', 'POST'])
 def addHospital():
 	# try:
-	hospital_id = request.form['hospitalID']
-	print("resquest.form", request.form)
 	name = request.form['name']
 	phone = request.form['phone']
 	address = request.form['address']
@@ -711,8 +724,10 @@ def addHospital():
 	# 	return make_response(jsonify({
 	# 		"ret":1, "message": "Missing attributes"
 	# 	}))
+	hospital_id = None
 
 	hos = Hospital(
+		id=hospital_id,
 		name=name,
 		phone=phone,
 		address=address,

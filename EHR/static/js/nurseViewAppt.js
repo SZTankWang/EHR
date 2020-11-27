@@ -55,7 +55,19 @@ function uploadLabReport(event){
   var data = new FormData($("#labReportForm")[0]);
   data.append("mcID", mcID);
 
-  var refresh = (res) => {refreshOnSuccess(res)};
+  var refresh = (res) => {
+    if (!res.ret) {
+      console.log(res);
+      sendRequest("nurseGetLabReports", "POST", {"mcID": mcID},
+      (res) => {
+        if (!res.ret) {
+          myPage.setLabReports(res.labReports);
+        } else {
+          alert(res.ret);
+        }
+      });
+    }
+  };
   sendFileRequest("nurseUploadLabReport", "POST", data, refresh);
 }
 
@@ -79,11 +91,11 @@ function sendFileRequest(route, type, data, successHandler){
 }
 
 // refresh page if submission is successful
-function refreshOnSuccess(res){
-  if (res.ret == "0") {
-    goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
-  }
-}
+// function refreshOnSuccess(res){
+//   if (res.ret == "0") {
+//     goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
+//   }
+// }
 
 // "form#labReportForm"
 // $.ajax({
