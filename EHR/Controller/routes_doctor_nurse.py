@@ -268,6 +268,8 @@ def nurseCreateAppt():
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
 		medical_record = Medical_record(patient_id=patient_id)
+		db.session.add(medical_record)
+		db.session.commit()
 		mc_id = medical_record.id
 		application = Application(
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -283,7 +285,6 @@ def nurseCreateAppt():
 					mc_id=mc_id)
 		# update corresponding table
 		db.session.add(application)
-		db.session.add(medical_record)
 		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		if timeslot.n_booked > 0:
 			timeslot.n_booked = timeslot.n_booked - 1
