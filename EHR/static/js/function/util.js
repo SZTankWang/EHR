@@ -2,7 +2,7 @@
 * @author Jingyi Zhu
 * @desc utilities
 */
-function jsonify(data){
+function jsonify(data) {
   var obj = {};
   for(var i=0;i<data.length;i++){
     obj[data[i].name]=data[i].value;
@@ -10,7 +10,7 @@ function jsonify(data){
   return obj;
 }
 
-function goToPage(route, delay){
+function goToPage(route, delay) {
   setTimeout("window.location.replace('http://localhost:5000/" + route + "')", delay);
 }
 
@@ -32,11 +32,11 @@ function sendRequest(route, type, data, successHandler){
   });
 }
 
-function getFullDate(date){
+function getFullDate(date) {
   return date.toISOString().split("T")[0];
 }
 
-function getFullTime(date){
+function getFullTime(date) {
   return date.toISOString().split("T")[1];
 }
 
@@ -61,7 +61,7 @@ function switchInputAttr (start, end, startDate, endDate, submit) {
   $("#applyRange").prop("disabled", submit);
 }
 
-function setStartOrEndDate(startDate=null, endDate=null){
+function setStartOrEndDate(startDate=null, endDate=null) {
   if (!startDate && !endDate) {
     startDate = getFullDate(new Date());
   }
@@ -76,7 +76,7 @@ function setStartOrEndDate(startDate=null, endDate=null){
   }
 }
 
-function jsonifyDateRange(startDate, endDate, range=0){
+function jsonifyDateRange(startDate, endDate, range=0) {
   if (range < 0) {
     startDate.setDate(endDate.getDate() + range);
   } else if (range > 0) {

@@ -1,10 +1,13 @@
+from sys import exec_prefix
+
+from flask.globals import current_app
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
 import collections
 from datetime import timedelta
 from itertools import count
 from time import strftime
-from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response
-from flask.signals import appcontext_tearing_down
+from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response, abort
+from flask.signals import appcontext_tearing_down, request_finished
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 from numpy.core.arrayprint import TimedeltaFormat
@@ -15,6 +18,7 @@ from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import datetime
+import os
 
 
 #---------------------------Nurse--------------------------------
@@ -64,7 +68,7 @@ def nursePendingApp():
 def nurseTodayAppt():
 	nurseID = current_user.get_id()
 	# nurseID = "44116022"    # a nurseID that returns something,
-	# 						for testing purpose, set the 'period' to 20
+	# 							for testing purpose, set the 'period' to 20
 	# department ID of current nurse
 	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
 
@@ -259,18 +263,18 @@ def nurseGetSlotsForDoctor():
 def nurseCreateAppt():
 	try:
 		nurseID = current_user.get_id()
-		appID = request.form['id']
 		symptom = request.form['symptoms']
-		time_slot_id = request.form['time_slot_id']
-		doctor_id = request.form['doctor_id']
-		patient_id = request.form['patient_id']
+		time_slot_id = request.form['slotID']
+		doctor_id = request.form['doctorID']
+		patient_id = request.form['patientID']
 		slot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
 		medical_record = Medical_record(patient_id=patient_id)
-		mc_id = medical_record.mc_id
+		db.session.add(medical_record)
+		db.session.commit()
+		mc_id = medical_record.id
 		application = Application(
-					id=appID,
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 					symptoms=symptom,
 					status=StatusEnum.approved,
@@ -284,10 +288,9 @@ def nurseCreateAppt():
 					mc_id=mc_id)
 		# update corresponding table
 		db.session.add(application)
-		db.session.add(medical_record)
-		timeslot = Time_slot.query.filter(id == time_slot_id).first()
-		if timeslot.n_booked > 0:
-			timeslot.n_booked = timeslot.n_booked - 1
+		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
+		if timeslot.n_booked < timeslot.n_total:
+			timeslot.n_booked = timeslot.n_booked + 1
 		else:
 			db.session.rollback()
 			return make_response(jsonify({'ret':1, 'message':"no available slots!"}))
@@ -343,90 +346,78 @@ def nurseGoViewAppt(appID):
 
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
+@app.route('/doctorViewAppt', methods=['GET','POST'])
 @login_required
-def nurseViewAppt():
-	mc_id = request.form['mcID']
-	mc_id2 = request.args.get('mcID')
-	print("mc_id:", mc_id)
-	print("mc_id2", request.form)
+def doctorNurseViewAppt():
+	if request.method == "POST":
+		mc_id = request.form['mcID']
+	elif request.method == "GET":
+		mc_id = request.args.get('mcID')
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
-	print(mc)
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 	lab_reports = mc.lab_reports
-	if bool(request.form['type']):
+
+	ret = {
+		"ret": "0",
+
+		"preExam":
+			{"bodyTemperature": str(mc.body_temperature),
+			"heartRate": str(mc.heart_rate),
+			"lowBloodPressure": str(mc.low_blood_pressure),
+			"highBloodPressure": str(mc.high_blood_pressure),
+			"weight": str(mc.weight),
+			"height": str(mc.height),
+			"state": mc.state.value},
+
+		"diagnosis":
+			mc.diagnosis,
+
+		"prescriptions":
+			[{"id": pres.id,
+			  "medicine": pres.medicine,
+			  "dose": pres.dose,
+			  "comments": pres.comments} for pres in prescription_list],
+
+		"labReports":
+			[{"lr_type": lr.lr_type.value,
+			"id": lr.id,
+			"comments": lr.comments,
+			"file_path": lr.file_path} for lr in lab_reports]
+	}
+
+	getLabReportTypes = bool(request.form['type'])
+	if getLabReportTypes:
 		lab_r_types = Lab_report_type.query.all()
 
-		return make_response(
-			jsonify({
-				"ret": "0",
+		ret["labReportTypes"] = [{"type": lrt.type.value,
+		  "description": lrt.description
+			} for lrt in lab_r_types]
 
-				"preExam":
-					{"bodyTemperature": str(mc.body_temperature),
-					"heartRate": str(mc.heart_rate),
-					"lowBloodPressure": str(mc.low_blood_pressure),
-					"highBloodPressure": str(mc.high_blood_pressure),
-					"weight": str(mc.weight),
-					"height": str(mc.height),
-					"state": mc.state.value},
+	return make_response(jsonify(ret))
 
-				"diagnosis":
-					mc.diagnosis,
-
-				"prescriptions":
-					[{"id": pres.id,
-					  "medicine": pres.medicine,
-					  "dose": pres.dose,
-					  "comments": pres.comments} for pres in prescription_list],
-
-				"labReportTypes":
-					[{"type": lrt.type.value,
-					  "description": lrt.description
-						} for lrt in lab_r_types],
-
-				"labReports":
-					[{"lr_type": lr.lr_type.value,
-					"id": lr.id,
-					"comments": lr.comments} for lr in lab_reports]
-			})
-		)
-	else:
-		return make_response(
-			jsonify({
-				"ret": "0",
-
-				"preExam":
-					{"bodyTemperature": str(mc.body_temperature),
-					"heartRate": str(mc.heart_rate),
-					"lowBloodPressure": str(mc.low_blood_pressure),
-					"highBloodPressure": str(mc.high_blood_pressure),
-					"weight": str(mc.weight),
-					"height": str(mc.height),
-					"state": mc.state.value},
-
-				"diagnosis":
-					mc.diagnosis,
-
-				"prescriptions":
-					[{"id": pres.id,
-					  "medicine": pres.medicine,
-					  "dose": pres.dose,
-					  "comments": pres.comments} for pres in prescription_list],
-
-				"labReports":
-					[{"lr_type": lr.lr_type.value,
-					"id": lr.id,
-					"comments": lr.comments} for lr in lab_reports]
-			})
-		)
+@app.route('/nurseGetLabReports', methods=['POST'])
+def nurseGetLabReports():
+	mc_id = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
+	return make_response(jsonify({
+		"ret": 0,
+		"labReports":
+			[{"lr_type": lr.lr_type.value,
+			"id": lr.id,
+			"comments": lr.comments,
+			"file_path": lr.file_path} for lr in mc.lab_reports]
+		}))
 
 
-@app.route('/nursePreviewLR', methods=['GET', 'POST'])
-def nursePreviewLR():
-	lr_id = request.form['lrID']
-	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
-
+# @app.route('/nursePreviewLR', methods=['GET', 'POST'])
+# def nursePreviewLR():
+# 	lr_id = request.form['lrID']
+# 	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
+# 	return make_response(jsonify({'file_path': mc.file_path}))
 
 #---nurse edit appointment/medical record---
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
@@ -460,21 +451,32 @@ def nurseUploadLabReport():
 	nurse_id = current_user.get_id()
 
 	mc_id = request.form['mcID']
-	lr_type_id = request.form['type']
-	lab_report_file = request.files['labReport'].read()
+	lr_type_str = request.form['type']
+	lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
+	lab_report_file = request.files['labReport']
+	lr_fname = lab_report_file.filename
+	mc_addr = None
+	if lr_fname != "":
+		# file_name = os.path.splitext(lr_fname)[0]
+		file_ext = os.path.splitext(lr_fname)[1]
+		if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+			abort(400)
+		mc_addr = os.path.join(helper.MC_PREFIX, mc_id+"_"+lr_fname)
+		lab_report_file.save(mc_addr)
 	comments = request.form['comments']
 
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	patient_id = mc.patient_id
 
 	lab_report = Lab_report(
-		comments=comments,
-		lr_type = lr_type_id,
-		uploader_id=nurse_id,
-		patient_id=patient_id,
-		mc_id=mc_id,
-		file=lab_report_file
+		comments = comments,
+		lr_type = lr_type,
+		uploader_id = nurse_id,
+		patient_id = patient_id,
+		mc_id = mc_id,
+		file_path = mc_addr
 	)
+
 	mc.lab_reports.append(lab_report)
 	db.session.add(lab_report)
 	db.session.commit()
@@ -549,10 +551,9 @@ def Settings():
 @app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
 def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
-	print("patient id:", p_id)
 	if request.method == "GET":
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender.value, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
 	if request.method == "POST":
 		age = request.form['age']
 		gender = request.form['gender']
@@ -649,7 +650,7 @@ def doctorOnGoingAppt():
 				"patient": helper.id2name(appt.patient_id),
 				"symptoms": appt.symptoms} for appt in now_approved_appts]
 	))
-	
+
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():
@@ -688,6 +689,50 @@ def doctorPastAppt():
 
 
 
+#---doctor schedule page---
+@app.route('/doctorSchedule', methods=['GET', 'POST'])
+@login_required
+def doctorSchedule():
+	return render_template('doctorSchedule.html')
+
+
+#---doctor view appt---
+@app.route('/doctorGoViewAppt/<string:appID>', methods=['GET', 'POST'])
+@login_required
+def doctorGoViewAppt(appID):
+	appt_res = Application.query.filter(Application.id==appID).first()
+	finished = False
+	if appt_res.status.value == "finished":
+		finished = True
+
+	return render_template('doctorViewAppt.html',
+		appID=appt_res.id,
+		date=appt_res.date.strftime(helper.DATE_FORMAT),
+		time=appt_res.time.strftime(helper.TIME_FORMAT),
+		approverID=appt_res.approver_id,
+		patientID=appt_res.patient_id,
+		patient=helper.id2name(appt_res.patient_id),
+		symptoms=appt_res.symptoms,
+		comments=appt_res.reject_reason,
+		mcID=appt_res.mc_id,
+		finished=finished)
+
+
+@app.route('/doctorGetPrescrip', methods=['POST'])
+def doctorGetPrescrip():
+	mc_id = request.form['mcID']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
+	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
+	return make_response(jsonify({
+		"ret": 0,
+		"prescriptions":
+			[{"id": pres.id,
+			  "medicine": pres.medicine,
+			  "dose": pres.dose,
+			  "comments": pres.comments} for pres in prescription_list]
+		}))
 
 
 
@@ -701,3 +746,45 @@ def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
+
+@app.route('/addHospital',methods=['GET', 'POST'])
+def addHospital():
+
+	name = helper.get_from_form(request, 'name')
+	phone = helper.get_from_form(request, 'phone')
+	address = helper.get_from_form(request, 'address')
+	description = helper.get_from_form(request, 'description')
+
+	# check for duplicated hospital name
+	res = Hospital.query.filter(Hospital.name == name).all()
+	if res != []:
+		return make_response(jsonify({'ret':1, 'msg':'Duplicated Hospital Name'}))
+
+	hos = Hospital(
+		name=name,
+		phone=phone,
+		address=address,
+		description=description
+	)
+	try:
+		db.session.add(hos)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+
+	return make_response(jsonify({'ret':0}))
+
+# @app.route('/addLabReportType', methods=['Post', 'GET'])
+# def addLabReportType():
+# 	lr_type_value = helper.get_from_form(request, 'type')
+# 	lr_type_value = "Good Test"
+# 	lr_type_name = lr_type_value.lower().replace(" ", "_")
+# 	class labReportTypeEnum(enum.Enum):
+# 		lr_type_name = lr_type_value
+# 	lr_type = Lab_report_type(
+# 		type = labReportTypeEnum.lr_type_name
+# 	)
+# 	db.session.add(lr_type)
+# 	db.session.commit()
+# 	return make_response(jsonify({'ret':0}))

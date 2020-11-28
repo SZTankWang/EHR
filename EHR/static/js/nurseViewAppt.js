@@ -18,7 +18,7 @@ $(document).ready(function() {
     myPage.loadAppInfo(appID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
-    myPage.loadMCInfo(mcID);
+    myPage.loadMCInfo(mcID, "nurseViewAppt");
 });
 
 
@@ -41,8 +41,7 @@ function editPreExam(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  var refresh = (res) => {refreshOnSuccess(res)};
-  sendRequest("nurseEditPreExam", "POST", data, refresh);
+  sendRequest("nurseEditPreExam", "POST", data, ()=>{});
 }
 
 /**
@@ -56,7 +55,18 @@ function uploadLabReport(event){
   var data = new FormData($("#labReportForm")[0]);
   data.append("mcID", mcID);
 
-  var refresh = (res) => {refreshOnSuccess(res)};
+  var refresh = (res) => {
+    if (!res.ret) {
+      sendRequest("nurseGetLabReports", "POST", {"mcID": mcID},
+      (res) => {
+        if (!res.ret) {
+          myPage.setLabReports(res.labReports);
+        } else {
+          alert(res.ret);
+        }
+      });
+    }
+  };
   sendFileRequest("nurseUploadLabReport", "POST", data, refresh);
 }
 
@@ -80,11 +90,11 @@ function sendFileRequest(route, type, data, successHandler){
 }
 
 // refresh page if submission is successful
-function refreshOnSuccess(res){
-  if (res.ret == "0") {
-    goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
-  }
-}
+// function refreshOnSuccess(res){
+//   if (res.ret == "0") {
+//     goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
+//   }
+// }
 
 // "form#labReportForm"
 // $.ajax({
