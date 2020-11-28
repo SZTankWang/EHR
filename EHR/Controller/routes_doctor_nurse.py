@@ -18,7 +18,7 @@ from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import datetime
-import os 
+import os
 
 
 #---------------------------Nurse--------------------------------
@@ -65,7 +65,7 @@ def nursePendingApp():
 
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 @login_required # Otherwise, we cannot get current_user's id
-def nurseTodayAppt(): 
+def nurseTodayAppt():
 	nurseID = current_user.get_id()
 	# nurseID = "44116022"    # a nurseID that returns something,
 	# 							for testing purpose, set the 'period' to 20
@@ -125,7 +125,7 @@ def nurseFutureAppt():
 	## TODO
 	## TODO
 	## TODO
-	## TODO: POST method          
+	## TODO: POST method
 	nurse_id = current_user.get_id()
 	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
 	# department ID of current nurse
@@ -383,7 +383,8 @@ def doctorNurseViewAppt():
 		"labReports":
 			[{"lr_type": lr.lr_type.value,
 			"id": lr.id,
-			"comments": lr.comments} for lr in lab_reports]
+			"comments": lr.comments,
+			"file_path": lr.file_path} for lr in lab_reports]
 	}
 
 	getLabReportTypes = bool(request.form['type'])
@@ -407,15 +408,16 @@ def nurseGetLabReports():
 		"labReports":
 			[{"lr_type": lr.lr_type.value,
 			"id": lr.id,
-			"comments": lr.comments} for lr in mc.lab_reports]
+			"comments": lr.comments,
+			"file_path": lr.file_path} for lr in mc.lab_reports]
 		}))
 
 
-@app.route('/nursePreviewLR', methods=['GET', 'POST'])
-def nursePreviewLR():
-	lr_id = request.form['lrID']
-	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
-	return make_response(jsonify({'file_path': mc.file_path}))
+# @app.route('/nursePreviewLR', methods=['GET', 'POST'])
+# def nursePreviewLR():
+# 	lr_id = request.form['lrID']
+# 	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
+# 	return make_response(jsonify({'file_path': mc.file_path}))
 
 #---nurse edit appointment/medical record---
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
@@ -455,10 +457,11 @@ def nurseUploadLabReport():
 	lr_fname = lab_report_file.filename
 	mc_addr = None
 	if lr_fname != "":
+		# file_name = os.path.splitext(lr_fname)[0]
 		file_ext = os.path.splitext(lr_fname)[1]
 		if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
 			abort(400)
-		mc_addr = os.path.join(helper.MC_PREFIX, mc_id+file_ext)
+		mc_addr = os.path.join(helper.MC_PREFIX, mc_id+"_"+lr_fname)
 		lab_report_file.save(mc_addr)
 	comments = request.form['comments']
 
@@ -473,6 +476,7 @@ def nurseUploadLabReport():
 		mc_id = mc_id,
 		file_path = mc_addr
 	)
+
 	mc.lab_reports.append(lab_report)
 	db.session.add(lab_report)
 	db.session.commit()

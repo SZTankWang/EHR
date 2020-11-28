@@ -138,14 +138,17 @@ class MCModal extends AppFullModal{
   }
 
   setPrescriptions(prescripitions){
+    this.prescriptions.empty();
     for (let i=0; i < prescripitions.length; i++) {
       this.prescriptions.append(newPrescriptionCard(i+1, prescripitions[i].id + ": " + prescripitions[i].medicine, prescripitions[i].dose, prescripitions[i].comments));
     };
   }
 
   setLabReports(labReports){
+    this.labReports.empty();
     for (let i=0; i < labReports.length; i++){
-      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments));
+      console.log(labReports[i].file_path);
+      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, labReports[i].file_path));
     };
   }
 
