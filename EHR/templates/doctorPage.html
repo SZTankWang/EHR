@@ -22,7 +22,7 @@
 		<input type="text" id="doctorID" name="doctorID" value={{ doctorID }}>
 		<input type="text" id="hospital" name="hospital" value={{ hospital }}>
 		<input type="text" id="department" name="department" value={{ department }}>
-
+		<input type="text" id="curr-slot-id" name="curr-slot-id" value="">
 	</form>
 	<div class="pageContent">
 
@@ -104,11 +104,11 @@
 			<div class="dialog-content input-part">
 				<h3>Confirm your information</h3>
 				<div class="dialog-content-row">
-					<p>name <input type="text" class="input-name"></p>
+					<p>name <input type="text" class="input-name" id="appt-name"></p>
 
 				</div>
 				<div class="dialog-content-row">
-					<p>phone <input type="text" class="input-phone"></p>
+					<p>phone <input type="text" class="input-phone" id="appt-phone"></p>
 				</div>
 			</div>
 
@@ -124,7 +124,7 @@
 			</div>
 
 			<div class="dialog-content">
-				<button id="submit">submit</button>
+				<button class="submit-btn" onclick="submitAppt(this)">submit</button>
 			</div>
 		</div>
 
@@ -140,7 +140,7 @@
 
 	$('#search').button();
 
-	$('#submit').button();
+	$('.submit-btn').button();
 
 	getDocSlot(moment().format("YYYY-MM-DD"));
 

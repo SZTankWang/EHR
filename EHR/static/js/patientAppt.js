@@ -107,7 +107,15 @@
 
 
 	// 打开模态框
-	function openModal(){
+	function openModal(th){
+		console.log($(th).attr('id'));
+		var slotID = $(th).attr('id');
+		//设定提交按钮id
+		$('.submit-btn').attr('id',slotID);
+
+		//请求slot 信息
+		getSlotInfo(slotID);
+
 		var width=$(window).width();
 		var height = $(window).height();
 		$('.book-dialog').dialog({
@@ -141,7 +149,7 @@
 
 
 	function renderTimeSlot(data){
-		var temp = '<!-- 单个时间段 --><li id='+data['slotID']+'><div class="time-slot-row"><div class="time-slot-info time"><h4>'+data['slotTime']+'</h4></div><div class="wrapper"><div class="time-slot-info availSpace">Available Space: '+data['avail_num']+'</div><div class="time-slot-info reserve"><button class="book-btn" onclick="openModal()" data-toggle="modal" data-target="#myModal">make an appointment</button></div></div></div></li>';
+		var temp = '<!-- 单个时间段 --><li id='+data['slotID']+'><div class="time-slot-row"><div class="time-slot-info time"><h4>'+data['slotTime']+'</h4></div><div class="wrapper"><div class="time-slot-info availSpace">Available Space: '+data['avail_num']+'</div><div class="time-slot-info reserve"><button class="book-btn" id='+data['slotID']+' onclick="openModal(this)" data-toggle="modal" data-target="#myModal">make an appointment</button></div></div></div></li>';
 		
 		$('#time-slot-list').append(temp);
 	}
@@ -161,4 +169,47 @@
 		date = moment(date).format("YYYY-MM-DD");
 		console.log(date);
 		getDocSlot(date);
+	}
+
+	function submitAppt(th){
+		console.log($(th).attr('id'));
+		var slotID = $(th).attr('id');
+		info = getApptInfo(slotID);
+		$.ajax({
+			url:"http://localhost:5000/makeAppt",
+			data: info,
+			type:'POST',
+			success:function(data){
+				console.log(data);
+			}
+		})
+	}
+
+	//获取预约信息
+	function getApptInfo(slotID){
+		var name = $('#appt-name').val();
+		var phone = $('#appt-phone').val();
+		var synopsis = $('#synopsis').val();
+
+		var info = {};
+		info['slotID'] = slotID;
+		info['name'] = name;
+		info['phone'] = phone;
+		info['synopsis']=synopsis;
+		return info;
+
+	}
+
+
+	function getSlotInfo(slotID){
+		$.ajax({
+			url:"http://localhost:5000/querySlotInfo",
+			data:{'slotID':slotID},
+			type:'GET',
+			success:function(data){
+				console.log(data);
+			}
+		})
+
+
 	}
