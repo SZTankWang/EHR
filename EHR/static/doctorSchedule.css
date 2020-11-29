@@ -39,8 +39,20 @@ body{
 	background: white;
 	height:4.1rem;
 	padding-left: 1.2rem;
+	padding-top: 0.5rem;
 }
 
 .filter-wrapper{
 	width:50%;
+}
+
+.apply-btn-container{
+	margin-bottom: 0.8rem;
+}
+
+.schedule-container{
+	height:70%;
+	width:100%;
+	background: #f1f1f1;
+	padding:0.8rem;
 }
