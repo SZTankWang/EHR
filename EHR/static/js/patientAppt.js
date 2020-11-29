@@ -174,7 +174,8 @@
 	function submitAppt(th){
 		console.log($(th).attr('id'));
 		var slotID = $(th).attr('id');
-		info = getApptInfo(slotID);
+		var doctorID = $('#doctorID').val();
+		info = getApptInfo(slotID,doctorID);
 		$.ajax({
 			url:"http://localhost:5000/makeAppt",
 			data: info,
@@ -186,16 +187,18 @@
 	}
 
 	//获取预约信息
-	function getApptInfo(slotID){
+	function getApptInfo(slotID,doctorID){
 		var name = $('#appt-name').val();
 		var phone = $('#appt-phone').val();
 		var synopsis = $('#synopsis').val();
 
 		var info = {};
 		info['slotID'] = slotID;
+		info['doctorID'] = doctorID;
 		info['name'] = name;
 		info['phone'] = phone;
-		info['synopsis']=synopsis;
+		info['symptom']=synopsis;
+
 		return info;
 
 	}
