@@ -147,7 +147,6 @@ class MCModal extends AppFullModal{
   setLabReports(labReports){
     this.labReports.empty();
     for (let i=0; i < labReports.length; i++){
-      console.log(labReports[i].file_path);
       this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, labReports[i].file_path));
     };
   }

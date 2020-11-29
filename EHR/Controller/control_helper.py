@@ -8,14 +8,13 @@ from enum import Enum
 
 TIME_FORMAT = "%H:%M"
 DATE_FORMAT = "%Y-%m-%d"
-MC_PREFIX = "LabReport"
 id_name_map = {}
 
 def get_from_form(request, field):
 	if field in request.form:
 		return request.form[field]
 	else:
-		return None 
+		return None
 
 def paginate(db_obj):
 	try:

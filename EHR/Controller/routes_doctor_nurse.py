@@ -6,7 +6,7 @@ import collections
 from datetime import timedelta
 from itertools import count
 from time import strftime
-from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response, abort
+from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response, abort, send_from_directory
 from flask.signals import appcontext_tearing_down, request_finished
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
@@ -14,6 +14,7 @@ from numpy.core.arrayprint import TimedeltaFormat
 from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
@@ -413,11 +414,14 @@ def nurseGetLabReports():
 		}))
 
 
-# @app.route('/nursePreviewLR', methods=['GET', 'POST'])
-# def nursePreviewLR():
-# 	lr_id = request.form['lrID']
-# 	mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
-# 	return make_response(jsonify({'file_path': mc.file_path}))
+@app.route('/previewOneLR/<path:filename>')
+def previewLR(filename):
+	print(app.config["UPLOAD_FOLDER"], filename)
+	return send_from_directory(app.config["UPLOAD_FOLDER"],filename)
+	# lr_id = request.form['lrID']
+	# mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
+	# return make_response(jsonify({'file_path': mc.file_path}))
+
 
 #---nurse edit appointment/medical record---
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
@@ -453,17 +457,18 @@ def nurseUploadLabReport():
 	mc_id = request.form['mcID']
 	lr_type_str = request.form['type']
 	lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
-	lab_report_file = request.files['labReport']
-	lr_fname = lab_report_file.filename
+	lab_report_file = request.files['labReportInput']
+	filename = lab_report_file.filename
 	mc_addr = None
-	if lr_fname != "":
+	if filename != "":
 		# file_name = os.path.splitext(lr_fname)[0]
-		file_ext = os.path.splitext(lr_fname)[1]
+		file_ext = os.path.splitext(filename)[1]
 		if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
 			abort(400)
-		mc_addr = os.path.join(helper.MC_PREFIX, mc_id+"_"+lr_fname)
+		lr_fname = secure_filename(mc_id+"_"+filename)
+		mc_addr = os.path.join("EHR", app.config["UPLOAD_FOLDER"], lr_fname)
 		lab_report_file.save(mc_addr)
-	comments = request.form['comments']
+	comments = request.form['commentsInput']
 
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	patient_id = mc.patient_id
@@ -474,7 +479,7 @@ def nurseUploadLabReport():
 		uploader_id = nurse_id,
 		patient_id = patient_id,
 		mc_id = mc_id,
-		file_path = mc_addr
+		file_path = lr_fname
 	)
 
 	mc.lab_reports.append(lab_report)

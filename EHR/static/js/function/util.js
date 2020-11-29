@@ -14,6 +14,10 @@ function goToPage(route, delay) {
   setTimeout("window.location.replace('http://localhost:5000/" + route + "')", delay);
 }
 
+function goToPageNewTab(route, delay) {
+  setTimeout("window.open('http://localhost:5000/" + route + "')", delay);
+}
+
 function sendRequest(route, type, data, successHandler){
   $("#overlay").removeClass("d-none");
   $.ajax({
