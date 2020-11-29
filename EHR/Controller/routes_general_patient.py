@@ -276,3 +276,54 @@ def getDoctorSlot():
 			"avail_num":str(avail_num_list[i]),
 			"slotTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
+
+@app.route('/querySlotInfo',methods=['GET'])
+@login_required
+def querySlotInfo():
+	slotID = request.args.get('slotID')
+	return make_response(
+		jsonify(
+		{"slotTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
+		)
+		)
+
+@app.route('/makeAppt',methods=['GET','POST'])
+@login_required
+def makeAppt():
+	try:
+		patient_id = current_user.get_id()
+		symptom = request.form['symptoms']
+		time_slot_id = request.form['slotID']
+		doctor_id = request.form['doctorID']
+		slot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
+		#doctor_id = slot.doctor_id
+		date = slot.slot_date
+		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
+		medical_record = Medical_record(patient_id=patient_id)
+		db.session.add(medical_record)
+		db.session.commit()
+		mc_id = medical_record.id
+		application = Application(
+					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+					symptoms=symptom,
+					status=StatusEnum.pending,
+					reject_reason="",
+					date=date,
+					time=time,
+					time_slot_id=time_slot_id,
+					doctor_id=doctor_id,
+					patient_id=patient_id,
+					mc_id=mc_id)
+		# update corresponding table
+		db.session.add(application)
+		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
+		if timeslot.n_booked < timeslot.n_total:
+			timeslot.n_booked = timeslot.n_booked + 1
+		else:
+			db.session.rollback()
+			return make_response(jsonify({'ret':1, 'message':"no available slots!"}))
+		db.session.commit()
+		return make_response(jsonify({"ret":0, 'message':""}), 200)
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message':"error"}))
