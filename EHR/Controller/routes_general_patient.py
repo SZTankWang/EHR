@@ -283,7 +283,7 @@ def querySlotInfo():
 	slotID = request.args.get('slotID')
 	return make_response(
 		jsonify(
-		{"slotTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
+		{"slotTime": datetime.datetime.combine(helper.t_slotid2date(slotID),helper.t_slot2time(slotID)).strftime("%Y-%m-%d %H:%M")}
 		)
 		)
 
