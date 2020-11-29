@@ -61,6 +61,9 @@ function uploadLabReport(event){
       (res) => {
         if (!res.ret) {
           myPage.setLabReports(res.labReports);
+          $("#labReportTypes").empty();
+          $("#labReportInput").val("");
+          $("#commentsInput").val("");
         } else {
           alert(res.ret);
         }
