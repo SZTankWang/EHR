@@ -99,7 +99,7 @@ def nurseOnGoingAppt():
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.dept_appts(user=current_user, period=0).\
 		filter(
-			Application.status==StatusEnum.approved
+			Application.status == StatusEnum.approved
 			).all()
 
 	# filter3: now() in timeslot
