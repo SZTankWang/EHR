@@ -260,6 +260,8 @@ def viewDoctorByID(doctorID):
 						hospital = hospital,
 						department = department)
 
+
+
 @app.route('/getDoctorSlot',methods=['GET','POST'])
 @login_required
 def getDoctorSlot():
@@ -292,7 +294,7 @@ def querySlotInfo():
 def makeAppt():
 	try:
 		patient_id = current_user.get_id()
-		symptom = request.form['symptoms']
+		symptom = request.form['symptom']
 		time_slot_id = request.form['slotID']
 		doctor_id = request.form['doctorID']
 		slot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()

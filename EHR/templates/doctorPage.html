@@ -75,7 +75,7 @@
 
 	<!-- 预约对话框 -->
 	<div class="book-dialog" title="confirm appointment">
-		<div class="dialog-content-container">
+		<div class="dialog-content-container form-container">
 
 			<!-- 预约时间 -->
 			<div class="dialog-content">
@@ -93,7 +93,7 @@
 						<p>{{doctorName}}</p>
 					</div>
 					<div>
-						<p>date</p>		
+						<p id="slot-time">date</p>		
 					</div>
 					
 				</div>
@@ -125,6 +125,41 @@
 
 			<div class="dialog-content">
 				<button class="submit-btn" onclick="submitAppt(this)">submit</button>
+			</div>
+		</div>
+
+
+		<!-- 信息展示 -->
+		<div class="msg-container-wrapper">
+			<div class="dialog-content-container msg-container">
+
+				<!-- 成功 -->
+				<div class="msg-wrapper" id="success">
+					<div class="msg-content success">
+						<div class="icon success-icon"></div>
+						<p>Appointment submitted</p>
+					</div>
+				</div>
+
+
+				<!-- 失败 -->
+				<div class="msg-wrapper" id="failure">
+					<div class="msg-content failure">
+		 				<div class="icon failure-icon"></div>
+		 				<p>attempt failed, please try later</p>
+		 			</div>
+
+				</div>
+ 
+ 				<!-- 失败 已满 -->
+
+ 				<div class="msg-wrapper" id="full">
+	 				<div class="msg-content full">
+						<div class="icon failure-icon"></div>
+						<p>the slot is already full</p>
+					</div>			
+ 				</div>
+
 			</div>
 		</div>
 

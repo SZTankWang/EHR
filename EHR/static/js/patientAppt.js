@@ -66,6 +66,9 @@
 			data:{'deptID':deptID},
 			success:function(data){
 				console.log(data);
+				if($("#close-frame-container").css("display")=="block"){
+					$("#close-frame-container").css("display","none");
+				}
 				$('#card-list').empty();
 				for(var i=0;i<data.length;i++){
 					$('#card-list').append(renderDoctor(data[i]));
@@ -114,8 +117,10 @@
 		$('.submit-btn').attr('id',slotID);
 
 		//请求slot 信息
-		getSlotInfo(slotID);
-
+		var time = getSlotInfo(slotID);
+		console.log(time);
+		//设置展示日期时间
+		$('#slot-time').text(time);
 		var width=$(window).width();
 		var height = $(window).height();
 		$('.book-dialog').dialog({
@@ -165,10 +170,15 @@
 
 	// 根据用户输入时间 查询可用slot
 	function searchSlotByDate(){
-		var date = $('#select-date').datepicker("getDate");
-		date = moment(date).format("YYYY-MM-DD");
+		var date = translateDate();
 		console.log(date);
 		getDocSlot(date);
+	}
+
+	function translateDate(){
+		var date = $('#select-date').datepicker("getDate");
+		date = moment(date).format("YYYY-MM-DD");
+		return date;
 	}
 
 	function submitAppt(th){
@@ -182,8 +192,47 @@
 			type:'POST',
 			success:function(data){
 				console.log(data);
+				proceedMsg(data['ret'],data['message']);
+
+				setTimeout(function(){
+				$( ".book-dialog" ).dialog( "close" );
+
+				setTimeout(function(){
+					searchSlotByDate();
+				},1000);
+
+				},1000);
+
 			}
 		})
+	}
+
+
+	function proceedMsg(ret,msg){
+		$(".form-container").css("display","none");
+
+		if(ret==0){
+			//预约成功
+			$(".msg-container-wrapper").css("display","block");
+			$("#success").css("display","block");
+
+		}
+
+		if(ret == 1){
+			if(msg == "error"){
+				$(".msg-container-wrapper").css("display","block");
+				$("#failure").css("display","block");
+			}
+			else{
+
+				$(".msg-container-wrapper").css("display","block");
+				$("#full").css("display","block");
+			}
+		}
+
+	
+	
+
 	}
 
 	//获取预约信息
@@ -205,14 +254,20 @@
 
 
 	function getSlotInfo(slotID){
+		var time=  null;
 		$.ajax({
+			async:false,
 			url:"http://localhost:5000/querySlotInfo",
 			data:{'slotID':slotID},
 			type:'GET',
 			success:function(data){
 				console.log(data);
+				time =moment(data['slotTime']).format("dddd, MMMM Do YYYY, h:mm a");
+				console.log(time);
+
+
 			}
 		})
-
+		return time ;
 
 	}

@@ -172,3 +172,51 @@ button.book-btn{
 	margin-left:1rem;
 }
 
+
+.msg-container-wrapper{
+	display: none;
+	width:100%;
+	height:100%;
+}
+
+.msg-wrapper{
+	display: none;
+}
+
+/*#success{
+	display: block;
+}
+*/
+.icon{
+	display: flex;
+	flex-direction: row;
+	width:10rem;
+	height:5rem;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+
+}
+
+.msg-container{
+	justify-content: center;
+}
+
+
+
+.msg-content{
+	display: inherit;
+	flex-direction: column;
+	align-items: center;
+}
+
+.success-icon{
+	background-image: url(/static/success.svg);
+}
+
+.failure-icon{
+	background-image: url(/static/failure.svg);
+}
+
+/*.form-container{
+	display: none;
+}*/
