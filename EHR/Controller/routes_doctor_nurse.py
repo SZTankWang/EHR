@@ -560,7 +560,10 @@ def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
 	if request.method == "GET":
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender.value, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
+		gender = role_user.gender
+		if gender:
+			gender = gender.value
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
 	if request.method == "POST":
 		age = helper.StrOrNone(request.form['age'])
 		gender = request.form['gender']

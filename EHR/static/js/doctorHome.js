@@ -41,6 +41,7 @@ $("#todayAppt").on("click", () => goUpdateTable("doctorTodayAppt"));
 */
 function buttonAction(event) {
   event.preventDefault();
+  var data = myTable.table.row( $(this).parents('tr') ).data();
   var appID = data['appID'];
   goToPage("doctorGoViewAppt/" + appID, 0);
 }
