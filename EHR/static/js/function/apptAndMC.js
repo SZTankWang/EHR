@@ -7,12 +7,12 @@
 // load lab report
 // $(".preview-btn").on("click", loadLabReport);
 // prevent default page refresh if lab report not loaded
-$(".collapse").on("click", ".preview-btn", function(event){
-  if ($(this).attr('href') == "") {
-    event.preventDefault();
-    alert("Lab report empty");
-  }
-})
+// $(".collapse").on("click", ".preview-btn", function(event){
+//   if ($(this).attr('href') == "") {
+//     event.preventDefault();
+//     alert("Lab report empty");
+//   }
+// })
 // --------------------------event handlers----------------------------
 /**
 * @desc load lab report if the lab report card is clicked
@@ -22,6 +22,8 @@ function loadLabReport(e) {
   const filename = $(e).attr('href');
   if (filename != ""){
     goToPageNewTab("previewOneLR/" + filename, 300);
+  } else {
+    alert("Lab report empty");
   }
 }
 // function loadLabReport(e) {

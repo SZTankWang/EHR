@@ -400,15 +400,9 @@ def doctorNurseViewAppt():
 		  "description": lrt.description
 		} for lrt in lab_r_types]
 
-	getLabReportReqs = bool(request.form['req'])
-	if getLabReportReqs:
-		ret["labReportReqs"] = [{"lr_type": "blood_test",
-			"id": 1001,
-		  	"comments": "hi"
-		}]
-
 	return make_response(jsonify(ret))
 
+#JZ
 @app.route('/nurseGetLabReports', methods=['POST'])
 def nurseGetLabReports():
 	mc_id = request.form['mcID']
@@ -459,6 +453,7 @@ def nurseEditPreExam():
 
 	return make_response(jsonify({'ret':0}))
 
+#JZ
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
 @login_required
 def nurseUploadLabReport():
@@ -480,7 +475,6 @@ def nurseUploadLabReport():
 	nurse_comments = request.form['commentsInput']
 
 	lab_report = Lab_report.query.get(lr_id)
-	print(lab_report)
 	if not lab_report:
 		return make_response(jsonify({"ret": "Lab report request deos not exist"}))
 	lab_report = lab_report.all()

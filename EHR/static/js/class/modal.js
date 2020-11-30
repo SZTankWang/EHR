@@ -147,7 +147,8 @@ class MCModal extends AppFullModal{
   setLabReports(labReports){
     this.labReports.empty();
     for (let i=0; i < labReports.length; i++) {
-      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, labReports[i].file_path));
+      const path = labReports[i].file_path ? labReports[i].file_path : "";
+      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, path));
     };
   }
 
@@ -225,8 +226,8 @@ class MCPage extends MCModal{
     };
   }
 
-  loadMCInfo(mcID, route, type, req) {
-    const mcData = {"mcID": mcID, "type": type, "req": req};
+  loadMCInfo(mcID, route, type) {
+    const mcData = {"mcID": mcID, "type": type};
     var fillMCData = (res) => {
       if (res.ret == "0") {
         this.setBodyTemperature(res.preExam.bodyTemperature);
@@ -245,8 +246,6 @@ class MCPage extends MCModal{
           if (res.labReports)
             this.setLabReports(res.labReports);
         } else {
-          if (res.labReportReqs)
-            this.setLabReportReqs(res.labReportReqs);
           if (res.labReportAndReqs)
             this.setLabReportAndReqs(res.labReportAndReqs);
         }
