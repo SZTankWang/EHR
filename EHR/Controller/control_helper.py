@@ -150,10 +150,10 @@ def doc2appts(doctorID,period=0, start_date = datetime.date.today(),direction = 
 	elif direction == 'past':
 		if limit == 'yes':
 			return Application.query.filter(Application.doctor_id == doctorID,
-				Application.status == StatusEnum.approved,Application.date <= start_date, Application.date >= start_date - timedelta(days = period)).all()
+				Application.status == StatusEnum.finished,Application.date <= start_date, Application.date >= start_date - timedelta(days = period)).all()
 		else:
 			return Application.query.filter(Application.doctor_id == doctorID,
-				Application.status == StatusEnum.approved,Application.date <= start_date).all()
+				Application.status == StatusEnum.finished,Application.date <= start_date).all()
 
 def dept_to_doc(deptID):
 	doctor_list = dept2doc(deptID)
