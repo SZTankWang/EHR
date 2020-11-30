@@ -146,7 +146,7 @@ class MCModal extends AppFullModal{
 
   setLabReports(labReports){
     this.labReports.empty();
-    for (let i=0; i < labReports.length; i++){
+    for (let i=0; i < labReports.length; i++) {
       this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, labReports[i].file_path));
     };
   }
@@ -196,6 +196,27 @@ class MCPage extends MCModal{
   constructor(){
     super();
     this.labReportTypes = $("#labReportTypes");
+    this.labReportReqs = $("#labReportReqs");
+  }
+
+  setLabReportReqs(labReportReqs){
+    this.labReportReqs.empty();
+    for (let i=0; i < labReportReqs.length; i++) {
+      this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
+    }
+  }
+
+  setLabReportAndReqs(labReportAndReqs){
+    this.labReports.empty();
+    this.labReportReqs.empty();
+    for (let i=0; i < labReportAndReqs.length; i++) {
+      if (labReportAndReqs[i].file_path) {
+        console.log(labReportAndReqs[i].file_path);
+        this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
+      } else {
+        this.labReports.append(newLabReportCard(i+1, labReportAndReqs[i].lr_type, labReportAndReqs[i].id, labReportAndReqs[i].comments, labReportAndReqs[i].file_path));
+      }
+    }
   }
 
   setLabReportTypes(labReportTypes){
@@ -204,8 +225,8 @@ class MCPage extends MCModal{
     };
   }
 
-  loadMCInfo(mcID, route) {
-    const mcData = {"mcID": mcID, "type": "True"};
+  loadMCInfo(mcID, route, type, req) {
+    const mcData = {"mcID": mcID, "type": type, "req": req};
     var fillMCData = (res) => {
       if (res.ret == "0") {
         this.setBodyTemperature(res.preExam.bodyTemperature);
@@ -218,10 +239,17 @@ class MCPage extends MCModal{
         this.setDiagnosis(res.diagnosis);
         if (res.prescriptions)
           this.setPrescriptions(res.prescriptions);
-        if (res.labReportTypes)
-          this.setLabReportTypes(res.labReportTypes);
-        if (res.labReports)
-          this.setLabReports(res.labReports);
+        if (type) {
+          if (res.labReportTypes)
+            this.setLabReportTypes(res.labReportTypes);
+          if (res.labReports)
+            this.setLabReports(res.labReports);
+        } else {
+          if (res.labReportReqs)
+            this.setLabReportReqs(res.labReportReqs);
+          if (res.labReportAndReqs)
+            this.setLabReportAndReqs(res.labReportAndReqs);
+        }
       } else {
         alert(res.ret);
       }

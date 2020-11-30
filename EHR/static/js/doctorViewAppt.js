@@ -18,7 +18,7 @@ $(document).ready(function() {
     myPage.loadAppInfo(appID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
-    myPage.loadMCInfo(mcID, "doctorViewAppt");
+    myPage.loadMCInfo(mcID, "doctorViewAppt", true, true);
 });
 
 
