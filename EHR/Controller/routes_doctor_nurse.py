@@ -99,7 +99,7 @@ def nurseOnGoingAppt():
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.dept_appts(user=current_user, period=0).\
 		filter(
-			Application.status==StatusEnum.approved
+			Application.status == StatusEnum.approved
 			).all()
 
 	# filter3: now() in timeslot
@@ -634,7 +634,7 @@ def doctorOnGoingAppt():
 	helper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
 	nowtime = datetime.datetime.now()
-	appt_list = helper.doc2appts(doctorID, 0)
+	appt_list = helper.doc2appts(doctorID,0)
 
 	now_approved_appts = []
 	for appt in appt_list:
@@ -683,13 +683,74 @@ def doctorAllAppt():
 @app.route('/doctorFutureAppt', methods=['GET', 'POST'])
 @login_required
 def doctorFutureAppt():
-	pass
+	if request.method == "POST":
+		start_date = request.form["startDate"]
+		end_date = request.form["endDate"]
+	elif request.method == "GET":
+		start_date = 0
+		end_date = 0
+	doctorID = current_user.get_id()
+	if start_date:
+		start_date = datetime.datetime.strptime(start_date, helper.DATE_FORMAT)
+	else:
+		start_date = datetime.datetime.today()
+	if end_date:
+		end_date = datetime.datetime.strptime(end_date, helper.DATE_FORMAT)
+
+	if end_date:
+		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,start_date = start_date)
+	else:
+		apps = helper.doc2appts(doctorID,start_date = start_date,limit = 'no')
+
+	helper.load_id2name_map()
+	return make_response(
+		jsonify([
+			{
+				"appID": app.id,
+				"date": app.date.strftime(helper.DATE_FORMAT),
+				"time": app.time.strftime(helper.TIME_FORMAT),
+				"doctor": helper.id2name(app.doctor_id),
+				"patient": helper.id2name(app.patient_id),
+				"symptoms": app.symptoms,
+			} for app in apps
+		]))
 
 
 @app.route('/doctorPastAppt', methods=['GET', 'POST'])
 @login_required
 def doctorPastAppt():
-	pass
+	if request.method == "POST":
+		start_date = request.form["startDate"]
+		end_date = request.form["endDate"]
+	elif request.method == "GET":
+		start_date = 0
+		end_date = 0
+	doctorID = current_user.get_id()
+	if start_date:
+		start_date = datetime.datetime.strptime(start_date, helper.DATE_FORMAT)
+	if end_date:
+		end_date = datetime.datetime.strptime(end_date, helper.DATE_FORMAT)
+	else:
+		end_date = datetime.date.today()
+
+	if start_date:
+		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,direction = 'past',start_date = start_date)
+	else:
+		apps = helper.doc2appts(doctorID,start_date = start_date,direction = 'past',limit = 'no')
+
+	helper.load_id2name_map()
+	return make_response(
+		jsonify([
+			{
+				"appID": app.id,
+				"date": app.date.strftime(helper.DATE_FORMAT),
+				"time": app.time.strftime(helper.TIME_FORMAT),
+				"doctor": helper.id2name(app.doctor_id),
+				"patient": helper.id2name(app.patient_id),
+				"symptoms": app.symptoms,
+				"status": 'approved'
+			} for app in apps
+		]))
 
 
 
