@@ -713,7 +713,6 @@ def doctorFutureAppt():
 				"doctor": helper.id2name(app.doctor_id),
 				"patient": helper.id2name(app.patient_id),
 				"symptoms": app.symptoms,
-				"status": 'approved'
 			} for app in apps
 		]))
 
