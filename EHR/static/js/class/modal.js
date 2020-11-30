@@ -82,9 +82,9 @@ class MCModal extends AppFullModal{
 
   checkAndSet(element, data) {
     if (element.is("input")) {
-      if (element != "") {
-        element.attr("disabled", true);
-      }
+      // if (element != "") {
+      //   element.attr("disabled", true);
+      // }
       element.val(data);
     } else {
       element.text(data);

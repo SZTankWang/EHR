@@ -10,6 +10,11 @@ TIME_FORMAT = "%H:%M"
 DATE_FORMAT = "%Y-%m-%d"
 id_name_map = {}
 
+def StrOrNone(string):
+	if string == "":
+		return None
+	return string
+
 def get_from_form(request, field):
 	if field in request.form:
 		return request.form[field]

@@ -26,7 +26,10 @@ function addHospital(event){
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret != "0") {
+    if (res.ret == "0") {
+      $("#addHospital input").val("");
+      $("#addHospital textarea").val("");
+    } else {
       alert(res.ret);
     }
   };
@@ -42,7 +45,10 @@ function addDepartment(event){
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret != "0") {
+    if (res.ret == "0") {
+      $("#addDepartment input").val("");
+      $("#addDepartment textarea").val("");
+    } else {
       alert(res.ret);
     }
   };
@@ -58,7 +64,10 @@ function addLabReportType(event){
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret != "0") {
+    if (res.ret == "0") {
+      $("#addLabReportType input").val("");
+      $("#addLabReportType textarea").val("");
+    } else {
       alert(res.ret);
     }
   };
@@ -74,7 +83,9 @@ function updateAffiliation(event){
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret != "0") {
+    if (res.ret == "0") {
+      $("#updateAffiliation input").val("");
+    } else {
       alert(res.ret);
     }
   };

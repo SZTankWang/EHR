@@ -66,7 +66,6 @@ class DoctorTable extends Table{
           { "data" : "time", "title": "Time" },
           { "data" : "patient", "title": "Patient" },
           { "data" : "symptoms", "title": "Symptoms" },
-          { "data" : "status", "title": "Status" },
           { "data" : "", "title": "" }
       ],
       "columnDefs": [{
