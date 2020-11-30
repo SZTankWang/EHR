@@ -148,7 +148,7 @@ class MCModal extends AppFullModal{
     this.labReports.empty();
     for (let i=0; i < labReports.length; i++) {
       const path = labReports[i].file_path ? labReports[i].file_path : "";
-      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, path));
+      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].doctor_comments, labReports[i].nurse_comments, path));
     };
   }
 
@@ -215,7 +215,7 @@ class MCPage extends MCModal{
         console.log(labReportAndReqs[i].file_path);
         this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
       } else {
-        this.labReports.append(newLabReportCard(i+1, labReportAndReqs[i].lr_type, labReportAndReqs[i].id, labReportAndReqs[i].comments, labReportAndReqs[i].file_path));
+        this.labReports.append(newLabReportCard(i+1, labReportAndReqs[i].lr_type, labReportAndReqs[i].id, labReportAndReqs[i].doctor_comments, labReportAndReqs[i].nurse_comments, labReportAndReqs[i].file_path));
       }
     }
   }

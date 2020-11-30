@@ -388,7 +388,8 @@ def doctorNurseViewAppt():
 		"labReports":
 			[{"lr_type": lr.lr_type.value,
 			"id": lr.id,
-			"comments": lr.comments,
+			"doctor_comments": lr.doctor_comments,
+			"nurse_comments": lr.nurse_comments,
 			"file_path": lr.file_path} for lr in lab_reports]
 	}
 
