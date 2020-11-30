@@ -8,8 +8,9 @@ from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 import collections
 from itertools import count
+
+
 from datetime import timedelta
-import datetime
 from time import strftime
 from numpy.core.arrayprint import TimedeltaFormat
 from numpy.lib.function_base import select
@@ -20,6 +21,8 @@ from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
+
+import datetime
 
 
 #---------------------------Nurse--------------------------------
@@ -91,7 +94,7 @@ def nurseTodayAppt():
 def nurseOnGoingAppt():
 	helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
-	nowtime = datetime.now()
+	nowtime = datetime.datetime.now()
 	# testing data
 	# nurse_id = '17711783'
 	# nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
@@ -105,7 +108,7 @@ def nurseOnGoingAppt():
 	# filter3: now() in timeslot
 	now_approved_appts = []
 	for appt in today_approved_appts:
-		appt_date_time = datetime.combine(appt.date, appt.time)
+		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
 	return make_response(
@@ -151,10 +154,10 @@ def nursePastAppt():
 	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
 	# nurse_id = "17711783"
 
-	end_date = datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
+	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
 	if request.form['startDate']:
-		start_date = datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+		start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
 		apps = helper.dept_appts(user=current_user, period=(end_date-start_date).days,\
 			 start_date=start_date).filter(Application.status==StatusEnum.finished)
 	else: # if startDate is None then get all past appts
@@ -186,9 +189,9 @@ def nurseRejectedApp():
 	start_date = request.form['startDate']
 	end_date = request.form['endDate']
 	if start_date:
-		start_date = datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+		start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
 	if end_date:
-		end_date = datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
+		end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 
 	if start_date:
 		if end_date:
@@ -249,13 +252,13 @@ def nurseGetDoctorsForDepartment():
 @login_required
 def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
-	slot_list = helper.doc2slots_available(doctorID, 0, start_date=datetime.today())
+	slot_list = helper.doc2slots_available(doctorID, 0, start_date=datetime.date.today())
 	date_list = [helper.t_slotid2date(slot_list[i].id) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
 	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
-			[{"slotID": str(slot_list[i].id),"slotDateTime": datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
+			[{"slotID": str(slot_list[i].id),"slotDateTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
 
@@ -276,7 +279,7 @@ def nurseCreateAppt():
 		db.session.commit()
 		mc_id = medical_record.id
 		application = Application(
-					app_timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 					symptoms=symptom,
 					status=StatusEnum.approved,
 					reject_reason="",
@@ -558,7 +561,10 @@ def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
 	if request.method == "GET":
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender.value, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
+		gender = role_user.gender
+		if gender:
+			gender = gender.value
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
 	if request.method == "POST":
 		age = helper.StrOrNone(request.form['age'])
 		gender = request.form['gender']
@@ -635,12 +641,12 @@ def doctorHome():
 def doctorOnGoingAppt():
 	helper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
-	nowtime = datetime.now()
+	nowtime = datetime.datetime.now()
 	appt_list = helper.doc2appts(doctorID,0)
 
 	now_approved_appts = []
 	for appt in appt_list:
-		appt_date_time = datetime.combine(appt.date, appt.time)
+		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
 	return make_response(
@@ -690,11 +696,11 @@ def doctorFutureAppt():
 		end_date = 0
 	doctorID = current_user.get_id()
 	if start_date:
-		start_date = datetime.strptime(start_date, helper.DATE_FORMAT)
+		start_date = datetime.datetime.strptime(start_date, helper.DATE_FORMAT)
 	else:
-		start_date = datetime.today()
+		start_date = datetime.datetime.today()
 	if end_date:
-		end_date = datetime.strptime(end_date, helper.DATE_FORMAT)
+		end_date = datetime.datetime.strptime(end_date, helper.DATE_FORMAT)
 
 	if end_date:
 		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,start_date = start_date)
@@ -726,11 +732,11 @@ def doctorPastAppt():
 		end_date = 0
 	doctorID = current_user.get_id()
 	if start_date:
-		start_date = datetime.strptime(start_date, helper.DATE_FORMAT)
+		start_date = datetime.datetime.strptime(start_date, helper.DATE_FORMAT)
 	if end_date:
-		end_date = datetime.strptime(end_date, helper.DATE_FORMAT)
+		end_date = datetime.datetime.strptime(end_date, helper.DATE_FORMAT)
 	else:
-		end_date = date.today()
+		end_date = datetime.date.today()
 
 	if start_date:
 		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,direction = 'past',start_date = start_date)

@@ -195,7 +195,7 @@ class MCModal extends AppFullModal{
 class MCPage extends MCModal{
   constructor(){
     super();
-    this.labReportTypes = $("#labReportTypes");
+    this.labReportTypes = $("#labReportTypeInput");
     this.labReportReqs = $("#labReportReqs");
   }
 
