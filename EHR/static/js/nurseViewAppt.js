@@ -16,6 +16,9 @@ $(document).ready(function() {
     // request and fill in app status and comments
     const appID = myPage.appID.text();
     myPage.loadAppInfo(appID);
+    // request and fill in patient basic info
+    const patientID = myPage.patientID;
+    myPage.loadPatientInfo(patientID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
     myPage.loadMCInfo(mcID, "nurseViewAppt");

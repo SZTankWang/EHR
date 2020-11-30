@@ -74,7 +74,7 @@
 				<div class="row">
 					<div class="col-md-8"><span><b>Application/Appointment Status: </b></span><span id="appStatus"></span></div>
 					<form action="/doctorNurseGoViewMC" method="POST" class="col-md-4">
-						<input class="d-none" type="text" name="patientID" value="{{patientID}}" readonly>
+						<input class="d-none" type="text" id="patientID" name="patientID" value="{{patientID}}" readonly>
 						<input type="submit" class="btn btn-sm btn-primary" id="viewMC" value="view patient's medical history">
 					</form>
 				</div>
@@ -85,6 +85,25 @@
 		      <div class="col"><span><b>Comments: </b></span><span id="comments"></span></div>
 		    </div>
 		  </div>
+
+			<hr>
+			<h5>Patient's Health Info</h5>
+			<div class="container-fluid">
+				<div class="row">
+          <div class="col-4"><span><b>Age: </b></span><span id="age"></span></div>
+					<div class="col-4"><span><b>Gender: </b></span><span id="gender"></span></div>
+					<div class="col-4"><span><b>Blood Type: </b></span><span id="bloodType"></span></div>
+				</div>
+				<div class="row">
+					<div class="col"><span><b>Allergies: </b></span><span id="allergies"></span></div>
+				</div>
+				<div class="row">
+					<div class="col"><span><b>Chronic Health Conditions: </b></span><span id="chronics"></span></div>
+				</div>
+				<div class="row">
+					<div class="col"><span><b>Medications: </b></span><span id="medications"></span></div>
+				</div>
+      </div>
 
 			<hr>
 			{% if finished %}

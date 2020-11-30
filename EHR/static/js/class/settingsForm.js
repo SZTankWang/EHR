@@ -27,12 +27,16 @@ class HealthInfo {
     this.gender = $("#gender");
     this.bloodType = $("#bloodType");
     this.allergies = $("#allergies");
+    this.chronics = $("#chronics");
+    this.medications = $("#medications");
   }
 
   update(res) {
     this.age.val(res.age);
     this.bloodType.val(res.bloodType);
     this.allergies.text(res.allergies);
+    this.chronics.text(res.chronics);
+    this.medications.text(res.medications);
     this.setGender(res.gender);
   }
 

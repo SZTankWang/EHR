@@ -35,9 +35,7 @@ function submitInfo(event){
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret == "0") {
-      myForm.update(res);
-    } else {
+    if (res.ret != "0") {
       alert("Failed to submit");
     }
   };
@@ -53,9 +51,7 @@ function submitHealthInfo(route, data){
   var data = jsonify($(this).serializeArray());
 
   var callBack = (res) => {
-    if (res.ret == "0") {
-      myHealthInfo.update(res);
-    } else {
+    if (res.ret != "0") {
       alert("Failed to submit");
     }
   };

@@ -196,6 +196,25 @@ class MCPage extends MCModal{
   constructor(){
     super();
     this.labReportTypes = $("#labReportTypes");
+    this.patientID = $("#patientID").val();
+    this.age = $("#age");
+    this.gender = $("#gender");
+    this.bloodType = $("#bloodType");
+    this.allergies = $("#allergies");
+    this.chronics = $("#chronics");
+    this.medications = $("#medications");
+  }
+
+  loadPatientInfo(patientID) {
+    var fillInfoData = (res) => {
+      this.age.text(res.age);
+      this.gender.text(res.gender);
+      this.bloodType.text(res.bloodType);
+      this.allergies.text(res.allergies);
+      this.chronics.text(res.chronics);
+      this.medications.text(res.medications);
+    };
+    sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
   }
 
   setLabReportTypes(labReportTypes){

@@ -130,6 +130,9 @@ class Patient(db.Model):
 	gender = db.Column(db.Enum(GenderEnum))
 	blood_type = db.Column(db.String(10))
 	allergies = db.Column(db.Text())
+    #JZ: 增加下面两行
+    #chronics = db.Column(db.Text())
+    #medications = db.Column(db.Text())
 
 	#one-to-many relationship
 	applications = db.relationship('Application', backref='patient', lazy=True)
@@ -205,6 +208,8 @@ class Application(db.Model):
 				time: {self.time} >'
 
 class stateEnum(enum.Enum):
+    #JZ：增加下面这行
+    #undefined = "undefined"
     conscious = "conscious"
     coma = "coma"
 
@@ -218,6 +223,8 @@ class Medical_record(db.Model):
 	weight = db.Column(db.Numeric(5,1))
 	height = db.Column(db.Numeric(5,1))
 	state = db.Column(db.Enum(stateEnum), default=stateEnum.conscious)
+    #JZ：把上面这行改成下面这行
+    #state = db.Column(db.Enum(stateEnum), default=stateEnum.conscious)
 	diagnosis = db.Column(db.Text())
 
 	#foreign key

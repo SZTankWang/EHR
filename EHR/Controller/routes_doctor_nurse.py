@@ -563,12 +563,14 @@ def patientUpdateHealthInfo():
 		gender = role_user.gender
 		if gender:
 			gender = gender.value
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies, "chronic": role_user.chronic, "medications": role_user.medications}))
 	if request.method == "POST":
 		age = helper.StrOrNone(request.form['age'])
 		gender = request.form['gender']
 		blood_type = request.form['bloodType']
 		allergies = request.form['allergies']
+		chronics = request.form['chronics']
+		medications = request.form['medications']
 		db.session.query(Patient).filter(Patient.id==p_id).update(
 			{
 				Patient.id: p_id,
@@ -576,11 +578,13 @@ def patientUpdateHealthInfo():
 				Patient.allergies: allergies,
 				Patient.age: age,
 				Patient.blood_type: blood_type,
+				Patient.chronics: chronics,
+				Patient.medications: medications
 
 			}, synchronize_session=False
 		)
 		db.session.commit()
-		return make_response(jsonify({"ret": 0, "age": age, "gender": gender, "bloodType": blood_type, "allergies": allergies}))
+		return make_response(jsonify({"ret": 0}))
 
 #---------------------------Nurse-Doctor--------------------------------
 #---------------------------Nurse-Doctor--------------------------------
@@ -615,9 +619,7 @@ def UpdateInfo():
 		db.session.commit()
 
 		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
-		return make_response(jsonify({'ret':0, 'firstName': f_name,
-									'lastName': l_name, 'id': new_id,
-									"email": email, 'phone': phone}), 200)
+		return make_response(jsonify({'ret':0}), 200)
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret':1}))

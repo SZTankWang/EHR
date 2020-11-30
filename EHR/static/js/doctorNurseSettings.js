@@ -30,9 +30,7 @@ function updateSettings(event){
   var data = jsonify($(this).serializeArray())
 
   var updateForm = (res) => {
-    if (res.ret == "0"){
-      myForm.update(res);
-    } else {
+    if (res.ret != "0"){
       alert("Failed to submit");
     }
   };
