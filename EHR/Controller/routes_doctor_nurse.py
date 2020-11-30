@@ -1,16 +1,15 @@
 from sys import exec_prefix
-import os
 
-from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response, abort, send_from_directory
 from flask.globals import current_app
+from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
+import collections
+from datetime import timedelta
+from itertools import count
+from time import strftime
+from flask import Flask, render_template, redirect, url_for, request, json, jsonify, session, flash, make_response, abort, send_from_directory
 from flask.signals import appcontext_tearing_down, request_finished
 from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
-import collections
-from itertools import count
-import datetime
-from datetime import timedelta
-from time import strftime
 from numpy.core.arrayprint import TimedeltaFormat
 from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
@@ -19,7 +18,8 @@ from werkzeug.utils import secure_filename
 from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
-from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
+import datetime
+import os
 
 
 #---------------------------Nurse--------------------------------
@@ -317,7 +317,6 @@ def nurseProcessApp():
 		appt.reject_reason = request.form['comments']
 	elif decision.lower() == 'approve':
 		appt.status = StatusEnum.approved
-		appt.reject_reason = request.form['comments']
 
 	db.session.commit()
 
@@ -417,6 +416,7 @@ def nurseGetLabReports():
 
 @app.route('/previewOneLR/<path:filename>')
 def previewLR(filename):
+	print(app.config["UPLOAD_FOLDER"], filename)
 	return send_from_directory(app.config["UPLOAD_FOLDER"],filename)
 	# lr_id = request.form['lrID']
 	# mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
@@ -427,12 +427,12 @@ def previewLR(filename):
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
 def nurseEditPreExam():
 	mc_id = request.form['mcID']
-	body_temperature = helper.StrOrNone(request.form['bodyTemperature'])
-	heart_rate = helper.StrOrNone(request.form['heartRate'])
-	high_blood_pressure = helper.StrOrNone(request.form['highBloodPressure'])
-	low_blood_pressure = helper.StrOrNone(request.form['lowBloodPressure'])
-	weight = helper.StrOrNone(request.form['weight'])
-	height = helper.StrOrNone(request.form['height'])
+	body_temperature = request.form['bodyTemperature']
+	heart_rate = request.form['heartRate']
+	high_blood_pressure = request.form['highBloodPressure']
+	low_blood_pressure = request.form['lowBloodPressure']
+	weight = request.form['weight']
+	height = request.form['height']
 	state = stateEnum(request.form['state'])
 
 	mc = Medical_record.query.filter( Medical_record.id == mc_id).first()
@@ -552,6 +552,7 @@ def Settings():
 					email=user.email,
 					phone=user.phone)
 
+###TODO
 @app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
 def patientUpdateHealthInfo():
 	p_id = current_user.get_id()
@@ -559,7 +560,7 @@ def patientUpdateHealthInfo():
 		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
 		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": role_user.gender.value, "bloodType": role_user.blood_type, "allergies": role_user.allergies}))
 	if request.method == "POST":
-		age = helper.StrOrNone(request.form['age'])
+		age = request.form['age']
 		gender = request.form['gender']
 		blood_type = request.form['bloodType']
 		allergies = request.form['allergies']
@@ -620,6 +621,9 @@ def UpdateInfo():
 #---------------------------Doctor--------------------------------
 #---------------------------Doctor--------------------------------
 #---------------------------Doctor--------------------------------
+#TODO
+#TODO
+#TODO
 
 #---doctor home page---
 @app.route('/doctorHome', methods=['GET', 'POST'])
@@ -669,9 +673,6 @@ def doctorTodayAppt():
 		       )
 	)
 
-#TODO
-#TODO
-#TODO
 
 #---doctor all appointments page---
 @app.route('/doctorAllAppt', methods=['GET', 'POST'])
@@ -709,7 +710,7 @@ def doctorFutureAppt():
 				"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
 				"time": app.time.strftime(helper.TIME_FORMAT),
-				"doctor": helper.id2name(app.doctor_id),
+				"nurse": helper.id2name(app.approver_id),
 				"patient": helper.id2name(app.patient_id),
 				"symptoms": app.symptoms,
 			} for app in apps
@@ -745,10 +746,9 @@ def doctorPastAppt():
 				"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
 				"time": app.time.strftime(helper.TIME_FORMAT),
-				"doctor": helper.id2name(app.doctor_id),
+				"nurse": helper.id2name(app.approver_id),
 				"patient": helper.id2name(app.patient_id),
 				"symptoms": app.symptoms,
-				"status": 'approved'
 			} for app in apps
 		]))
 
