@@ -58,13 +58,23 @@
 		</nav>
 	</div>
 	<div class="my-container content-outer-container">
-		<div class="my-container filter-container">
-			<div class="my-container filter-wrapper" ><p>date&nbsp<input id="calendar"></input></p></div>
-			<div class="my-container filter-wrapper" ><p>start time &nbsp<input type="text" id="timepicker"></p></div>
+		<div class="my-container filter-container content-control">
+			<div class="my-container filter-wrapper calendar-wrapper" ><p>date&nbsp<input id="calendar"></input></p></div>
+			<div class="my-container filter-wrapper timepicker-wrapper" ><p>start time &nbsp<input type="text" id="timepicker"></p></div>
 			<div class="my-container filter-wrapper apply-btn-container"><button id="apply-btn">search</button></div>
 		</div>
-		<div class="my-container schedule-container">
-			div
+		<div class="my-container schedule-container content-control">
+			<div class="my-container time-slot-area">
+				<div class="my-container time-slot-row">
+					<div class="my-container time-slot-info date"><h4>date</h4></div>
+					<div class="my-container time-slot-info start-time"><p>start time</p></div>
+					<div class="my-container time-slot-info end-time"><p>end time</p></div>
+					<div class="my-container time-slot-info book-person"><p>appoint person</p></div>
+					<div class="my-container time-slot-info do-btn-wrapper"><button class="do-btn">process</button></div>
+
+
+				</div>
+			</div>
 		</div>
 
 	</div>
@@ -92,6 +102,8 @@
 		})
 
 		$('#apply-btn').button();
+
+		$('.do-btn').button();
 	</script>
 </body>
 </html>
