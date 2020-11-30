@@ -42,7 +42,6 @@ $("#labReportForm").on("submit", requestLabReport);
 * @param {event} event - click
 */
 function finish(event){
-  event.preventDefault();
   var appID = myPage.appID.text();
   var data = {'appID': appID};
 
@@ -108,8 +107,8 @@ function requestLabReport(event){
 }
 
 // refresh page if submission is successful
-// function refreshOnSuccess(res){
-//   if (res.ret == "0") {
-//     goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)
-//   }
-// }
+function refreshOnSuccess(res){
+   if (res.ret == "0") {
+     goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)
+   }
+ }

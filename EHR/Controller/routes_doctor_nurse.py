@@ -812,13 +812,62 @@ def doctorEditDiag():
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
 	mc.diagnosis = diagnosis
-	db.session.commit()
 	try:
 		db.session.commit()
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret':1, 'message': "Database error"}))
 	return make_response(jsonify({'ret':0}))
+
+@app.route('/doctorAddPrescrip', methods=['POST'])
+def doctorAddPrescrip():
+	mc_id = request.form['mcID']
+	medicine = request.form['medicine']
+	dose = request.form['dose']
+	comments = request.form['comments']
+	prescription = Presciption(
+				medicine = medicine,
+				dose = dose,
+				comments = comments,
+				mc_id = mc_id
+	)
+	try:
+		db.session.add(prescription)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+	return make_response(jsonify({'ret':0}))
+
+@app.route('/doctorReqLabReport', methods=['POST'])
+def doctorReqLabReport():
+	mc_id = request.form['mcID']
+	patient_id = Medical_record.query.filter(Medical_record.id==mc_id).first().patient_id
+	lr_type_str = request.form['type']
+	lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
+	comments = request.form['comments']
+	lab_report = Lab_report(
+				comments = comments,
+				lr_type = lr_type,
+				mc_id = mc_id,
+				patient_id = patient_id
+	)
+	try:
+		db.session.add(lab_report)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+	return make_response(jsonify({'ret':0}))
+
+@app.route('/doctorFinishAppt', methods=['POST'])
+def doctorFinishAppt():
+	app_id = request.form['appID']
+	appt = Application.query.filter(Application.id==app_id).first()
+	appt.status = StatusEnum.finished
+	db.session.commit()
+	return make_response(jsonify({'ret':0}))
+
 
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
