@@ -247,6 +247,7 @@ class Prescription(db.Model):
 	def __repr__(self):
 		return f'Prescription < id: {self.id}, mc_id: {self.mc_id} >'
 
+#JZ：把这个Enum去掉
 class labReportTypeEnum(enum.Enum):
 	urine_test = "Urine Test"
 	blood_test = "Blood Test"
@@ -258,6 +259,8 @@ class labReportTypeEnum(enum.Enum):
 
 class Lab_report_type(db.Model):
 	type = db.Column(db.Enum(labReportTypeEnum), primary_key=True)
+    #JZ：把type换成下面这行
+    #type = db.Column(db.Text(), primary_key=True)
 	description = db.Column(db.Text())
 	#one-to-many relationship, one report type might contains sereval reports.
 	lab_reports = db.relationship('Lab_report', backref='lab_report_type', lazy=True)
@@ -268,9 +271,15 @@ class Lab_report(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
 	file_path = db.Column(db.Text())
 	comments = db.Column(db.Text())
+    #JZ：把comments换成下面两行
+    #doctor_comment = db.Column(db.Text())
+    #nurse_comment = db.Column(db.Text())
 	#foreign key
 	lr_type = db.Column(db.Enum(labReportTypeEnum), \
 		db.ForeignKey('lab_report_type.type'), nullable=False)
+    #JZ：把lr_type换成下面这行
+    #lr_type = db.Column(db.Text(), \
+		#db.ForeignKey('lab_report_type.type'), nullable=False)
 	mc_id = db.Column(db.Integer(), \
 		db.ForeignKey('medical_record.id'), nullable=False)
 	uploader_id = db.Column(db.String(100), \
