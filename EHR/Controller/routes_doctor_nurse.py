@@ -8,7 +8,8 @@ from flask_login.utils import logout_user
 from flask_login import login_user, logout_user, current_user, login_required
 import collections
 from itertools import count
-import datetime
+
+
 from datetime import timedelta
 from time import strftime
 from numpy.core.arrayprint import TimedeltaFormat
@@ -20,6 +21,8 @@ from EHR import app, db, login
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
+
+import datetime
 
 
 #---------------------------Nurse--------------------------------
