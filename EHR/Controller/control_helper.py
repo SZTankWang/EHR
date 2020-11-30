@@ -134,8 +134,21 @@ def doc2slots_available(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period),Time_slot.n_total>Time_slot.n_booked).all()
 
-def doc2appts(doctorID,period, start_date = datetime.date.today()):
-	return Application.query.filter(Application.doctor_id == doctorID, Application.status == StatusEnum.approved,Application.date == start_date).all()
+def doc2appts(doctorID,period=0, start_date = datetime.date.today(),direction = "future",limit = 'yes'):
+	if direction == 'future':
+		if limit == 'yes':
+			return Application.query.filter(Application.doctor_id == doctorID,
+				Application.status == StatusEnum.approved,Application.date >= start_date, Application.date <= start_date + timedelta(days = period)).all()
+		else:
+			return Application.query.filter(Application.doctor_id == doctorID,
+				Application.status == StatusEnum.approved,Application.date >= start_date).all()
+	elif direction == 'past':
+		if limit == 'yes':
+			return Application.query.filter(Application.doctor_id == doctorID,
+				Application.status == StatusEnum.approved,Application.date <= start_date, Application.date >= start_date - timedelta(days = period)).all()
+		else:
+			return Application.query.filter(Application.doctor_id == doctorID,
+				Application.status == StatusEnum.approved,Application.date <= start_date).all()
 
 def dept_to_doc(deptID):
 	doctor_list = dept2doc(deptID)
