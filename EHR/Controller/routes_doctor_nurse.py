@@ -799,7 +799,21 @@ def doctorGetPrescrip():
 			  "comments": pres.comments} for pres in prescription_list]
 		}))
 
-
+@app.route('/doctorEditDiag', methods=['POST'])
+def doctorEditDiag():
+	mc_id = request.form['mcID']
+	diagnosis = request.form['diagnosis']
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
+	mc.diagnosis = diagnosis
+	db.session.commit()
+	try:
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+	return make_response(jsonify({'ret':0}))
 
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
