@@ -26,6 +26,7 @@
 				<div class="navbar-nav">
 					<a class="nav-main nav-item nav-link" href="/doctorHome">Home</a>
 					<a class="nav-main nav-item nav-link" href="/doctorAllAppt">All appointments</a>
+					<a class="nav-main nav-item nav-link" href="/doctorSchedule">Schedule</a>
 				</div>
 			</div>
 			<div class="d-flex justify-content-end">
@@ -148,16 +149,16 @@
 				Prescriptions
 				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#prescriptions" aria-expanded="false" aria-controls="prescriptions">Show</button>
 			</h5>
+			{% if finished %}
+			<div id="prescriptions" class="collapse show"></div>
+			{% else %}
 			<div id="prescriptions" class="collapse"></div>
+			{% endif %}
 
+			{% if not finished %}
 			<hr>
 			<h5>Add prescription</h5>
 			<div class="container-fluid">
-				{% if finished %}
-				<fieldset disabled>
-				{% else %}
-				<fieldset>
-				{% endif %}
 				<form id="prescriptionForm" enctype="multipart/form-data">
 					<div class="form-group row">
 						<label class="col-form-label col-3" for="medicine"><b>Medicine/Treatment</b></label>
@@ -175,23 +176,25 @@
 	      </form>
 				</fieldset>
 			</div>
+			{% endif %}
 
 			<hr>
 			<h5>
 				Lab reports
 				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReports" aria-expanded="false" aria-controls="labReports">Show</button>
 			</h5>
+			{% if finished %}
+			<div id="labReports" class="collapse show"></div>
+			{% else %}
 			<div id="labReports" class="collapse"></div>
+			{% endif %}
+
+			{% if not finished %}
 			<hr>
 			<h5>
 				Request a lab report
 			</h5>
 			<div class="container-fluid">
-				{% if finished %}
-				<fieldset disabled>
-				{% else %}
-				<fieldset>
-				{% endif %}
 				<form id="labReportForm">
 					<div class="form-group row">
 						<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
@@ -207,8 +210,9 @@
 					</div>
 					<input type="submit" id="uploadReport" class="btn btn-primary" value="Request"/>
 	      </form>
-				</fieldset>
 			</div>
+			{% endif %}
+
     </div>
 
 	</div>

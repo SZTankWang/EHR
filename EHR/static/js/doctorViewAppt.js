@@ -61,7 +61,7 @@ function editDiagnosis(event){
   data.mcID = mcID;
 
   var callBack = function(res) {
-    if (!res.ret) {
+    if (res.ret) {
       alert(res.ret);
     }
   }
