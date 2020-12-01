@@ -140,7 +140,7 @@ class MCModal extends AppFullModal{
   setPrescriptions(prescripitions){
     this.prescriptions.empty();
     for (let i=0; i < prescripitions.length; i++) {
-      this.prescriptions.append(newPrescriptionCard(i+1, prescripitions[i].id + ": " + prescripitions[i].medicine, prescripitions[i].dose, prescripitions[i].comments));
+      this.prescriptions.append(newPrescriptionCard(i+1, prescripitions[i].id, prescripitions[i].medicine, prescripitions[i].dose, prescripitions[i].comments));
     };
   }
 
@@ -148,7 +148,7 @@ class MCModal extends AppFullModal{
     this.labReports.empty();
     for (let i=0; i < labReports.length; i++) {
       const path = labReports[i].file_path ? labReports[i].file_path : "";
-      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].doctor_comments, labReports[i].nurse_comments, path));
+      this.labReports.append(newLabReportCard(i+1, labReports[i].id, labReports[i].lr_type, labReports[i].doctor_comments, labReports[i].nurse_comments, path));
     };
   }
 
@@ -196,8 +196,8 @@ class MCModal extends AppFullModal{
 class MCPage extends MCModal{
   constructor(){
     super();
-<<<<<<< HEAD
-    this.labReportTypes = $("#labReportTypes");
+    this.labReportTypes = $("#labReportTypeInput");
+    this.labReportReqs = $("#labReportReqs");
     this.patientID = $("#patientID").val();
     this.age = $("#age");
     this.gender = $("#gender");
@@ -217,15 +217,13 @@ class MCPage extends MCModal{
       this.medications.text(res.medications);
     };
     sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
-=======
-    this.labReportTypes = $("#labReportTypeInput");
-    this.labReportReqs = $("#labReportReqs");
+
   }
 
   setLabReportReqs(labReportReqs){
     this.labReportReqs.empty();
     for (let i=0; i < labReportReqs.length; i++) {
-      this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
+      this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].doctor_comments));
     }
   }
 
@@ -233,14 +231,13 @@ class MCPage extends MCModal{
     this.labReports.empty();
     this.labReportReqs.empty();
     for (let i=0; i < labReportAndReqs.length; i++) {
-      if (labReportAndReqs[i].file_path) {
-        console.log(labReportAndReqs[i].file_path);
-        this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
+      const path = labReportAndReqs[i].file_path ? labReportAndReqs[i].file_path : "";
+      if (!path) {
+        this.labReportReqs.append(newLabReportReqCard(i+1, labReportAndReqs[i].id, labReportAndReqs[i].lr_type, labReportAndReqs[i].doctor_comments));
       } else {
-        this.labReports.append(newLabReportCard(i+1, labReportAndReqs[i].lr_type, labReportAndReqs[i].id, labReportAndReqs[i].doctor_comments, labReportAndReqs[i].nurse_comments, labReportAndReqs[i].file_path));
+        this.labReports.append(newLabReportCard(i+1, labReportAndReqs[i].id, labReportAndReqs[i].lr_type, labReportAndReqs[i].doctor_comments, labReportAndReqs[i].nurse_comments, path));
       }
     }
->>>>>>> JZ
   }
 
   setLabReportTypes(labReportTypes){
@@ -269,8 +266,8 @@ class MCPage extends MCModal{
           if (res.labReports)
             this.setLabReports(res.labReports);
         } else {
-          if (res.labReportAndReqs)
-            this.setLabReportAndReqs(res.labReportAndReqs);
+          if (res.labReports)
+            this.setLabReportAndReqs(res.labReports);
         }
       } else {
         alert(res.ret);

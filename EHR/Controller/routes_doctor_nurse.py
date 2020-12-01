@@ -352,6 +352,7 @@ def nurseGoViewAppt(appID):
 
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @app.route('/doctorViewAppt', methods=['GET','POST'])
+@app.route('/doctorNurseViewAppt', methods=['GET','POST'])
 @login_required
 def doctorNurseViewAppt():
 	if request.method == "POST":
@@ -405,7 +406,8 @@ def doctorNurseViewAppt():
 
 #JZ
 @app.route('/nurseGetLabReports', methods=['POST'])
-def nurseGetLabReports():
+@app.route('/doctorGetLabReports', methods=['POST'])
+def getLabReports():
 	mc_id = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	if not mc:
@@ -464,24 +466,23 @@ def nurseUploadLabReport():
 	lr_id = request.form['id']
 	lab_report_file = request.files['labReportInput']
 	filename = lab_report_file.filename
-	mc_addr = None
+	file_path = None
 	if filename != "":
 		# file_name = os.path.splitext(lr_fname)[0]
 		file_ext = os.path.splitext(filename)[1]
 		if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
 			abort(400)
 		lr_fname = secure_filename(mc_id+"_"+filename)
-		mc_addr = os.path.join("EHR", app.config["UPLOAD_FOLDER"], lr_fname)
-		lab_report_file.save(mc_addr)
+		file_path = os.path.join("EHR", app.config["UPLOAD_FOLDER"], lr_fname)
+		lab_report_file.save(file_path)
 	nurse_comments = request.form['commentsInput']
 
 	lab_report = Lab_report.query.get(lr_id)
 	if not lab_report:
 		return make_response(jsonify({"ret": "Lab report request deos not exist"}))
-	lab_report = lab_report.all()
 	lab_report.nurse_comment = nurse_comments
 	lab_report.uploader_id = nurse_id
-	lab_report.file_path = file_path
+	lab_report.file_path = lr_fname
 
 	db.session.commit()
 
@@ -518,113 +519,10 @@ def viewMC():
 		       )
 	)
 
-#--- Nurse edit personal information ---
-@app.route('/nurseSettings', methods=['GET'])
-@app.route('/doctorSettings', methods=['GET'])
-@app.route('/patientSettings', methods=['GET'])
-def Settings():
-	id = current_user.get_id()
-	hospital_id = 1
-	user, role_user = None, None
-	print(current_user.role)
-
-	if current_user.role == RoleEnum.patient:
-		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-		return render_template("patientSettings.html",
-					firstName=user.first_name,
-					lastName=user.last_name,
-					nationalID=role_user.id,
-					email=user.email,
-					phone=user.phone)
-
-	elif current_user.role == RoleEnum.nurse:
-		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
-	elif current_user.role == RoleEnum.doctor:
-		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
-
-	return render_template("doctorNurseSettings.html",
-					 hospitalID=hospital_id,
-					deptID=role_user.department_id,
-					firstName=user.first_name,
-					lastName=user.last_name,
-					licenseID=user.id,
-					email=user.email,
-					phone=user.phone)
-
-@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
-def patientUpdateHealthInfo():
-	p_id = current_user.get_id()
-	if request.method == "GET":
-		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		gender = role_user.gender
-		if gender:
-			gender = gender.value
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies, "chronic": role_user.chronic, "medications": role_user.medications}))
-	if request.method == "POST":
-		age = helper.StrOrNone(request.form['age'])
-		gender = request.form['gender']
-		blood_type = request.form['bloodType']
-		allergies = request.form['allergies']
-		chronics = request.form['chronics']
-		medications = request.form['medications']
-		db.session.query(Patient).filter(Patient.id==p_id).update(
-			{
-				Patient.id: p_id,
-				Patient.gender: gender,
-				Patient.allergies: allergies,
-				Patient.age: age,
-				Patient.blood_type: blood_type,
-				Patient.chronics: chronics,
-				Patient.medications: medications
-
-			}, synchronize_session=False
-		)
-		db.session.commit()
-		return make_response(jsonify({"ret": 0}))
-
-#---------------------------Nurse-Doctor--------------------------------
-#---------------------------Nurse-Doctor--------------------------------
-#---------------------------Nurse-Doctor--------------------------------
-@app.route('/doctorNurseUpdateInfo', methods=['POST'])
-@app.route('/patientUpdateInfo', methods=['POST'])
-def UpdateInfo():
-	try:
-		f_name = request.form['firstName']
-		l_name = request.form['lastName']
-		old_id = current_user.get_id()
-		new_id = request.form['id']
-		email = request.form['email']
-		phone = request.form['phone']
-		role_user = None
-		user = None
-		if current_user.role == RoleEnum.doctor:
-			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==old_id).first()
-		elif current_user.role == RoleEnum.nurse:
-			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==old_id).first()
-		elif current_user.role == RoleEnum.patient:
-			user, role_user = db.session.query(User, Patient).join().filter(User.id==old_id).first()
-		if not role_user or not user:
-			return make_response(jsonify({'ret':"user not found"}))
-
-		# user.id = new_id
-		# print("user.id", user.id)
-		user.first_name = f_name
-		user.last_name= l_name
-		user.email= email
-		user.phone = phone
-		db.session.commit()
-
-		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
-		return make_response(jsonify({'ret':0}), 200)
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret':1}))
-
 
 #---------------------------Doctor--------------------------------
 #---------------------------Doctor--------------------------------
 #---------------------------Doctor--------------------------------
-
 
 #---doctor home page---
 @app.route('/doctorHome', methods=['GET', 'POST'])
@@ -812,7 +710,7 @@ def doctorEditDiag():
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+		return make_response(jsonify({'ret': "Database error"}))
 	return make_response(jsonify({'ret':0}))
 
 @app.route('/doctorAddPrescrip', methods=['POST'])
@@ -821,7 +719,7 @@ def doctorAddPrescrip():
 	medicine = request.form['medicine']
 	dose = request.form['dose']
 	comments = request.form['comments']
-	prescription = Presciption(
+	prescription = Prescription(
 				medicine = medicine,
 				dose = dose,
 				comments = comments,
@@ -839,11 +737,11 @@ def doctorAddPrescrip():
 def doctorReqLabReport():
 	mc_id = request.form['mcID']
 	patient_id = Medical_record.query.filter(Medical_record.id==mc_id).first().patient_id
-	lr_type_str = request.form['type']
-	lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
+	lr_type = request.form['type']
+	# lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
 	comments = request.form['comments']
 	lab_report = Lab_report(
-				comments = comments,
+				doctor_comment = comments,
 				lr_type = lr_type,
 				mc_id = mc_id,
 				patient_id = patient_id
@@ -853,7 +751,7 @@ def doctorReqLabReport():
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+		return make_response(jsonify({'ret': "Database error"}))
 	return make_response(jsonify({'ret':0}))
 
 @app.route('/doctorFinishAppt', methods=['POST'])
@@ -868,6 +766,15 @@ def doctorFinishAppt():
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
+@app.route('/getPatientInfo', methods=['POST'])
+def getPatientInfo():
+	p_id = request.form['patientID']
+	patient = db.session.query(Patient).filter(Patient.id==p_id).first()
+	gender = patient.gender
+	if gender:
+		gender = gender.value
+	return make_response(jsonify({"ret": 0, "age": patient.age, "gender": gender, "bloodType": patient.blood_type, "allergies": patient.allergies, "chronics": patient.chronics, "medications": patient.medications}), 200)
+
 
 #---get comments util---
 @app.route('/getComments', methods=['GET','POST'])
@@ -876,7 +783,116 @@ def getComments():
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
 
-@app.route('/addHospital',methods=['GET', 'POST'])
+
+#------------------------------common functionalities-------------------------------
+#------------------------------common functionalities-------------------------------
+#------------------------------common functionalities-------------------------------
+#--- edit personal information ---
+@app.route('/nurseSettings', methods=['GET'])
+@app.route('/doctorSettings', methods=['GET'])
+@app.route('/patientSettings', methods=['GET'])
+def Settings():
+	id = current_user.get_id()
+	hospital_id = 1
+	user, role_user = None, None
+	print(current_user.role)
+
+	if current_user.role == RoleEnum.patient:
+		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
+		return render_template("patientSettings.html",
+					firstName=user.first_name,
+					lastName=user.last_name,
+					nationalID=role_user.id,
+					email=user.email,
+					phone=user.phone)
+
+	elif current_user.role == RoleEnum.nurse:
+		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
+	elif current_user.role == RoleEnum.doctor:
+		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+
+	return render_template("doctorNurseSettings.html",
+					hospitalID=hospital_id,
+					deptID=role_user.department_id,
+					firstName=user.first_name,
+					lastName=user.last_name,
+					licenseID=user.id,
+					email=user.email,
+					phone=user.phone)
+
+
+@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
+def patientUpdateHealthInfo():
+	p_id = current_user.get_id()
+	if request.method == "GET":
+		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
+		gender = role_user.gender
+		if gender:
+			gender = gender.value
+		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies, "chronics": role_user.chronics, "medications": role_user.medications}))
+	if request.method == "POST":
+		age = helper.StrOrNone(request.form['age'])
+		gender = request.form['gender']
+		blood_type = request.form['bloodType']
+		allergies = request.form['allergies']
+		chronics = request.form['chronics']
+		medications = request.form['medications']
+		db.session.query(Patient).filter(Patient.id==p_id).update(
+			{
+				Patient.id: p_id,
+				Patient.gender: gender,
+				Patient.allergies: allergies,
+				Patient.age: age,
+				Patient.blood_type: blood_type,
+				Patient.chronics: chronics,
+				Patient.medications: medications
+
+			}, synchronize_session=False
+		)
+		db.session.commit()
+		return make_response(jsonify({"ret": 0}))
+
+@app.route('/doctorNurseUpdateInfo', methods=['POST'])
+@app.route('/patientUpdateInfo', methods=['POST'])
+def UpdateInfo():
+	try:
+		f_name = request.form['firstName']
+		l_name = request.form['lastName']
+		old_id = current_user.get_id()
+		new_id = request.form['id']
+		email = request.form['email']
+		phone = request.form['phone']
+		role_user = None
+		user = None
+		if current_user.role == RoleEnum.doctor:
+			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==old_id).first()
+		elif current_user.role == RoleEnum.nurse:
+			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==old_id).first()
+		elif current_user.role == RoleEnum.patient:
+			user, role_user = db.session.query(User, Patient).join().filter(User.id==old_id).first()
+		if not role_user or not user:
+			return make_response(jsonify({'ret':"user not found"}))
+
+		# user.id = new_id
+		# print("user.id", user.id)
+		user.first_name = f_name
+		user.last_name= l_name
+		user.email= email
+		user.phone = phone
+		db.session.commit()
+
+		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
+		return make_response(jsonify({'ret':0}), 200)
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1}))
+
+
+
+#------------------------------Admin-------------------------------
+#------------------------------Admin-------------------------------
+#------------------------------Admin-------------------------------
+@app.route('/addHospital',methods=['POST'])
 def addHospital():
 
 	name = helper.get_from_form(request, 'name')
@@ -904,16 +920,18 @@ def addHospital():
 
 	return make_response(jsonify({'ret':0}))
 
-# @app.route('/addLabReportType', methods=['Post', 'GET'])
-# def addLabReportType():
-# 	lr_type_value = helper.get_from_form(request, 'type')
-# 	lr_type_value = "Good Test"
-# 	lr_type_name = lr_type_value.lower().replace(" ", "_")
-# 	class labReportTypeEnum(enum.Enum):
-# 		lr_type_name = lr_type_value
-# 	lr_type = Lab_report_type(
-# 		type = labReportTypeEnum.lr_type_name
-# 	)
-# 	db.session.add(lr_type)
-# 	db.session.commit()
-# 	return make_response(jsonify({'ret':0}))
+@app.route('/addLabReportType', methods=['POST'])
+def addLabReportType():
+	lr_type_value = helper.get_from_form(request, 'type')
+	lr_description = helper.get_from_form(request, 'description')
+	# lr_type_value = "Good Test"
+	# lr_type_name = lr_type_value.lower().replace(" ", "_")
+	# class labReportTypeEnum(enum.Enum):
+	# 	lr_type_name = lr_type_value
+	lr_type = Lab_report_type(
+		type = lr_type_value,
+		description = lr_description
+	)
+	db.session.add(lr_type)
+	db.session.commit()
+	return make_response(jsonify({'ret':0}))

@@ -61,8 +61,7 @@ function uploadLabReport(event){
       sendRequest("nurseGetLabReports", "POST", {"mcID": mcID},
       (res) => {
         if (!res.ret) {
-          myPage.setLabReportAndReqs(res.labReportsAndReqs);
-          this.remove();
+          myPage.setLabReportAndReqs(res.labReports);
         } else {
           alert(res.ret);
         }

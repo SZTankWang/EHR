@@ -289,11 +289,11 @@ class Lab_report(db.Model):
     mc_id = db.Column(db.Integer(), \
     	db.ForeignKey('medical_record.id'), nullable=False)
     uploader_id = db.Column(db.String(100), \
-    	db.ForeignKey('nurse.id'), nullable=False)
+    	db.ForeignKey('nurse.id'))
     patient_id = db.Column(db.String(100), \
     	db.ForeignKey('patient.id'), nullable=False)
 
     def __repr__(self):
-    	return f'Lab_report < id: {self.id}, (report_)type: {len(self.lr_type)},\
+    	return f'Lab_report < id: {self.id}, (report_)type: {self.lr_type},\
     		mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
     			patient_id: {self.patient_id} >'

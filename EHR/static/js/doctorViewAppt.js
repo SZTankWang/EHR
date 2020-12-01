@@ -17,7 +17,7 @@ $(document).ready(function() {
     const appID = myPage.appID.text();
     myPage.loadAppInfo(appID);
     // request and fill in patient basic info
-    const patientID = myPage.patientID.val();
+    const patientID = myPage.patientID;
     myPage.loadPatientInfo(patientID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
@@ -60,7 +60,12 @@ function editDiagnosis(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  sendRequest("doctorEditDiag", "POST", data, ()=>{});
+  var callBack = function(res) {
+    if (!res.ret) {
+      alert(res.ret);
+    }
+  }
+  sendRequest("doctorEditDiag", "POST", data, callBack);
 }
 
 
@@ -78,11 +83,13 @@ function addPrescription(event){
   // var refresh = (res) => {refreshOnSuccess(res)};
   var refresh = (res) => {
     if (!res.ret) {
-      console.log(res);
       sendRequest("doctorGetPrescrip", "POST", {"mcID": mcID},
       (res) => {
         if (!res.ret) {
           myPage.setPrescriptions(res.prescriptions);
+          $("#medicine").val(null);
+          $("#dose").val(null);
+          $("#comments").val(null);
         } else {
           alert(res.ret);
         }
@@ -102,8 +109,23 @@ function requestLabReport(event){
   var mcID = myPage.mcID.text();
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
-
-  sendRequest("doctorReqLabReport", "POST", data, () => {});
+  var callBack = function(res) {
+    if (!res.ret) {
+      $("#labReportTypeInput option:selected").prop("selected", false);
+      $("#commentsInput").val(null);
+      sendRequest("doctorGetLabReports", "POST", {"mcID": mcID},
+      (res) => {
+        if (!res.ret) {
+          myPage.setLabReports(res.labReports);
+        } else {
+          alert(res.ret);
+        }
+      });
+    } else {
+      alert(res.ret);
+    }
+  }
+  sendRequest("doctorReqLabReport", "POST", data, callBack);
 }
 
 // refresh page if submission is successful
