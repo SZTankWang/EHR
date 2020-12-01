@@ -903,7 +903,7 @@ def addHospital():
 	# check for duplicated hospital name
 	res = Hospital.query.filter(Hospital.name == name).all()
 	if res != []:
-		return make_response(jsonify({'ret':1, 'msg':'Duplicated Hospital Name'}))
+		return make_response(jsonify({'ret':'Duplicated Hospital Name'}))
 
 	hos = Hospital(
 		name=name,

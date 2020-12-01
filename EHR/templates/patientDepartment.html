@@ -22,17 +22,18 @@
 	  <span class="navbar-brand mb-0 h1" style="color:white;">WeCare</span>
 
 	  <div id="user-link-wrapper">
-		  <a href="#" class="navbar-link navbar-right" style="color:white;">User</a>
+			<a href="/patientSettings" class="navbar-link navbar-right" style="color:white;">User</a>
+			<a href="/logout" class="navbar-link navbar-right" style="color:white;">Logout</a>
 	  </div>
-	  
+
 	</nav>
-	
+
 	<div id="content-wrapper">
 		<div id="header-wrapper">
 			<div class='header'id="header-1">
 				<div id="header-1-left">
 					<div id="back-btn-wrapper">
-						<div id="back-btn-arrow"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+						<div id="back-btn-arrow" onclick="goToPage('hospitalListPage', 0)"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 						  <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-4.5.5a.5.5 0 0 0 0-1H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5z"/>
 						</svg>
 						</div>
@@ -69,11 +70,11 @@
 					{% for dept in department_list %}
 						{% if loop.index==1 %}
 					  <button type="button" id={{dept.departmentID}} class="list-group-item list-group-item-action active dept-btn">{{dept.departmentName}}</button>
-					  	{% else %}	
+					  	{% else %}
 					  <button type="button" id={{dept.departmentID}} class="list-group-item list-group-item-action dept-btn">{{dept.departmentName}}</button>
 					  {% endif %}
 					  {% endfor %}
-				</div>				
+				</div>
 			</div>
 			<div id="card-list-container">
 				<div id="close-frame-container">
@@ -83,18 +84,17 @@
 						</svg></span></button>Back to Doctor</p>
 
 					</div>
-				</div>	
+				</div>
 				<div id="card-list">
-				  </div>		  			  							
+				  </div>
 			</div>
 
 		</div>
-		</div>		
+		</div>
 
 
-	
 
-
+	<script type="text/javascript" src="/static/js/function/util.js"></script>
 	<script type="text/javascript" src="/static/js/patientAppt.js">
 	</script>
 	<script type="text/javascript">
