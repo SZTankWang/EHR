@@ -140,7 +140,7 @@ def doc2slots_available(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period),Time_slot.n_total>Time_slot.n_booked).all()
 
-def doc2appts(doctorID,period=0, start_date = datetime.date.today(),direction = "future",limit = 'yes'):
+def doc2appts(doctorID,period=0, start_date = datetime.date.today(), direction = "future",limit = 'yes'):
 	if direction == 'future':
 		if limit == 'yes':
 			return Application.query.filter(Application.doctor_id == doctorID,

@@ -634,9 +634,9 @@ def doctorPastAppt():
 		end_date = datetime.date.today()
 
 	if start_date:
-		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,direction = 'past',start_date = start_date)
+		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,direction = 'past',start_date = end_date)
 	else:
-		apps = helper.doc2appts(doctorID,start_date = start_date,direction = 'past',limit = 'no')
+		apps = helper.doc2appts(doctorID,start_date = start_date, direction = 'past',limit = 'no')
 
 	helper.load_id2name_map()
 	return make_response(
