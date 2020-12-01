@@ -122,26 +122,26 @@ class GenderEnum(enum.Enum):
 
 
 class Patient(db.Model):
-	id = db.Column(db.String(100), db.ForeignKey('user.id'), primary_key=True, onupdate="CASCADE")
-	#foreign key
-	# user_id = db.Column(db.String(100), db.ForeignKey('user.user_id'), nullable=False, unique=True, onupdate="CASCADE")
+    id = db.Column(db.String(100), db.ForeignKey('user.id'), primary_key=True, onupdate="CASCADE")
+    #foreign key
+    # user_id = db.Column(db.String(100), db.ForeignKey('user.user_id'), nullable=False, unique=True, onupdate="CASCADE")
 
-	age = db.Column(db.SmallInteger())
-	gender = db.Column(db.Enum(GenderEnum))
-	blood_type = db.Column(db.String(10))
-	allergies = db.Column(db.Text())
+    age = db.Column(db.SmallInteger())
+    gender = db.Column(db.Enum(GenderEnum))
+    blood_type = db.Column(db.String(10))
+    allergies = db.Column(db.Text())
     #JZ: 增加下面两行
-    #chronics = db.Column(db.Text())
-    #medications = db.Column(db.Text())
+    chronics = db.Column(db.Text())
+    medications = db.Column(db.Text())
 
-	#one-to-many relationship
-	applications = db.relationship('Application', backref='patient', lazy=True)
-	# medical_records = db.relationship('Medical_record', backref='patient', lazy=True)
-	lab_reports = db.relationship('Lab_report', backref='patient', lazy=True)
+    #one-to-many relationship
+    applications = db.relationship('Application', backref='patient', lazy=True)
+    # medical_records = db.relationship('Medical_record', backref='patient', lazy=True)
+    lab_reports = db.relationship('Lab_report', backref='patient', lazy=True)
 
 
-	def __repr__(self):
-		return f'Patient < id: {self.id} >'
+    def __repr__(self):
+    	return f'Patient < id: {self.id} >'
 
 class Time_segment(db.Model):
 	t_seg_id = db.Column(db.Integer(), primary_key=True)
@@ -209,38 +209,37 @@ class Application(db.Model):
 
 class stateEnum(enum.Enum):
     #JZ：增加下面这行
-    #undefined = "undefined"
+    undefined = "undefined"
     conscious = "conscious"
     coma = "coma"
 
 class Medical_record(db.Model):
-	id = db.Column(db.Integer(), primary_key=True)
-	# static health condition of the patient
-	body_temperature = db.Column(db.Numeric(5,1))
-	low_blood_pressure = db.Column(db.Numeric(5,1))
-	high_blood_pressure = db.Column(db.Numeric(5,1))
-	heart_rate = db.Column(db.Integer())
-	weight = db.Column(db.Numeric(5,1))
-	height = db.Column(db.Numeric(5,1))
-	state = db.Column(db.Enum(stateEnum), default=stateEnum.conscious)
+    id = db.Column(db.Integer(), primary_key=True)
+    # static health condition of the patient
+    body_temperature = db.Column(db.Numeric(5,1))
+    low_blood_pressure = db.Column(db.Numeric(5,1))
+    high_blood_pressure = db.Column(db.Numeric(5,1))
+    heart_rate = db.Column(db.Integer())
+    weight = db.Column(db.Numeric(5,1))
+    height = db.Column(db.Numeric(5,1))
     #JZ：把上面这行改成下面这行
-    #state = db.Column(db.Enum(stateEnum), default=stateEnum.conscious)
-	diagnosis = db.Column(db.Text())
+    state = db.Column(db.Enum(stateEnum), default=stateEnum.undefined)
+    diagnosis = db.Column(db.Text())
 
-	#foreign key
-	patient_id = db.Column(db.String(100), \
-		db.ForeignKey('patient.id'), nullable=False)
-	# appt_id = db.Column(db.Integer(), \
-	# 	db.ForeignKey('application.id'), nullable=False)
-	# nurse_id = db.Column(db.String(100), \
-	# 	db.ForeignKey('nurse.id'), nullable=False)
+    #foreign key
+    patient_id = db.Column(db.String(100), \
+    	db.ForeignKey('patient.id'), nullable=False)
+    # appt_id = db.Column(db.Integer(), \
+    # 	db.ForeignKey('application.id'), nullable=False)
+    # nurse_id = db.Column(db.String(100), \
+    # 	db.ForeignKey('nurse.id'), nullable=False)
 
-	## one-to-many relationship
-	lab_reports = db.relationship('Lab_report', backref='medical_record', lazy=True)
-	prescription = db.relationship('Prescription', backref='medical_record', lazy=True)
+    ## one-to-many relationship
+    lab_reports = db.relationship('Lab_report', backref='medical_record', lazy=True)
+    prescription = db.relationship('Prescription', backref='medical_record', lazy=True)
 
-	def __repr__(self):
-		return f'Medical_record < id: {self.id}, patient_id: {self.patient_id} >'
+    def __repr__(self):
+    	return f'Medical_record < id: {self.id}, patient_id: {self.patient_id} >'
 
 class Prescription(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
@@ -265,36 +264,36 @@ class labReportTypeEnum(enum.Enum):
 	thyroid_stimulating_hormone = "Thyroid Stimulating Hormone"
 
 class Lab_report_type(db.Model):
-	type = db.Column(db.Enum(labReportTypeEnum), primary_key=True)
+    #type = db.Column(db.Enum(labReportTypeEnum), primary_key=True)
     #JZ：把type换成下面这行
-    #type = db.Column(db.Text(), primary_key=True)
-	description = db.Column(db.Text())
-	#one-to-many relationship, one report type might contains sereval reports.
-	lab_reports = db.relationship('Lab_report', backref='lab_report_type', lazy=True)
-	def __repr__(self):
-		return f'Lab_report_type < type: {self.type}, number of lab reports: {len(self.lab_reports)} >'
+    type = db.Column(db.String(255), primary_key=True)
+    description = db.Column(db.Text())
+    #one-to-many relationship, one report type might contains sereval reports.
+    lab_reports = db.relationship('Lab_report', backref='lab_report_type', lazy=True)
+    def __repr__(self):
+    	return f'Lab_report_type < type: {self.type}, number of lab reports: {len(self.lab_reports)} >'
 
 class Lab_report(db.Model):
-	id = db.Column(db.Integer(), primary_key=True)
-	file_path = db.Column(db.Text())
-	comments = db.Column(db.Text())
+    id = db.Column(db.Integer(), primary_key=True)
+    file_path = db.Column(db.Text())
+    #comments = db.Column(db.Text())
     #JZ：把comments换成下面两行
-    #doctor_comment = db.Column(db.Text())
-    #nurse_comment = db.Column(db.Text())
-	#foreign key
-	lr_type = db.Column(db.Enum(labReportTypeEnum), \
-		db.ForeignKey('lab_report_type.type'), nullable=False)
+    doctor_comment = db.Column(db.Text())
+    nurse_comment = db.Column(db.Text())
+    #foreign key
+    #lr_type = db.Column(db.Enum(labReportTypeEnum), \
+    	#db.ForeignKey('lab_report_type.type'), nullable=False)
     #JZ：把lr_type换成下面这行
-    #lr_type = db.Column(db.Text(), \
-		#db.ForeignKey('lab_report_type.type'), nullable=False)
-	mc_id = db.Column(db.Integer(), \
-		db.ForeignKey('medical_record.id'), nullable=False)
-	uploader_id = db.Column(db.String(100), \
-		db.ForeignKey('nurse.id'), nullable=False)
-	patient_id = db.Column(db.String(100), \
-		db.ForeignKey('patient.id'), nullable=False)
+    lr_type = db.Column(db.String(255), \
+    	db.ForeignKey('lab_report_type.type'), nullable=False)
+    mc_id = db.Column(db.Integer(), \
+    	db.ForeignKey('medical_record.id'), nullable=False)
+    uploader_id = db.Column(db.String(100), \
+    	db.ForeignKey('nurse.id'), nullable=False)
+    patient_id = db.Column(db.String(100), \
+    	db.ForeignKey('patient.id'), nullable=False)
 
-	def __repr__(self):
-		return f'Lab_report < id: {self.id}, (report_)type: {len(self.lr_type)},\
-			mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
-				patient_id: {self.patient_id} >'
+    def __repr__(self):
+    	return f'Lab_report < id: {self.id}, (report_)type: {len(self.lr_type)},\
+    		mc_id: {self.mc_id}, uploader_id: {self.uploader_id},\
+    			patient_id: {self.patient_id} >'

@@ -21,16 +21,13 @@ $(document).ready(function() {
     myPage.loadPatientInfo(patientID);
     // request and fill in medical record data
     const mcID = myPage.mcID.text();
-    myPage.loadMCInfo(mcID, "nurseViewAppt");
+    myPage.loadMCInfo(mcID, "nurseViewAppt", false);
 });
 
 
 // ---------------------capture user action--------------------------
 // edit preExam data
 $("#PreExamForm").on("submit", editPreExam);
-// upload a lab report
-$("#labReportForm").on("submit", uploadLabReport);
-
 
 // --------------------------event handlers----------------------------
 /**
@@ -55,7 +52,8 @@ function editPreExam(event){
 function uploadLabReport(event){
   event.preventDefault();
   var mcID = myPage.mcID.text();
-  var data = new FormData($("#labReportForm")[0]);
+  var form = $(event.target);
+  var data = new FormData(form[0]);
   data.append("mcID", mcID);
 
   var refresh = (res) => {
@@ -63,14 +61,14 @@ function uploadLabReport(event){
       sendRequest("nurseGetLabReports", "POST", {"mcID": mcID},
       (res) => {
         if (!res.ret) {
-          myPage.setLabReports(res.labReports);
-          $("#labReportTypes").empty();
-          $("#labReportInput").val("");
-          $("#commentsInput").val("");
+          myPage.setLabReportAndReqs(res.labReportsAndReqs);
+          this.remove();
         } else {
           alert(res.ret);
         }
       });
+    } else {
+      alert(res.ret);
     }
   };
   sendFileRequest("nurseUploadLabReport", "POST", data, refresh);
@@ -94,29 +92,3 @@ function sendFileRequest(route, type, data, successHandler){
     contentType: false
   })
 }
-
-// refresh page if submission is successful
-// function refreshOnSuccess(res){
-//   if (res.ret == "0") {
-//     goToPage("nurseGoViewAppt/" + myPage.appID.text(), 0)
-//   }
-// }
-
-// "form#labReportForm"
-// $.ajax({
-//   url: "http://localhost:5000/nurseUploadLabReport",
-//   type: 'POST',
-//   data: data,
-//   success: function(res){
-//     console.log(res);
-//     if (res.ret == "0") {
-//       window.location.replace("http://localhost:5000/nurseViewAppt/" + $("#appID").text());
-//     }
-//   },
-//   error: function(err) {
-//     console.log(err);
-//   },
-//   cache: false,
-//   processData: false,
-//   contentType: false
-// })

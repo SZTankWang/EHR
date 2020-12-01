@@ -5,9 +5,11 @@ from sys import path_importer_cache
 from typing import Container, DefaultDict, List
 
 from sqlalchemy.orm.session import _state_session
-sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
+#sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
+sys.path.append("/Users/jenny/Desktop/EHR")
+mypath = "/Users/jenny/Desktop/EHR/EHR/utilities"
 from EHR.model.models import *
-from EHR import db 
+from EHR import db
 import random
 import pandas as pd
 import requests
@@ -15,7 +17,7 @@ from bs4 import BeautifulSoup, NavigableString
 import datetime
 from sqlalchemy import func, or_
 from EHR.Controller import control_helper as helper
-import string 
+import string
 
 N_RECORD = 100
 BLOOD_TYPE = ['A','B','O','AB']
@@ -26,7 +28,7 @@ MEDICINE_LIST = [ 'Vicodin', 'Simvastatin', 'Lisinopril', 'Levothyroxine', \
 				  'Amoxicillin', 'Hydrochlorothiazide']
 
 def gen_hospital_data():
-	hospital_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/hospital_info.csv")
+	hospital_df = pd.read_csv(mypath + "/hospital_info.csv")
 	name_list, address_list = hospital_df["name"].tolist(), hospital_df["address"].tolist()
 	phone_list = ['{:8}'.format(random.randint(10000000,99999999)) for _ in range(N_RECORD)]
 	start_index = Hospital.query.count()
@@ -57,12 +59,12 @@ def get_dept_list():
 	return name_descp
 
 def gen_user_data():
-	#  hospital info   
-	user_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/user_info.csv")
+	#  hospital info
+	user_df = pd.read_csv(mypath + "/user_info.csv")
 	id_list = list(set(['{:8}'.format(random.randint(10000000,99999999)) for _ in range(N_RECORD)  ]))
 	roles = ['doctor', 'nurse', 'patient']
 	role_list = [roles[i%len(roles)] for i in range(N_RECORD)]
-	
+
 	firstname_list, lastname_list, email_list, password_list = \
 		user_df["first_name"].tolist(), user_df["last_name"], user_df["email"].tolist(), user_df["password"].tolist()
 	phone_list = ['{:8}'.format(random.randint(10000000,99999999)) for _ in range(N_RECORD)]
@@ -82,9 +84,9 @@ def gen_user_data():
 			new = Doctor(id=id_list[i],
 					   department_id=1+i%num_dept)
 		elif u.role=='patient':
-			new = Patient(id=id_list[i], 
-						  age=random.randint(1,100), 
-						  gender=random.choice(list(GenderEnum)), 
+			new = Patient(id=id_list[i],
+						  age=random.randint(1,100),
+						  gender=random.choice(list(GenderEnum)),
 						  blood_type=random.choice(BLOOD_TYPE))
 		elif u.role=='nurse':
 			new = Nurse(id=id_list[i],
@@ -95,8 +97,8 @@ def gen_user_data():
 		db.session.add(new)
 	db.session.commit()
 
-def gen_dept_data():    
-	name_desc_df = pd.read_csv("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/dept_info.csv")
+def gen_dept_data():
+	name_desc_df = pd.read_csv(mypath + "/dept_info.csv")
 	dept_phones = ["{:8}".format(random.randint(10000000,99999999)) for _ in range(len(name_desc_df))]
 	name_list = name_desc_df['dept_name'].tolist()
 	desp_list = name_desc_df['dept_description'].tolist()
@@ -112,7 +114,7 @@ def gen_dept_data():
 def gen_time_seg():
 	office_hour_s = 80000
 	# doctor_id_list = get_single_column(Doctor, Doctor.id)
-	
+
 	for i in range(17-9):
 		office_hour_s += 10000
 		ts = Time_segment(
@@ -121,12 +123,12 @@ def gen_time_seg():
 	db.session.commit()
 
 def gen_time_slot():
-	
+
 	date_format= '%Y-%m-%d'
 	# time_format= '%H-%M-%S'
 	# datetime_format = date_format+'-'+time_format
 
-	# start_date = datetime.date.today()    
+	# start_date = datetime.date.today()
 	# start_date = datetime.datetime.strptime(TIME_SLOT_START_DATE, date_format)
 	start_date = datetime.date.today()
 	start_index = Time_slot.query.count()
@@ -152,7 +154,7 @@ def get_single_column(db_obj, column_wanted) -> List:
 
 
 def gen_appt():
-	slotid_list = get_single_column(Time_slot, Time_slot.id) 
+	slotid_list = get_single_column(Time_slot, Time_slot.id)
 	basetime = datetime.datetime.today()
 	# status_list = [status for status, _ in StatusEnum.__members__.items()]
 	# doctorid_list = get_single_column(Doctor, Doctor.id)
@@ -193,7 +195,7 @@ def gen_appt():
 			)
 			db.session.add(mc)
 
-		appt = Application( 
+		appt = Application(
 						doctor_id = doctorid,
 						app_timestamp = appt_made_time,
 						# status = status_enum.value,
@@ -204,7 +206,7 @@ def gen_appt():
 						symptoms = random.choice(["fever","dry cough","tiredness","sore throat"]),
 						date = timeslot_filter.one().slot_date,
 						time = helper.segid2time(timeslot_filter.one().slot_seg_id),
-						mc_id = mc_count+1 if mc_count!=None else None		
+						mc_id = mc_count+1 if mc_count!=None else None
 		)
 		if mc_count != None:
 			mc.appointment.append(appt)
@@ -237,7 +239,7 @@ def gen_report_type():
 	descriptions = gen_random_string(n_type, 30)
 	for i in range(n_type):
 		lrt = Lab_report_type(
-			type=list(labReportTypeEnum)[i],
+			type=list(labReportTypeEnum)[i].value,
 			description=descriptions[i]
 		)
 		db.session.add(lrt)
@@ -251,8 +253,9 @@ def gen_lab_reports():
 
 	for i in range(N_RECORD):
 		lb = Lab_report(
-			lr_type = random.choice(list(labReportTypeEnum)),
-			comments = gen_random_string(1, 30),
+			lr_type = random.choice(list(labReportTypeEnum)).value,
+			doctor_comment = gen_random_string(1, 30),
+			nurse_comment = gen_random_string(1, 30),
 			mc_id = random.choice(mc_ids),
 			uploader_id = random.choice(nurse_ids),
 			patient_id = random.choice(patient_ids),
@@ -263,8 +266,8 @@ def gen_lab_reports():
 
 def practice_query():
 	slot_id=15
-	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date 
-	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id 
+	slot_date = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_date
+	seg_id = Time_slot.query.filter(Time_slot.id==slot_id).first().slot_seg_id
 	seg_start_t = Time_segment.query.filter(Time_segment.t_seg_id==seg_id).first().t_seg_starttime
 
 
@@ -279,7 +282,6 @@ def main():
 	# gen_appt()
 	# gen_prescription()
 	# gen_report_type()
-	# gen_lab_reports()
+	gen_lab_reports()
 
 main()
-	

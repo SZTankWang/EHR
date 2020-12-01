@@ -386,9 +386,10 @@ def doctorNurseViewAppt():
 			  "comments": pres.comments} for pres in prescription_list],
 
 		"labReports":
-			[{"lr_type": lr.lr_type.value,
+			[{"lr_type": lr.lr_type,
 			"id": lr.id,
-			"comments": lr.comments,
+			"doctor_comments": lr.doctor_comment,
+			"nurse_comments": lr.nurse_comment,
 			"file_path": lr.file_path} for lr in lab_reports]
 	}
 
@@ -396,12 +397,13 @@ def doctorNurseViewAppt():
 	if getLabReportTypes:
 		lab_r_types = Lab_report_type.query.all()
 
-		ret["labReportTypes"] = [{"type": lrt.type.value,
+		ret["labReportTypes"] = [{"type": lrt.type,
 		  "description": lrt.description
-			} for lrt in lab_r_types]
+		} for lrt in lab_r_types]
 
 	return make_response(jsonify(ret))
 
+#JZ
 @app.route('/nurseGetLabReports', methods=['POST'])
 def nurseGetLabReports():
 	mc_id = request.form['mcID']
@@ -411,9 +413,10 @@ def nurseGetLabReports():
 	return make_response(jsonify({
 		"ret": 0,
 		"labReports":
-			[{"lr_type": lr.lr_type.value,
+			[{"lr_type": lr.lr_type,
 			"id": lr.id,
-			"comments": lr.comments,
+			"nurse_comments": lr.nurse_comment,
+			"doctor_comments": lr.doctor_comment,
 			"file_path": lr.file_path} for lr in mc.lab_reports]
 		}))
 
@@ -451,15 +454,14 @@ def nurseEditPreExam():
 
 	return make_response(jsonify({'ret':0}))
 
-
+#JZ
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
 @login_required
 def nurseUploadLabReport():
 	nurse_id = current_user.get_id()
 
 	mc_id = request.form['mcID']
-	lr_type_str = request.form['type']
-	lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
+	lr_id = request.form['id']
 	lab_report_file = request.files['labReportInput']
 	filename = lab_report_file.filename
 	mc_addr = None
@@ -471,22 +473,16 @@ def nurseUploadLabReport():
 		lr_fname = secure_filename(mc_id+"_"+filename)
 		mc_addr = os.path.join("EHR", app.config["UPLOAD_FOLDER"], lr_fname)
 		lab_report_file.save(mc_addr)
-	comments = request.form['commentsInput']
+	nurse_comments = request.form['commentsInput']
 
-	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
-	patient_id = mc.patient_id
+	lab_report = Lab_report.query.get(lr_id)
+	if not lab_report:
+		return make_response(jsonify({"ret": "Lab report request deos not exist"}))
+	lab_report = lab_report.all()
+	lab_report.nurse_comment = nurse_comments
+	lab_report.uploader_id = nurse_id
+	lab_report.file_path = file_path
 
-	lab_report = Lab_report(
-		comments = comments,
-		lr_type = lr_type,
-		uploader_id = nurse_id,
-		patient_id = patient_id,
-		mc_id = mc_id,
-		file_path = lr_fname
-	)
-
-	mc.lab_reports.append(lab_report)
-	db.session.add(lab_report)
 	db.session.commit()
 
 	return make_response(jsonify({"ret": 0}))

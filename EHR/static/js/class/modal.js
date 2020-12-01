@@ -146,8 +146,9 @@ class MCModal extends AppFullModal{
 
   setLabReports(labReports){
     this.labReports.empty();
-    for (let i=0; i < labReports.length; i++){
-      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].comments, labReports[i].file_path));
+    for (let i=0; i < labReports.length; i++) {
+      const path = labReports[i].file_path ? labReports[i].file_path : "";
+      this.labReports.append(newLabReportCard(i+1, labReports[i].lr_type, labReports[i].id, labReports[i].doctor_comments, labReports[i].nurse_comments, path));
     };
   }
 
@@ -195,6 +196,7 @@ class MCModal extends AppFullModal{
 class MCPage extends MCModal{
   constructor(){
     super();
+<<<<<<< HEAD
     this.labReportTypes = $("#labReportTypes");
     this.patientID = $("#patientID").val();
     this.age = $("#age");
@@ -215,6 +217,30 @@ class MCPage extends MCModal{
       this.medications.text(res.medications);
     };
     sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
+=======
+    this.labReportTypes = $("#labReportTypeInput");
+    this.labReportReqs = $("#labReportReqs");
+  }
+
+  setLabReportReqs(labReportReqs){
+    this.labReportReqs.empty();
+    for (let i=0; i < labReportReqs.length; i++) {
+      this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
+    }
+  }
+
+  setLabReportAndReqs(labReportAndReqs){
+    this.labReports.empty();
+    this.labReportReqs.empty();
+    for (let i=0; i < labReportAndReqs.length; i++) {
+      if (labReportAndReqs[i].file_path) {
+        console.log(labReportAndReqs[i].file_path);
+        this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].comments));
+      } else {
+        this.labReports.append(newLabReportCard(i+1, labReportAndReqs[i].lr_type, labReportAndReqs[i].id, labReportAndReqs[i].doctor_comments, labReportAndReqs[i].nurse_comments, labReportAndReqs[i].file_path));
+      }
+    }
+>>>>>>> JZ
   }
 
   setLabReportTypes(labReportTypes){
@@ -223,8 +249,8 @@ class MCPage extends MCModal{
     };
   }
 
-  loadMCInfo(mcID, route) {
-    const mcData = {"mcID": mcID, "type": "True"};
+  loadMCInfo(mcID, route, type) {
+    const mcData = {"mcID": mcID, "type": type};
     var fillMCData = (res) => {
       if (res.ret == "0") {
         this.setBodyTemperature(res.preExam.bodyTemperature);
@@ -237,10 +263,15 @@ class MCPage extends MCModal{
         this.setDiagnosis(res.diagnosis);
         if (res.prescriptions)
           this.setPrescriptions(res.prescriptions);
-        if (res.labReportTypes)
-          this.setLabReportTypes(res.labReportTypes);
-        if (res.labReports)
-          this.setLabReports(res.labReports);
+        if (type) {
+          if (res.labReportTypes)
+            this.setLabReportTypes(res.labReportTypes);
+          if (res.labReports)
+            this.setLabReports(res.labReports);
+        } else {
+          if (res.labReportAndReqs)
+            this.setLabReportAndReqs(res.labReportAndReqs);
+        }
       } else {
         alert(res.ret);
       }

@@ -185,27 +185,11 @@
 			</h5>
 			<div id="labReports" class="collapse"></div>
 			<hr>
-			<h5>Upload lab report</h5>
-			<form id="labReportForm" enctype="multipart/form-data">
-				<div class="form-group row">
-					<label for="type" class="col-2 col-form-label"><b>Lab Report Type</b></label>
-					<div class="col-5">
-						<select class="form-control" id="labReportTypes" name="type" required/>
-				      <option value="" disabled selected></option>
-				    </select>
-					</div>
-				</div>
-				<div class="form-group row">
-					<label class="col-10 col-form-label" for="labReportInput"><b>Choose a lab report</b></label>
-				  <input class="form-control" type="file" id="labReportInput" name="labReportInput" required>
-					<label class="col-form-label" for="labReportInput">supported file formats: .jpg, .png, .pdf</label>
-				</div>
-				<div class="form-group row">
-					<label class="col-10 col-form-label" for="commentsInput"><b>Comments</b></label>
-				  <textarea class="form-control" id="commentsInput" name="commentsInput"></textarea>
-				</div>
-				<input type="submit" id="uploadReport" class="btn btn-primary" value="Upload"/>
-      </form>
+			<h5>
+				Upload lab report
+				<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReportReqs" aria-expanded="false" aria-controls="labReportReqs">Show</button>
+			</h5>
+			<div id="labReportReqs" class="collapse show"></div>
     </div>
 
 	</div>

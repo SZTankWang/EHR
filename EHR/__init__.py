@@ -19,12 +19,14 @@ login.login_message = "Please login first"
 # try:
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://SE:mysql@8.129.182.214:3306/wecare"
 db = SQLAlchemy(app)
-db.create_all()
-db.session.commit()
 
 from EHR.model import models
 
 from EHR.Controller import routes_general_patient, routes_doctor_nurse
+
+# db.create_all()
+# db.session.commit()
+
 # except:
 # 	app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:1234@127.0.0.1/wecare"
 # 	db = SQLAlchemy(app)
