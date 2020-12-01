@@ -111,6 +111,15 @@ def t_slot2time(slot_id):
 								filter(Time_slot.id == slot_id).first().t_seg_starttime
 	return slot_time
 
+def user2hosp(id, role):
+	deptID = None
+	if role == "nurse":
+		deptID = Nurse.query.filter(Nurse.id == id).first().department_id
+	elif role == "doctor":
+		deptID = Nurse.query.filter(Doctor.id == id).first().department_id
+	hospitalID = Department.query.filter(Department.id == deptID).first().hospital_id
+	return hospitalID
+
 def nurse_hosp2dept(nurseID):
 	deptID = Nurse.query.filter(Nurse.id == nurseID).first().department_id
 	hospitalID = Department.query.filter(Department.id == deptID).first().hospital_id

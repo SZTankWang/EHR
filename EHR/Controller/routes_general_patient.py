@@ -156,7 +156,7 @@ def hospitalData():
 
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
 
-	rawHospitals = Hospital.query.offset(n_offset).limit(page_count).all()
+	rawHospitals = Hospital.query.offset(n_offset-1).limit(page_count).all()
 
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
@@ -240,7 +240,6 @@ def getDoctorByDept():
 	deptID = request.args.get('deptID')
 	return make_response(jsonify(helper.dept2doc_all(deptID)))
 
-
 '''
 	返回医生页面
 	参数：doctorID
@@ -261,7 +260,6 @@ def viewDoctorByID(doctorID):
 						department = department)
 
 
-
 @app.route('/getDoctorSlot',methods=['GET','POST'])
 @login_required
 def getDoctorSlot():
@@ -279,14 +277,13 @@ def getDoctorSlot():
 			"slotTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
+
 @app.route('/querySlotInfo',methods=['GET'])
 @login_required
 def querySlotInfo():
 	slotID = request.args.get('slotID')
 	return make_response(
-		jsonify(
-		{"slotTime": datetime.datetime.combine(helper.t_slotid2date(slotID),helper.t_slot2time(slotID)).strftime("%Y-%m-%d %H:%M")}
-		)
+		jsonify({"slotTime": datetime.datetime.combine(helper.t_slotid2date(slotID),helper.t_slot2time(slotID)).strftime("%Y-%m-%d %H:%M")})
 		)
 
 @app.route('/makeAppt',methods=['GET','POST'])

@@ -793,9 +793,7 @@ def getComments():
 @app.route('/patientSettings', methods=['GET'])
 def Settings():
 	id = current_user.get_id()
-	hospital_id = 1
 	user, role_user = None, None
-	print(current_user.role)
 
 	if current_user.role == RoleEnum.patient:
 		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
@@ -810,6 +808,7 @@ def Settings():
 		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
 	elif current_user.role == RoleEnum.doctor:
 		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+	hospital_id = helper.user2hosp(id, user.role.value)
 
 	return render_template("doctorNurseSettings.html",
 					hospitalID=hospital_id,
