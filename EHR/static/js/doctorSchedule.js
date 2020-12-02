@@ -53,7 +53,7 @@ function openDialog(th){
 function submit(th){
 	var data = getSlotInfo();
 	$.ajax({
-		url:"http://localhost:5000/newSlot",
+		url:"http://localhost:5000/doctorNewSlot",
 		data:data,
 		type:'POST',
 		success:function(data){
