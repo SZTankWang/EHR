@@ -11,7 +11,8 @@ from numpy.core.arrayprint import TimedeltaFormat
 from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
-from EHR import app, db, login
+from EHR import db, login
+from flask import current_app as app
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import datetime
@@ -92,15 +93,15 @@ def login():
 				user = User.query.get(id)
 				if not user:
 					# flash("Unregistered ID or wrong password")
-					return make_response(jsonify({"ret": "Unregistered user"}))
+					return make_response(jsonify({"ret":1, "message": "Unregistered user"}))
 				if not user.check_password(password):
-					return make_response(jsonify({"ret": "Incorrect password"}))
+					return make_response(jsonify({"ret":1, "message": "Incorrect password"}))
 				login_user(user)
 				# update roster
 				helper.load_id2name_map()
 			except:
 				# flash("Unknown error, sorry!")
-				return make_response(jsonify({"ret": "Unknown error"}))
+				return make_response(jsonify({"ret":1, "message": "Unknown error"}))
 		return make_response(jsonify({"ret":0, "role":current_user.role.value, "id": current_user.id}))
 		#redirect(url_for(f'{current_user.role.value}Home'))
 

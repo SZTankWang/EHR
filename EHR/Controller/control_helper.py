@@ -71,7 +71,7 @@ def dept_appts(user, direction=None, period=None, start_date=datetime.date.today
 	elif user.role == RoleEnum.doctor:
 		deptID = Nurse.query.filter(Doctor.id == user.id).first().department_id
 
-	if period:
+	if period is not None:
 		same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\
 							join(Time_slot, Time_slot.id == Application.time_slot_id).\

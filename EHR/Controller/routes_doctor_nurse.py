@@ -17,7 +17,8 @@ from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 
 from werkzeug.utils import secure_filename
-from EHR import app, db, login
+from EHR import db, login
+from flask import current_app as app
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
@@ -123,7 +124,7 @@ def nurseOnGoingAppt():
 	))
 
 
-@app.route('/nurseFutureAppt', methods=['POST'])
+@app.route('/nurseFutureAppt', methods=['GET', 'POST'])
 @login_required
 def nurseFutureAppt():
 	nurse_id = current_user.get_id()
@@ -304,7 +305,7 @@ def nurseCreateAppt():
 			db.session.commit()
 			return make_response(jsonify({'ret':"no available slots!"}))
 		db.session.commit()
-		return make_response(jsonify({"ret":0, 'message':""}), 200)
+		return make_response(jsonify({"ret":0}), 200)
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret':"error"}))
@@ -314,6 +315,7 @@ def nurseCreateAppt():
 @app.route('/nurseProcessApp', methods=['POST'])
 def nurseProcessApp():
 	try:
+		nurseID = current_user.get_id()
 		appID = request.form['appID']
 		# get Appt
 		app = Application.query.filter(Application.id==appID).first()
@@ -321,12 +323,12 @@ def nurseProcessApp():
 			return {'ret': f'The application: {appID} does not exist!'}
 
 		decision = request.form['action']
+		app.approver_id = nurseID
+		app.reject_reason = request.form['comments']
 		if decision.lower() == 'reject':
 			app.status = StatusEnum.rejected
-			app.reject_reason = request.form['comments']
 		elif decision.lower() == 'approve':
 			app.status = StatusEnum.approved
-			app.reject_reason = request.form['comments']
 			medical_record = Medical_record(patient_id=app.patient_id)
 			try:
 				db.session.add(medical_record)
@@ -577,6 +579,7 @@ def doctorOnGoingAppt():
 def doctorTodayAppt():
 	doctorID = current_user.get_id()
 	appt_list = helper.doc2appts(doctorID,0)
+
 	helper.load_id2name_map()
 	return make_response(
 		jsonify([{"appID":str(appt_list[i].id),
@@ -747,7 +750,7 @@ def doctorAddPrescrip():
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+		return make_response(jsonify({'ret': "Database error"}))
 	return make_response(jsonify({'ret':0}))
 
 @app.route('/doctorReqLabReport', methods=['POST'])
@@ -932,7 +935,35 @@ def addHospital():
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+		return make_response(jsonify({'ret': "Database error"}))
+
+	return make_response(jsonify({'ret':0}))
+
+@app.route('/addDepartment',methods=['POST'])
+def addDepartment():
+
+	hospital_id = helper.get_from_form(request, 'hospitalID')
+	name = helper.get_from_form(request, 'name')
+	phone = helper.get_from_form(request, 'phone')
+	description = helper.get_from_form(request, 'description')
+
+	# check for duplicated hospital name
+	res = Department.query.filter(Department.name == name).all()
+	if res != []:
+		return make_response(jsonify({'ret':'Duplicated Department Name'}))
+
+	dept = Department(
+		hospital_id=id,
+		name=name,
+		phone=phone,
+		description=description
+	)
+	try:
+		db.session.add(dept)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret': "Database error"}))
 
 	return make_response(jsonify({'ret':0}))
 
