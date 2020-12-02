@@ -11,6 +11,10 @@ function goToAppointment(){
 }
 
 
+function goToRecord(){
+	window.location.replace('http://localhost:5000/patientRecord');
+}
+
 
 //添加近期预约
 function renderNotice(data){

@@ -53,7 +53,7 @@ body{
 #function-container{
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-around;
 /*	background: white;
 *//*	align-items: center;
 */	/*border:1px solid red;*/

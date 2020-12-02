@@ -327,3 +327,7 @@ def makeAppt():
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret':1, 'message':"error"}))
+
+@app.route('/patientRecord',methods=['GET'])
+def patientRecord():
+	return render_template('/patientRecord.html')
