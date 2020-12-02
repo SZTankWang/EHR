@@ -310,17 +310,21 @@ def nurseCreateAppt():
 def nurseProcessApp():
 	appID = request.form['appID']
 	# get Appt
-	appt = Application.query.filter(Application.id==appID).first()
-	if not appt:
-		return {'ret': f'The appointment: {appID} does not exists!'}
+	app = Application.query.filter(Application.id==appID).first()
+	if not app:
+		return {'ret': f'The application: {appID} does not exist!'}
 
 	decision = request.form['action']
 	if decision.lower() == 'reject':
-		appt.status = StatusEnum.rejected
-		appt.reject_reason = request.form['comments']
+		app.status = StatusEnum.rejected
+		app.reject_reason = request.form['comments']
 	elif decision.lower() == 'approve':
-		appt.status = StatusEnum.approved
-		appt.reject_reason = request.form['comments']
+		app.status = StatusEnum.approved
+		app.reject_reason = request.form['comments']
+		medical_record = Medical_record(patient_id=app.patient_id)
+		db.session.add(medical_record)
+		mc_id = medical_record.id
+		app.mc_id = mc_id
 
 	db.session.commit()
 
