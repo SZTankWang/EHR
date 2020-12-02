@@ -123,17 +123,16 @@ def nurseOnGoingAppt():
 	))
 
 
-@app.route('/nurseFutureAppt', methods=['GET', 'POST'])
+@app.route('/nurseFutureAppt', methods=['POST'])
 @login_required
 def nurseFutureAppt():
-	## TODO
-	## TODO
-	## TODO
-	## TODO: POST method
 	nurse_id = current_user.get_id()
-	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
-	# department ID of current nurse
-	future_appts = helper.dept_appts(user=current_user, direction="future").all()
+	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+	if request.form['endDate']:
+		end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
+		future_appts = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days, start_date=start_date).all()
+	else:
+		future_appts = helper.dept_appts(user=current_user, direction="future", start_date=start_date).all()
 
 	helper.load_id2name_map()
 	def response_generator(app):
@@ -147,7 +146,7 @@ def nurseFutureAppt():
 				[response_generator(app) for app in future_appts ]), 200)
 
 
-@app.route('/nursePastAppt', methods=['GET', 'POST'])
+@app.route('/nursePastAppt', methods=['POST'])
 def nursePastAppt():
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
@@ -179,7 +178,7 @@ def nursePastAppt():
 	)
 
 
-@app.route('/nurseRejectedApp', methods=['GET', 'POST'])
+@app.route('/nurseRejectedApp', methods=['POST'])
 def nurseRejectedApp():
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
@@ -240,7 +239,7 @@ def nurseGetDepartmentsForNurse():
 			"deptName": dept_name[i]} for i in range(len(dept_list))]),200)
 
 
-@app.route('/nurseGetDoctorsForDepartment',methods=['GET','POST'])
+@app.route('/nurseGetDoctorsForDepartment',methods=['POST'])
 @login_required
 def nurseGetDoctorsForDepartment():
 	deptID = request.form['deptID']
@@ -248,7 +247,7 @@ def nurseGetDoctorsForDepartment():
 
 
 
-@app.route('/nurseGetSlotsForDoctor',methods=['GET','POST'])
+@app.route('/nurseGetSlotsForDoctor',methods=['POST'])
 @login_required
 def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
@@ -262,7 +261,7 @@ def nurseGetSlotsForDoctor():
 			 for i in range(len(slot_list))]),200)
 
 
-@app.route('/nurseCreateAppt', methods=['GET','POST'])
+@app.route('/nurseCreateAppt', methods=['POST'])
 @login_required
 def nurseCreateAppt():
 	try:
@@ -275,8 +274,12 @@ def nurseCreateAppt():
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
 		medical_record = Medical_record(patient_id=patient_id)
-		db.session.add(medical_record)
-		db.session.commit()
+		try:
+			db.session.add(medical_record)
+			db.session.commit()
+		except:
+			db.session.rollback()
+			return make_response(jsonify({'ret':"error"}))
 		mc_id = medical_record.id
 		application = Application(
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -297,38 +300,48 @@ def nurseCreateAppt():
 			timeslot.n_booked = timeslot.n_booked + 1
 		else:
 			db.session.rollback()
-			return make_response(jsonify({'ret':1, 'message':"no available slots!"}))
+			db.session.delete(medical_record)
+			db.session.commit()
+			return make_response(jsonify({'ret':"no available slots!"}))
 		db.session.commit()
 		return make_response(jsonify({"ret":0, 'message':""}), 200)
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message':"error"}))
+		return make_response(jsonify({'ret':"error"}))
 
 
 #---nurse process application---
-@app.route('/nurseProcessApp', methods=['GET','POST'])
+@app.route('/nurseProcessApp', methods=['POST'])
 def nurseProcessApp():
-	appID = request.form['appID']
-	# get Appt
-	app = Application.query.filter(Application.id==appID).first()
-	if not app:
-		return {'ret': f'The application: {appID} does not exist!'}
+	try:
+		appID = request.form['appID']
+		# get Appt
+		app = Application.query.filter(Application.id==appID).first()
+		if not app:
+			return {'ret': f'The application: {appID} does not exist!'}
 
-	decision = request.form['action']
-	if decision.lower() == 'reject':
-		app.status = StatusEnum.rejected
-		app.reject_reason = request.form['comments']
-	elif decision.lower() == 'approve':
-		app.status = StatusEnum.approved
-		app.reject_reason = request.form['comments']
-		medical_record = Medical_record(patient_id=app.patient_id)
-		db.session.add(medical_record)
-		mc_id = medical_record.id
-		app.mc_id = mc_id
+		decision = request.form['action']
+		if decision.lower() == 'reject':
+			app.status = StatusEnum.rejected
+			app.reject_reason = request.form['comments']
+		elif decision.lower() == 'approve':
+			app.status = StatusEnum.approved
+			app.reject_reason = request.form['comments']
+			medical_record = Medical_record(patient_id=app.patient_id)
+			try:
+				db.session.add(medical_record)
+				db.session.commit()
+			except:
+				db.session.rollback()
+				return make_response(jsonify({'ret':"error"}))
+			mc_id = medical_record.id
+			app.mc_id = mc_id
 
-	db.session.commit()
-
-	return make_response({'ret':0})
+		db.session.commit()
+		return make_response({'ret':0})
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"error"}))
 
 
 #---nurse view appointment---
