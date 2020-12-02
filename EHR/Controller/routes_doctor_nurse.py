@@ -943,18 +943,18 @@ def addHospital():
 def addDepartment():
 
 	hospital_id = helper.get_from_form(request, 'hospitalID')
-	name = helper.get_from_form(request, 'name')
+	title = helper.get_from_form(request, 'name')
 	phone = helper.get_from_form(request, 'phone')
 	description = helper.get_from_form(request, 'description')
 
 	# check for duplicated hospital name
-	res = Department.query.filter(Department.name == name).all()
+	res = Department.query.filter(Department.title == title).all()
 	if res != []:
 		return make_response(jsonify({'ret':'Duplicated Department Name'}))
 
 	dept = Department(
-		hospital_id=id,
-		name=name,
+		hospital_id=hospital_id,
+		title = title,
 		phone=phone,
 		description=description
 	)
