@@ -71,7 +71,7 @@ def dept_appts(user, direction=None, period=None, start_date=datetime.date.today
 	elif user.role == RoleEnum.doctor:
 		deptID = Nurse.query.filter(Doctor.id == user.id).first().department_id
 
-	if period:
+	if period is not None:
 		same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\
 							join(Time_slot, Time_slot.id == Application.time_slot_id).\
@@ -111,6 +111,15 @@ def t_slot2time(slot_id):
 								filter(Time_slot.id == slot_id).first().t_seg_starttime
 	return slot_time
 
+def user2hosp(id, role):
+	deptID = None
+	if role == "nurse":
+		deptID = Nurse.query.filter(Nurse.id == id).first().department_id
+	elif role == "doctor":
+		deptID = Nurse.query.filter(Doctor.id == id).first().department_id
+	hospitalID = Department.query.filter(Department.id == deptID).first().hospital_id
+	return hospitalID
+
 def nurse_hosp2dept(nurseID):
 	deptID = Nurse.query.filter(Nurse.id == nurseID).first().department_id
 	hospitalID = Department.query.filter(Department.id == deptID).first().hospital_id
@@ -140,7 +149,7 @@ def doc2slots_available(doctorID, period, start_date = datetime.date.today()):
 	return Time_slot.query.filter(Time_slot.doctor_id == doctorID,Time_slot.slot_date >= start_date,
 					   Time_slot.slot_date <= start_date + timedelta(days = period),Time_slot.n_total>Time_slot.n_booked).all()
 
-def doc2appts(doctorID,period=0, start_date = datetime.date.today(),direction = "future",limit = 'yes'):
+def doc2appts(doctorID,period=0, start_date = datetime.date.today(), direction = "future",limit = 'yes'):
 	if direction == 'future':
 		if limit == 'yes':
 			return Application.query.filter(Application.doctor_id == doctorID,

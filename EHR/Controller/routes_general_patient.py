@@ -11,7 +11,8 @@ from numpy.core.arrayprint import TimedeltaFormat
 from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
-from EHR import app, db, login
+from EHR import db, login
+from flask import current_app as app
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import datetime
@@ -92,15 +93,15 @@ def login():
 				user = User.query.get(id)
 				if not user:
 					# flash("Unregistered ID or wrong password")
-					return make_response(jsonify({"ret": "Unregistered user"}))
+					return make_response(jsonify({"ret":1, "message": "Unregistered user"}))
 				if not user.check_password(password):
-					return make_response(jsonify({"ret": "Incorrect password"}))
+					return make_response(jsonify({"ret":1, "message": "Incorrect password"}))
 				login_user(user)
 				# update roster
 				helper.load_id2name_map()
 			except:
 				# flash("Unknown error, sorry!")
-				return make_response(jsonify({"ret": "Unknown error"}))
+				return make_response(jsonify({"ret":1, "message": "Unknown error"}))
 		return make_response(jsonify({"ret":0, "role":current_user.role.value, "id": current_user.id}))
 		#redirect(url_for(f'{current_user.role.value}Home'))
 
@@ -156,7 +157,7 @@ def hospitalData():
 
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
 
-	rawHospitals = Hospital.query.offset(n_offset).limit(page_count).all()
+	rawHospitals = Hospital.query.offset(n_offset-1).limit(page_count).all()
 
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
@@ -240,7 +241,6 @@ def getDoctorByDept():
 	deptID = request.args.get('deptID')
 	return make_response(jsonify(helper.dept2doc_all(deptID)))
 
-
 '''
 	返回医生页面
 	参数：doctorID
@@ -261,7 +261,6 @@ def viewDoctorByID(doctorID):
 						department = department)
 
 
-
 @app.route('/getDoctorSlot',methods=['GET','POST'])
 @login_required
 def getDoctorSlot():
@@ -279,14 +278,13 @@ def getDoctorSlot():
 			"slotTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
 			 for i in range(len(slot_list))]),200)
 
+
 @app.route('/querySlotInfo',methods=['GET'])
 @login_required
 def querySlotInfo():
 	slotID = request.args.get('slotID')
 	return make_response(
-		jsonify(
-		{"slotTime": datetime.datetime.combine(helper.t_slotid2date(slotID),helper.t_slot2time(slotID)).strftime("%Y-%m-%d %H:%M")}
-		)
+		jsonify({"slotTime": datetime.datetime.combine(helper.t_slotid2date(slotID),helper.t_slot2time(slotID)).strftime("%Y-%m-%d %H:%M")})
 		)
 
 @app.route('/makeAppt',methods=['GET','POST'])

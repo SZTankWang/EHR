@@ -8,10 +8,12 @@ from flask_login import UserMixin # UserMixin conains four useful login function
 								  # [https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins]
 import enum
 from sqlalchemy import Enum
+from flask_sqlalchemy import SQLAlchemy
 
 @login.user_loader
 def load_user(id):
     return User.query.get(id)
+
 class Hospital(db.Model):
 	id = db.Column(db.Integer(), primary_key=True)
 	name = db.Column(db.String(100), nullable=False, unique=True)

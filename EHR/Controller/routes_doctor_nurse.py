@@ -17,7 +17,8 @@ from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 
 from werkzeug.utils import secure_filename
-from EHR import app, db, login
+from EHR import db, login
+from flask import current_app as app
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
@@ -126,14 +127,13 @@ def nurseOnGoingAppt():
 @app.route('/nurseFutureAppt', methods=['GET', 'POST'])
 @login_required
 def nurseFutureAppt():
-	## TODO
-	## TODO
-	## TODO
-	## TODO: POST method
 	nurse_id = current_user.get_id()
-	# nurseID = "17711783" # a working nurseID for testing purpose, set 'period' to 30
-	# department ID of current nurse
-	future_appts = helper.dept_appts(user=current_user, direction="future").all()
+	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+	if request.form['endDate']:
+		end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
+		future_appts = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days, start_date=start_date).all()
+	else:
+		future_appts = helper.dept_appts(user=current_user, direction="future", start_date=start_date).all()
 
 	helper.load_id2name_map()
 	def response_generator(app):
@@ -147,7 +147,7 @@ def nurseFutureAppt():
 				[response_generator(app) for app in future_appts ]), 200)
 
 
-@app.route('/nursePastAppt', methods=['GET', 'POST'])
+@app.route('/nursePastAppt', methods=['POST'])
 def nursePastAppt():
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
@@ -179,7 +179,7 @@ def nursePastAppt():
 	)
 
 
-@app.route('/nurseRejectedApp', methods=['GET', 'POST'])
+@app.route('/nurseRejectedApp', methods=['POST'])
 def nurseRejectedApp():
 	# testing data
 	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
@@ -240,7 +240,7 @@ def nurseGetDepartmentsForNurse():
 			"deptName": dept_name[i]} for i in range(len(dept_list))]),200)
 
 
-@app.route('/nurseGetDoctorsForDepartment',methods=['GET','POST'])
+@app.route('/nurseGetDoctorsForDepartment',methods=['POST'])
 @login_required
 def nurseGetDoctorsForDepartment():
 	deptID = request.form['deptID']
@@ -248,7 +248,7 @@ def nurseGetDoctorsForDepartment():
 
 
 
-@app.route('/nurseGetSlotsForDoctor',methods=['GET','POST'])
+@app.route('/nurseGetSlotsForDoctor',methods=['POST'])
 @login_required
 def nurseGetSlotsForDoctor():
 	doctorID = request.form['doctorID']
@@ -262,7 +262,7 @@ def nurseGetSlotsForDoctor():
 			 for i in range(len(slot_list))]),200)
 
 
-@app.route('/nurseCreateAppt', methods=['GET','POST'])
+@app.route('/nurseCreateAppt', methods=['POST'])
 @login_required
 def nurseCreateAppt():
 	try:
@@ -275,8 +275,12 @@ def nurseCreateAppt():
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
 		medical_record = Medical_record(patient_id=patient_id)
-		db.session.add(medical_record)
-		db.session.commit()
+		try:
+			db.session.add(medical_record)
+			db.session.commit()
+		except:
+			db.session.rollback()
+			return make_response(jsonify({'ret':"error"}))
 		mc_id = medical_record.id
 		application = Application(
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -297,34 +301,49 @@ def nurseCreateAppt():
 			timeslot.n_booked = timeslot.n_booked + 1
 		else:
 			db.session.rollback()
-			return make_response(jsonify({'ret':1, 'message':"no available slots!"}))
+			db.session.delete(medical_record)
+			db.session.commit()
+			return make_response(jsonify({'ret':"no available slots!"}))
 		db.session.commit()
-		return make_response(jsonify({"ret":0, 'message':""}), 200)
+		return make_response(jsonify({"ret":0}), 200)
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message':"error"}))
+		return make_response(jsonify({'ret':"error"}))
 
 
 #---nurse process application---
-@app.route('/nurseProcessApp', methods=['GET','POST'])
+@app.route('/nurseProcessApp', methods=['POST'])
 def nurseProcessApp():
-	appID = request.form['appID']
-	# get Appt
-	appt = Application.query.filter(Application.id==appID).first()
-	if not appt:
-		return {'ret': f'The appointment: {appID} does not exists!'}
+	try:
+		nurseID = current_user.get_id()
+		appID = request.form['appID']
+		# get Appt
+		app = Application.query.filter(Application.id==appID).first()
+		if not app:
+			return {'ret': f'The application: {appID} does not exist!'}
 
-	decision = request.form['action']
-	if decision.lower() == 'reject':
-		appt.status = StatusEnum.rejected
-		appt.reject_reason = request.form['comments']
-	elif decision.lower() == 'approve':
-		appt.status = StatusEnum.approved
-		appt.reject_reason = request.form['comments']
+		decision = request.form['action']
+		app.approver_id = nurseID
+		app.reject_reason = request.form['comments']
+		if decision.lower() == 'reject':
+			app.status = StatusEnum.rejected
+		elif decision.lower() == 'approve':
+			app.status = StatusEnum.approved
+			medical_record = Medical_record(patient_id=app.patient_id)
+			try:
+				db.session.add(medical_record)
+				db.session.commit()
+			except:
+				db.session.rollback()
+				return make_response(jsonify({'ret':"error"}))
+			mc_id = medical_record.id
+			app.mc_id = mc_id
 
-	db.session.commit()
-
-	return make_response({'ret':0})
+		db.session.commit()
+		return make_response({'ret':0})
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"error"}))
 
 
 #---nurse view appointment---
@@ -560,6 +579,7 @@ def doctorOnGoingAppt():
 def doctorTodayAppt():
 	doctorID = current_user.get_id()
 	appt_list = helper.doc2appts(doctorID,0)
+
 	helper.load_id2name_map()
 	return make_response(
 		jsonify([{"appID":str(appt_list[i].id),
@@ -634,9 +654,9 @@ def doctorPastAppt():
 		end_date = datetime.date.today()
 
 	if start_date:
-		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,direction = 'past',start_date = start_date)
+		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,direction = 'past',start_date = end_date)
 	else:
-		apps = helper.doc2appts(doctorID,start_date = start_date,direction = 'past',limit = 'no')
+		apps = helper.doc2appts(doctorID,start_date = start_date, direction = 'past',limit = 'no')
 
 	helper.load_id2name_map()
 	return make_response(
@@ -730,7 +750,7 @@ def doctorAddPrescrip():
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+		return make_response(jsonify({'ret': "Database error"}))
 	return make_response(jsonify({'ret':0}))
 
 @app.route('/doctorReqLabReport', methods=['POST'])
@@ -793,9 +813,7 @@ def getComments():
 @app.route('/patientSettings', methods=['GET'])
 def Settings():
 	id = current_user.get_id()
-	hospital_id = 1
 	user, role_user = None, None
-	print(current_user.role)
 
 	if current_user.role == RoleEnum.patient:
 		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
@@ -810,6 +828,7 @@ def Settings():
 		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
 	elif current_user.role == RoleEnum.doctor:
 		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
+	hospital_id = helper.user2hosp(id, user.role.value)
 
 	return render_template("doctorNurseSettings.html",
 					hospitalID=hospital_id,
@@ -903,7 +922,7 @@ def addHospital():
 	# check for duplicated hospital name
 	res = Hospital.query.filter(Hospital.name == name).all()
 	if res != []:
-		return make_response(jsonify({'ret':1, 'msg':'Duplicated Hospital Name'}))
+		return make_response(jsonify({'ret':'Duplicated Hospital Name'}))
 
 	hos = Hospital(
 		name=name,
@@ -916,7 +935,35 @@ def addHospital():
 		db.session.commit()
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1, 'message': "Database error"}))
+		return make_response(jsonify({'ret': "Database error"}))
+
+	return make_response(jsonify({'ret':0}))
+
+@app.route('/addDepartment',methods=['POST'])
+def addDepartment():
+
+	hospital_id = helper.get_from_form(request, 'hospitalID')
+	name = helper.get_from_form(request, 'name')
+	phone = helper.get_from_form(request, 'phone')
+	description = helper.get_from_form(request, 'description')
+
+	# check for duplicated hospital name
+	res = Department.query.filter(Department.name == name).all()
+	if res != []:
+		return make_response(jsonify({'ret':'Duplicated Department Name'}))
+
+	dept = Department(
+		hospital_id=id,
+		name=name,
+		phone=phone,
+		description=description
+	)
+	try:
+		db.session.add(dept)
+		db.session.commit()
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret': "Database error"}))
 
 	return make_response(jsonify({'ret':0}))
 
