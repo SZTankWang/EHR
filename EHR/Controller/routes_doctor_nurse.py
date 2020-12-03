@@ -59,7 +59,6 @@ def nursePendingApp():
 	# look up Time_slot table for next 7 days time_slot id
 	next7d_slotid = helper.day2slotid(period=7)
 	nurse_id = current_user.get_id()
-	# nurse_id = '17711783'
 	pending_app = helper.dept_appts(user=current_user, period=7).\
 									filter(
 										Application.status==StatusEnum.pending,
@@ -83,8 +82,6 @@ def nurseTodayAppt():
 		return redirect("/login")
 
 	nurseID = current_user.get_id()
-	# nurseID = "44116022"    # a nurseID that returns something,
-	# 							for testing purpose, set the 'period' to 20
 	# department ID of current nurse
 	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
 
@@ -110,8 +107,6 @@ def nurseOnGoingAppt():
 	helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
-	# testing data
-	# nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
 
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.dept_appts(user=current_user, period=0).\
@@ -165,9 +160,6 @@ def nurseFutureAppt():
 
 @app.route('/nursePastAppt', methods=['POST'])
 def nursePastAppt():
-	# testing data
-	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
-	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
 	if not helper.check_nurse_privilege():
 		return redirect("/login")
 
@@ -198,9 +190,6 @@ def nursePastAppt():
 
 @app.route('/nurseRejectedApp', methods=['POST'])
 def nurseRejectedApp():
-	# testing data
-	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
-	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
 	if not helper.check_nurse_privilege():
 		return redirect("/login")
 
@@ -282,7 +271,6 @@ def nurseGetSlotsForDoctor():
 	slot_list = helper.doc2slots_available(doctorID, 0, start_date=datetime.date.today())
 	date_list = [helper.t_slotid2date(slot_list[i].id) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
-	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
 			[{"slotID": str(slot_list[i].id),"slotDateTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
@@ -626,6 +614,7 @@ def doctorOnGoingAppt():
 				"symptoms": appt.symptoms} for appt in now_approved_appts]
 	))
 
+
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():
@@ -734,7 +723,6 @@ def doctorPastAppt():
 				"symptoms": app.symptoms,
 			} for app in apps
 		]))
-
 
 
 #---doctor schedule page---
@@ -931,193 +919,3 @@ def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
-
-
-#------------------------------common functionalities-------------------------------
-#------------------------------common functionalities-------------------------------
-#------------------------------common functionalities-------------------------------
-#--- edit personal information ---
-@app.route('/nurseSettings', methods=['GET'])
-@app.route('/doctorSettings', methods=['GET'])
-@app.route('/patientSettings', methods=['GET'])
-def Settings():
-	id = current_user.get_id()
-	user, role_user = None, None
-
-	if current_user.role == RoleEnum.patient:
-		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-		return render_template("patientSettings.html",
-					firstName=user.first_name,
-					lastName=user.last_name,
-					nationalID=role_user.id,
-					email=user.email,
-					phone=user.phone)
-
-	elif current_user.role == RoleEnum.nurse:
-		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
-	elif current_user.role == RoleEnum.doctor:
-		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
-	hospital_id = helper.user2hosp(id, user.role.value)
-
-	return render_template("doctorNurseSettings.html",
-					hospitalID=hospital_id,
-					deptID=role_user.department_id,
-					firstName=user.first_name,
-					lastName=user.last_name,
-					licenseID=user.id,
-					email=user.email,
-					phone=user.phone)
-
-
-@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
-def patientUpdateHealthInfo():
-	if not helper.check_patient_privilege():
-		return redirect("/login")
-
-	p_id = current_user.get_id()
-	if request.method == "GET":
-		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		gender = role_user.gender
-		if gender:
-			gender = gender.value
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies, "chronics": role_user.chronics, "medications": role_user.medications}))
-	if request.method == "POST":
-		age = helper.StrOrNone(request.form['age'])
-		gender = request.form['gender']
-		blood_type = request.form['bloodType']
-		allergies = request.form['allergies']
-		chronics = request.form['chronics']
-		medications = request.form['medications']
-		db.session.query(Patient).filter(Patient.id==p_id).update(
-			{
-				Patient.id: p_id,
-				Patient.gender: gender,
-				Patient.allergies: allergies,
-				Patient.age: age,
-				Patient.blood_type: blood_type,
-				Patient.chronics: chronics,
-				Patient.medications: medications
-
-			}, synchronize_session=False
-		)
-		db.session.commit()
-		return make_response(jsonify({"ret": 0}))
-
-@app.route('/doctorNurseUpdateInfo', methods=['POST'])
-@app.route('/patientUpdateInfo', methods=['POST'])
-def UpdateInfo():
-	try:
-		f_name = request.form['firstName']
-		l_name = request.form['lastName']
-		old_id = current_user.get_id()
-		new_id = request.form['id']
-		email = request.form['email']
-		phone = request.form['phone']
-		role_user = None
-		user = None
-		if current_user.role == RoleEnum.doctor:
-			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==old_id).first()
-		elif current_user.role == RoleEnum.nurse:
-			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==old_id).first()
-		elif current_user.role == RoleEnum.patient:
-			user, role_user = db.session.query(User, Patient).join().filter(User.id==old_id).first()
-		if not role_user or not user:
-			return make_response(jsonify({'ret':"user not found"}))
-
-		# user.id = new_id
-		# print("user.id", user.id)
-		user.first_name = f_name
-		user.last_name= l_name
-		user.email= email
-		user.phone = phone
-		db.session.commit()
-
-		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
-		return make_response(jsonify({'ret':0}), 200)
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret':1}))
-
-
-
-#------------------------------Admin-------------------------------
-#------------------------------Admin-------------------------------
-#------------------------------Admin-------------------------------
-@app.route('/addHospital',methods=['POST'])
-def addHospital():
-	if not helper.check_admin_privilege():
-		return redirect("/login")
-
-	name = helper.get_from_form(request, 'name')
-	phone = helper.get_from_form(request, 'phone')
-	address = helper.get_from_form(request, 'address')
-	description = helper.get_from_form(request, 'description')
-
-	# check for duplicated hospital name
-	res = Hospital.query.filter(Hospital.name == name).all()
-	if res != []:
-		return make_response(jsonify({'ret':'Duplicated Hospital Name'}))
-
-	hos = Hospital(
-		name=name,
-		phone=phone,
-		address=address,
-		description=description
-	)
-	try:
-		db.session.add(hos)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret': "Database error"}))
-
-	return make_response(jsonify({'ret':0}))
-
-@app.route('/addDepartment',methods=['POST'])
-def addDepartment():
-	if not helper.check_admin_privilege():
-		return redirect("/login")
-
-	hospital_id = helper.get_from_form(request, 'hospitalID')
-	title = helper.get_from_form(request, 'title')
-	phone = helper.get_from_form(request, 'phone')
-	description = helper.get_from_form(request, 'description')
-
-	# check for duplicated hospital name
-	res = Department.query.filter(Department.title == title).all()
-	if res != []:
-		return make_response(jsonify({'ret':'Duplicated Department Name'}))
-
-	dept = Department(
-		hospital_id=hospital_id,
-		title = title,
-		phone=phone,
-		description=description
-	)
-	try:
-		db.session.add(dept)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret': "Database error"}))
-
-	return make_response(jsonify({'ret':0}))
-
-@app.route('/addLabReportType', methods=['POST'])
-def addLabReportType():
-	if not helper.check_admin_privilege():
-		return redirect("/login")
-
-	lr_type_value = helper.get_from_form(request, 'type')
-	lr_description = helper.get_from_form(request, 'description')
-	# lr_type_value = "Good Test"
-	# lr_type_name = lr_type_value.lower().replace(" ", "_")
-	# class labReportTypeEnum(enum.Enum):
-	# 	lr_type_name = lr_type_value
-	lr_type = Lab_report_type(
-		type = lr_type_value,
-		description = lr_description
-	)
-	db.session.add(lr_type)
-	db.session.commit()
-	return make_response(jsonify({'ret':0}))
