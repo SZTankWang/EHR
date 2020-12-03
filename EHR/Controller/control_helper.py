@@ -22,6 +22,11 @@ def check_nurse_privilege():
 		return True
 	return False
 
+def check_admin_privilege():
+	if current_user.role.value == "admin":
+		return True
+	return False
+
 def StrOrNone(string):
 	if string == "":
 		return None

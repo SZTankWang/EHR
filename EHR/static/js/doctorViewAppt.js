@@ -28,10 +28,8 @@ $(document).ready(function() {
 // ---------------------capture user action--------------------------
 // edit diagnosis
 $("#diagnosisForm").on("submit", editDiagnosis);
-
 // add prescription
 $("#prescriptionForm").on("submit", addPrescription);
-
 // upload a lab report
 $("#labReportForm").on("submit", requestLabReport);
 
@@ -80,7 +78,6 @@ function addPrescription(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  // var refresh = (res) => {refreshOnSuccess(res)};
   var refresh = (res) => {
     if (!res.ret) {
       sendRequest("doctorGetPrescrip", "POST", {"mcID": mcID},
@@ -128,7 +125,7 @@ function requestLabReport(event){
   sendRequest("doctorReqLabReport", "POST", data, callBack);
 }
 
-// refresh page if submission is successful
+// refresh page
 function refreshOnSuccess(res){
    if (res.ret == "0") {
      goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)

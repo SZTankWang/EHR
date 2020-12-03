@@ -217,15 +217,14 @@ class MCPage extends MCModal{
       this.medications.text(res.medications);
     };
     sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
-
   }
 
-  setLabReportReqs(labReportReqs){
-    this.labReportReqs.empty();
-    for (let i=0; i < labReportReqs.length; i++) {
-      this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].doctor_comments));
-    }
-  }
+  // setLabReportReqs(labReportReqs){
+  //   this.labReportReqs.empty();
+  //   for (let i=0; i < labReportReqs.length; i++) {
+  //     this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].doctor_comments));
+  //   }
+  // }
 
   setLabReportAndReqs(labReportAndReqs){
     this.labReports.empty();

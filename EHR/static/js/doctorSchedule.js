@@ -4,12 +4,12 @@ $(document).ready(function(){
 		$('#search-date').datepicker({
 			minDate: new Date()
 		});
-		
+
 		$('.timepicker').timepicker({
-		    timeFormat: 'h:mm p',
-		    interval: 30,
+		    timeFormat: 'HH:mm',
+		    interval: 60,
 		    minTime: '10',
-		    maxTime: '6:00pm',
+		    maxTime: '18:00',
 		    startTime: '10:00',
 		    dynamic: false,
 		    dropdown: true,
@@ -58,6 +58,13 @@ function submit(th){
 		type:'POST',
 		success:function(data){
 			console.log(data);
+			if (data.ret) {
+				alert(data.ret)
+			} else {
+				var date = $('#new-slot-date').val("");
+				var startTime = $('#new-slot-time').val("");
+				var slotNumber = $('#new-slot-space').val("");
+			}
 		}
 	})
 
