@@ -15,6 +15,11 @@ body{
 	align-items: center
 }
 
+input{
+	outline:none;
+	border:1px solid #f1f1f1;
+}
+
 .navbar{
 	width:100%;
 }
