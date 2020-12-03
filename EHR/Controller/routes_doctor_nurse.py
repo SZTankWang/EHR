@@ -765,6 +765,28 @@ def doctorNewSlot():
 
 	return make_response({"ret": 0})
 
+@app.route('/doctorGetSlots', methods=['GET'])
+@login_required
+def doctorGetSlots():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
+	doctor_id = current_user.get_id()
+	t_slots = Time_slot.query.filter(Time_slot.doctor_id==doctor_id).all()
+
+	ret = {
+		"ret": 0,
+		"data": [
+			{
+				"title": f'total: {item.n_total}, booked: {item.n_booked}',
+				"start": item.slot_date.strftime(helper.DATE_FORMAT) + "T" + Time_segment.query.filter(Time_segment.t_seg_id==item.slot_seg_id).one().t_seg_starttime.strftime(helper.TIME_FORMAT)
+			}
+			for item in t_slots
+		]
+	}
+
+	return make_response(jsonify(ret), 200)
+
 
 #---doctor view appt---
 @app.route('/doctorGoViewAppt/<string:appID>', methods=['GET', 'POST'])
