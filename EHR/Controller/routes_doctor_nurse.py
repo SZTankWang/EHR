@@ -555,7 +555,7 @@ def nurseUploadLabReport():
 	return make_response(jsonify({"ret": 0}))
 
 
-#---nurse view medical record---
+#---view medical record---
 @app.route('/doctorNurseGoViewMC', methods=['GET', 'POST'])
 @login_required
 def goViewMC():
