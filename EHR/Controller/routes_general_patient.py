@@ -11,8 +11,8 @@ from numpy.core.arrayprint import TimedeltaFormat
 from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 from werkzeug.security import check_password_hash, generate_password_hash
-from EHR import db, login
-from flask import current_app as app
+from EHR import app, db, login
+#from flask import current_app as app
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 import datetime

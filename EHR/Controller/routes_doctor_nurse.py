@@ -17,13 +17,14 @@ from numpy.lib.function_base import select
 from sqlalchemy.util.langhelpers import methods_equivalent
 
 from werkzeug.utils import secure_filename
-from EHR import db, login
-from flask import current_app as app
+from EHR import app, db, login
+#from flask import current_app as app
 from EHR.model.models import *
 from EHR.Controller import control_helper as helper
 from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
 
 import datetime
+
 
 
 #---------------------------Nurse--------------------------------
@@ -943,7 +944,7 @@ def addHospital():
 def addDepartment():
 
 	hospital_id = helper.get_from_form(request, 'hospitalID')
-	title = helper.get_from_form(request, 'name')
+	title = helper.get_from_form(request, 'title')
 	phone = helper.get_from_form(request, 'phone')
 	description = helper.get_from_form(request, 'description')
 
