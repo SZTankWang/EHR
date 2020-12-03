@@ -61,7 +61,6 @@ function getAndDisplay(target){
         for (let i=0; i < res.length; i++) {
           $("#doctor").append(new Option(res[i].doctorName, res[i].doctorID));
         }
-        // $("#doctor").attr("disabled", false);
       };
     } else {
       id = $("#doctor").children(":selected").val();

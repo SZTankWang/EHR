@@ -16,7 +16,6 @@ $(document).ready(function() {
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest("doctorFutureAppt", "GET", null, initTable);
   setStartOrEndDate();
@@ -26,7 +25,6 @@ $(document).ready(function() {
 // click table button
 $('#main-table tbody').on( 'click', 'button', buttonAction);
 
-// ----------switch table content-------------
 // view future appointments
 $("#futureAppt").on('click', function(){
   var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
@@ -63,10 +61,8 @@ function buttonAction(event) {
 */
 function goUpdateTable(route, dateRange=null){
   var type = dateRange ? 'POST' : 'GET';
-  // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, dateRange, updateTable);
   setStartOrEndDate(dateRange ? dateRange.startDate : null, dateRange ? dateRange.endDate : null);

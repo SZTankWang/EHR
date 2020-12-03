@@ -3,16 +3,6 @@
 * @desc utilities for nurseViewAppt, nurseViewMC and doctorViewAppt
 */
 
-// ---------------------capture user action--------------------------
-// load lab report
-// $(".preview-btn").on("click", loadLabReport);
-// prevent default page refresh if lab report not loaded
-// $(".collapse").on("click", ".preview-btn", function(event){
-//   if ($(this).attr('href') == "") {
-//     event.preventDefault();
-//     alert("Lab report empty");
-//   }
-// })
 // --------------------------event handlers----------------------------
 /**
 * @desc load lab report if the lab report card is clicked
@@ -26,21 +16,6 @@ function loadLabReport(e) {
     alert("Lab report empty");
   }
 }
-// function loadLabReport(e) {
-//   const targetCard = $(e).attr("data-target");
-//   const button = $(targetCard+" a");
-//   if (button.attr('href') == ""){
-//     const lrID = button.attr('id').slice(6);
-//     const data = {"lrID": lrID};
-//     var updateHref = (res) => {
-//       if (res.file_path) {
-//         // button.attr('href', URL.createObjectURL(res.labReport));
-//         button.attr('href', res.file_path)
-//       }
-//     };
-//     sendRequest("nursePreviewLR", "POST", data, updateHref);
-//   }
-// }
 
 //--------------------prescription and lab report card def---------------------
 function newPrescriptionCard(index, id, medicine, dose, comments){

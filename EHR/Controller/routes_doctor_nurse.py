@@ -35,6 +35,8 @@ import datetime
 @app.route('/nurseHome', methods=['GET', 'POST'])
 @login_required
 def nurseHome():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
 	return render_template('nurseHome.html')
 
 
@@ -42,6 +44,8 @@ def nurseHome():
 @app.route('/nurseAllAppt', methods=['GET', 'POST'])
 @login_required
 def nurseAllAppt():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
 	return render_template('nurseAllAppt.html')
 
 
@@ -49,10 +53,12 @@ def nurseAllAppt():
 @app.route('/nursePendingApp', methods=['GET', 'POST'])
 # @login_required
 def nursePendingApp():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	# look up Time_slot table for next 7 days time_slot id
 	next7d_slotid = helper.day2slotid(period=7)
 	nurse_id = current_user.get_id()
-	# nurse_id = '17711783'
 	pending_app = helper.dept_appts(user=current_user, period=7).\
 									filter(
 										Application.status==StatusEnum.pending,
@@ -72,9 +78,10 @@ def nursePendingApp():
 @app.route('/nurseTodayAppt', methods=['GET', 'POST'])
 @login_required # Otherwise, we cannot get current_user's id
 def nurseTodayAppt():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	nurseID = current_user.get_id()
-	# nurseID = "44116022"    # a nurseID that returns something,
-	# 							for testing purpose, set the 'period' to 20
 	# department ID of current nurse
 	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
 
@@ -94,12 +101,12 @@ def nurseTodayAppt():
 #---under nurse all appointments page---
 @app.route('/nurseOnGoingAppt', methods=['GET'])
 def nurseOnGoingAppt():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
-	# testing data
-	# nurse_id = '17711783'
-	# nowtime = datetime.datetime.strptime("2020-11-21 12:00:00", "%Y-%m-%d %H:%M:%S")
 
 	# filter1: today's appts； filter2: status=approved
 	today_approved_appts = helper.dept_appts(user=current_user, period=0).\
@@ -128,6 +135,9 @@ def nurseOnGoingAppt():
 @app.route('/nurseFutureAppt', methods=['GET', 'POST'])
 @login_required
 def nurseFutureAppt():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	nurse_id = current_user.get_id()
 	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
 	if request.form['endDate']:
@@ -150,10 +160,8 @@ def nurseFutureAppt():
 
 @app.route('/nursePastAppt', methods=['POST'])
 def nursePastAppt():
-	# testing data
-	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
-	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
-	# nurse_id = "17711783"
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
 
 	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
@@ -182,10 +190,9 @@ def nursePastAppt():
 
 @app.route('/nurseRejectedApp', methods=['POST'])
 def nurseRejectedApp():
-	# testing data
-	# start_date = datetime.datetime.strptime("2020-11-20", helper.DATE_FORMAT)
-	# end_date = datetime.datetime.strptime('2020-12-30', helper.DATE_FORMAT)
-	# nurse_id = "17711783"
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	nurse_id = current_user.get_id()
 	start_date = request.form['startDate']
 	end_date = request.form['endDate']
@@ -227,12 +234,17 @@ def nurseRejectedApp():
 @app.route('/nurseGoCreateAppt', methods=['GET', 'POST'])
 @login_required
 def nurseGoCreateAppt():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
 	return render_template('nurseCreateAppt.html')
 
 
 @app.route('/nurseGetDepartmentsForNurse',methods=['GET'])
 @login_required
 def nurseGetDepartmentsForNurse():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	nurseID = current_user.get_id()
 	dept_list,dept_name = helper.nurse_hosp2dept(nurseID)
 	return make_response(
@@ -252,11 +264,13 @@ def nurseGetDoctorsForDepartment():
 @app.route('/nurseGetSlotsForDoctor',methods=['POST'])
 @login_required
 def nurseGetSlotsForDoctor():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	doctorID = request.form['doctorID']
 	slot_list = helper.doc2slots_available(doctorID, 0, start_date=datetime.date.today())
 	date_list = [helper.t_slotid2date(slot_list[i].id) for i in range(len(slot_list))]
 	time_list = [helper.t_slot2time(slot_list[i].id) for i in range(len(slot_list))]
-	#JZ: datetime.combine???
 	return make_response(
 		jsonify(
 			[{"slotID": str(slot_list[i].id),"slotDateTime": datetime.datetime.combine(date_list[i],time_list[i]).strftime("%Y-%m-%d %H:%M")}
@@ -266,6 +280,9 @@ def nurseGetSlotsForDoctor():
 @app.route('/nurseCreateAppt', methods=['POST'])
 @login_required
 def nurseCreateAppt():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	try:
 		nurseID = current_user.get_id()
 		symptom = request.form['symptoms']
@@ -315,6 +332,9 @@ def nurseCreateAppt():
 #---nurse process application---
 @app.route('/nurseProcessApp', methods=['POST'])
 def nurseProcessApp():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	try:
 		nurseID = current_user.get_id()
 		appID = request.form['appID']
@@ -351,6 +371,9 @@ def nurseProcessApp():
 @app.route('/nurseGoViewAppt/<string:appID>', methods=['GET', 'POST'])
 @login_required
 def nurseGoViewAppt(appID):
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	appt_res = Application.query.filter(Application.id==appID).first()
 	finished = False
 	if appt_res.status.value == "finished":
@@ -376,7 +399,7 @@ def nurseGoViewAppt(appID):
 @login_required
 def doctorNurseViewAppt():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
-		return make_response({"ret": "Privilege not granted"})
+		return redirect("/login")
 
 	if request.method == "POST":
 		mc_id = request.form['mcID']
@@ -433,6 +456,9 @@ def doctorNurseViewAppt():
 @app.route('/nurseGetLabReports', methods=['POST'])
 @app.route('/doctorGetLabReports', methods=['POST'])
 def getLabReports():
+	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
+		return redirect("/login")
+
 	mc_id = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	if not mc:
@@ -451,14 +477,14 @@ def getLabReports():
 @app.route('/previewOneLR/<path:filename>')
 def previewLR(filename):
 	return send_from_directory(app.config["UPLOAD_FOLDER"],filename)
-	# lr_id = request.form['lrID']
-	# mc = Medical_record.query.filter(Medical_record.id==lr_id).first()
-	# return make_response(jsonify({'file_path': mc.file_path}))
 
 
 #---nurse edit appointment/medical record---
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
 def nurseEditPreExam():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	mc_id = request.form['mcID']
 	body_temperature = helper.StrOrNone(request.form['bodyTemperature'])
 	heart_rate = helper.StrOrNone(request.form['heartRate'])
@@ -485,6 +511,9 @@ def nurseEditPreExam():
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
 @login_required
 def nurseUploadLabReport():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
+
 	nurse_id = current_user.get_id()
 
 	mc_id = request.form['mcID']
@@ -514,7 +543,7 @@ def nurseUploadLabReport():
 	return make_response(jsonify({"ret": 0}))
 
 
-#---nurse view medical record---
+#---view medical record---
 @app.route('/doctorNurseGoViewMC', methods=['GET', 'POST'])
 @login_required
 def goViewMC():
@@ -553,12 +582,17 @@ def viewMC():
 @app.route('/doctorHome', methods=['GET', 'POST'])
 @login_required
 def doctorHome():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
 	return render_template('doctorHome.html')
 
 
 @app.route('/doctorOnGoingAppt', methods=['GET', 'POST'])
 @login_required
 def doctorOnGoingAppt():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	helper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
 	nowtime = datetime.datetime.now()
@@ -580,9 +614,13 @@ def doctorOnGoingAppt():
 				"symptoms": appt.symptoms} for appt in now_approved_appts]
 	))
 
+
 @app.route('/doctorTodayAppt', methods=['GET', 'POST'])
 @login_required
 def doctorTodayAppt():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	doctorID = current_user.get_id()
 	appt_list = helper.doc2appts(doctorID,0)
 
@@ -603,12 +641,18 @@ def doctorTodayAppt():
 @app.route('/doctorAllAppt', methods=['GET', 'POST'])
 @login_required
 def doctorAllAppt():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	return render_template('doctorAllAppt.html')
 
 
 @app.route('/doctorFutureAppt', methods=['GET', 'POST'])
 @login_required
 def doctorFutureAppt():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	if request.method == "POST":
 		start_date = request.form["startDate"]
 		end_date = request.form["endDate"]
@@ -645,6 +689,9 @@ def doctorFutureAppt():
 @app.route('/doctorPastAppt', methods=['GET', 'POST'])
 @login_required
 def doctorPastAppt():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	if request.method == "POST":
 		start_date = request.form["startDate"]
 		end_date = request.form["endDate"]
@@ -678,18 +725,64 @@ def doctorPastAppt():
 		]))
 
 
-
 #---doctor schedule page---
-@app.route('/doctorSchedule', methods=['GET', 'POST'])
+@app.route('/doctorSchedule', methods=['GET'])
 @login_required
 def doctorSchedule():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	return render_template('doctorSchedule.html')
+
+@app.route('/doctorNewSlot', methods=['POST'])
+@login_required
+def doctorNewSlot():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
+	doctor_id = current_user.get_id()
+	date = datetime.datetime.strptime(request.form['date'], "%m/%d/%Y")
+	startTime = datetime.datetime.strptime(request.form['startTime'], helper.TIME_FORMAT)
+	total_slots = request.form['slotNumber']
+	t_seg = Time_segment.query.filter(Time_segment.t_seg_starttime==startTime).one()
+
+	time_slot = Time_slot(slot_date=date, n_total=total_slots, n_booked=0, slot_seg_id=t_seg.t_seg_id,  doctor_id=doctor_id)
+
+	db.session.add(time_slot)
+	db.session.commit()
+
+	return make_response({"ret": 0})
+
+@app.route('/doctorGetSlots', methods=['GET'])
+@login_required
+def doctorGetSlots():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
+	doctor_id = current_user.get_id()
+	t_slots = Time_slot.query.filter(Time_slot.doctor_id==doctor_id).all()
+
+	ret = {
+		"ret": 0,
+		"data": [
+			{
+				"title": f'total: {item.n_total}, booked: {item.n_booked}',
+				"start": item.slot_date.strftime(helper.DATE_FORMAT) + "T" + Time_segment.query.filter(Time_segment.t_seg_id==item.slot_seg_id).one().t_seg_starttime.strftime(helper.TIME_FORMAT)
+			}
+			for item in t_slots
+		]
+	}
+
+	return make_response(jsonify(ret), 200)
 
 
 #---doctor view appt---
 @app.route('/doctorGoViewAppt/<string:appID>', methods=['GET', 'POST'])
 @login_required
 def doctorGoViewAppt(appID):
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	appt_res = Application.query.filter(Application.id==appID).first()
 	finished = False
 	if appt_res.status.value == "finished":
@@ -710,6 +803,9 @@ def doctorGoViewAppt(appID):
 
 @app.route('/doctorGetPrescrip', methods=['POST'])
 def doctorGetPrescrip():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	mc_id = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	if not mc:
@@ -726,6 +822,9 @@ def doctorGetPrescrip():
 
 @app.route('/doctorEditDiag', methods=['POST'])
 def doctorEditDiag():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	mc_id = request.form['mcID']
 	diagnosis = request.form['diagnosis']
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
@@ -741,6 +840,9 @@ def doctorEditDiag():
 
 @app.route('/doctorAddPrescrip', methods=['POST'])
 def doctorAddPrescrip():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	mc_id = request.form['mcID']
 	medicine = request.form['medicine']
 	dose = request.form['dose']
@@ -761,6 +863,9 @@ def doctorAddPrescrip():
 
 @app.route('/doctorReqLabReport', methods=['POST'])
 def doctorReqLabReport():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	mc_id = request.form['mcID']
 	patient_id = Medical_record.query.filter(Medical_record.id==mc_id).first().patient_id
 	lr_type = request.form['type']
@@ -782,6 +887,9 @@ def doctorReqLabReport():
 
 @app.route('/doctorFinishAppt', methods=['POST'])
 def doctorFinishAppt():
+	if not helper.check_doctor_privilege():
+		return redirect("/login")
+
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).first()
 	appt.status = StatusEnum.finished
@@ -794,6 +902,9 @@ def doctorFinishAppt():
 #---------------------------Util--------------------------------
 @app.route('/getPatientInfo', methods=['POST'])
 def getPatientInfo():
+	if not (helper.check_doctor_privilege() or helper.check_doctor_privilege()):
+		return redirect("/login")
+
 	p_id = request.form['patientID']
 	patient = db.session.query(Patient).filter(Patient.id==p_id).first()
 	gender = patient.gender
@@ -808,183 +919,3 @@ def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
 	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
-
-
-#------------------------------common functionalities-------------------------------
-#------------------------------common functionalities-------------------------------
-#------------------------------common functionalities-------------------------------
-#--- edit personal information ---
-@app.route('/nurseSettings', methods=['GET'])
-@app.route('/doctorSettings', methods=['GET'])
-@app.route('/patientSettings', methods=['GET'])
-def Settings():
-	id = current_user.get_id()
-	user, role_user = None, None
-
-	if current_user.role == RoleEnum.patient:
-		user, role_user = db.session.query(User, Patient).join(User).filter(User.id==id).first()
-		return render_template("patientSettings.html",
-					firstName=user.first_name,
-					lastName=user.last_name,
-					nationalID=role_user.id,
-					email=user.email,
-					phone=user.phone)
-
-	elif current_user.role == RoleEnum.nurse:
-		user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==id).first()
-	elif current_user.role == RoleEnum.doctor:
-		user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==id).first()
-	hospital_id = helper.user2hosp(id, user.role.value)
-
-	return render_template("doctorNurseSettings.html",
-					hospitalID=hospital_id,
-					deptID=role_user.department_id,
-					firstName=user.first_name,
-					lastName=user.last_name,
-					licenseID=user.id,
-					email=user.email,
-					phone=user.phone)
-
-
-@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
-def patientUpdateHealthInfo():
-	p_id = current_user.get_id()
-	if request.method == "GET":
-		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		gender = role_user.gender
-		if gender:
-			gender = gender.value
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies, "chronics": role_user.chronics, "medications": role_user.medications}))
-	if request.method == "POST":
-		age = helper.StrOrNone(request.form['age'])
-		gender = request.form['gender']
-		blood_type = request.form['bloodType']
-		allergies = request.form['allergies']
-		chronics = request.form['chronics']
-		medications = request.form['medications']
-		db.session.query(Patient).filter(Patient.id==p_id).update(
-			{
-				Patient.id: p_id,
-				Patient.gender: gender,
-				Patient.allergies: allergies,
-				Patient.age: age,
-				Patient.blood_type: blood_type,
-				Patient.chronics: chronics,
-				Patient.medications: medications
-
-			}, synchronize_session=False
-		)
-		db.session.commit()
-		return make_response(jsonify({"ret": 0}))
-
-@app.route('/doctorNurseUpdateInfo', methods=['POST'])
-@app.route('/patientUpdateInfo', methods=['POST'])
-def UpdateInfo():
-	try:
-		f_name = request.form['firstName']
-		l_name = request.form['lastName']
-		old_id = current_user.get_id()
-		new_id = request.form['id']
-		email = request.form['email']
-		phone = request.form['phone']
-		role_user = None
-		user = None
-		if current_user.role == RoleEnum.doctor:
-			user, role_user = db.session.query(User, Doctor).join(User).filter(User.id==old_id).first()
-		elif current_user.role == RoleEnum.nurse:
-			user, role_user = db.session.query(User, Nurse).join(User).filter(User.id==old_id).first()
-		elif current_user.role == RoleEnum.patient:
-			user, role_user = db.session.query(User, Patient).join().filter(User.id==old_id).first()
-		if not role_user or not user:
-			return make_response(jsonify({'ret':"user not found"}))
-
-		# user.id = new_id
-		# print("user.id", user.id)
-		user.first_name = f_name
-		user.last_name= l_name
-		user.email= email
-		user.phone = phone
-		db.session.commit()
-
-		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
-		return make_response(jsonify({'ret':0}), 200)
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret':1}))
-
-
-
-#------------------------------Admin-------------------------------
-#------------------------------Admin-------------------------------
-#------------------------------Admin-------------------------------
-@app.route('/addHospital',methods=['POST'])
-def addHospital():
-
-	name = helper.get_from_form(request, 'name')
-	phone = helper.get_from_form(request, 'phone')
-	address = helper.get_from_form(request, 'address')
-	description = helper.get_from_form(request, 'description')
-
-	# check for duplicated hospital name
-	res = Hospital.query.filter(Hospital.name == name).all()
-	if res != []:
-		return make_response(jsonify({'ret':'Duplicated Hospital Name'}))
-
-	hos = Hospital(
-		name=name,
-		phone=phone,
-		address=address,
-		description=description
-	)
-	try:
-		db.session.add(hos)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret': "Database error"}))
-
-	return make_response(jsonify({'ret':0}))
-
-@app.route('/addDepartment',methods=['POST'])
-def addDepartment():
-
-	hospital_id = helper.get_from_form(request, 'hospitalID')
-	title = helper.get_from_form(request, 'title')
-	phone = helper.get_from_form(request, 'phone')
-	description = helper.get_from_form(request, 'description')
-
-	# check for duplicated hospital name
-	res = Department.query.filter(Department.title == title).all()
-	if res != []:
-		return make_response(jsonify({'ret':'Duplicated Department Name'}))
-
-	dept = Department(
-		hospital_id=hospital_id,
-		title = title,
-		phone=phone,
-		description=description
-	)
-	try:
-		db.session.add(dept)
-		db.session.commit()
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret': "Database error"}))
-
-	return make_response(jsonify({'ret':0}))
-
-@app.route('/addLabReportType', methods=['POST'])
-def addLabReportType():
-	lr_type_value = helper.get_from_form(request, 'type')
-	lr_description = helper.get_from_form(request, 'description')
-	# lr_type_value = "Good Test"
-	# lr_type_name = lr_type_value.lower().replace(" ", "_")
-	# class labReportTypeEnum(enum.Enum):
-	# 	lr_type_name = lr_type_value
-	lr_type = Lab_report_type(
-		type = lr_type_value,
-		description = lr_description
-	)
-	db.session.add(lr_type)
-	db.session.commit()
-	return make_response(jsonify({'ret':0}))
