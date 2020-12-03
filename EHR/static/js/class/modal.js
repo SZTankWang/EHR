@@ -59,9 +59,10 @@ class AppFullModal extends AppModal{
 * @desc modal for application and medical record
 * @page nurseViewMC
 * @attribute medical record: appStatus, mcID,
-* preExam(bodyTemperature, heartRate, bloodPressure),
+* preExam(bodyTemperature, heartRate, highBloodPressure, lowBloodPressure, weight, height, state),
 * diagnosis, precriptions, labReports
-* @method setMCID, setPreExam, setDiagnosis, setPrescriptions, setLabReports
+* @method checkAndSet, setAppStatus, setMCID, (setPreExam), setDiagnosis, setPrescriptions, setLabReports,
+loadAppInfo, loadMCInfo
 */
 class MCModal extends AppFullModal{
   constructor(){
@@ -99,30 +100,6 @@ class MCModal extends AppFullModal{
     this.mcID.text(mcID);
   }
 
-  setBodyTemperature(bodyTemperature){
-    this.checkAndSet(this.bodyTemperature, bodyTemperature);
-  }
-
-  setHeartRate(heartRate){
-    this.checkAndSet(this.heartRate, heartRate);
-  }
-
-  setHighBloodPressure(highBloodPressure){
-    this.checkAndSet(this.highBloodPressure, highBloodPressure);
-  }
-
-  setLowBloodPressure(lowBloodPressure){
-    this.checkAndSet(this.lowBloodPressure, lowBloodPressure);
-  }
-
-  setWeight(weight){
-    this.checkAndSet(this.weight, weight);
-  }
-
-  setHeight(height){
-    this.checkAndSet(this.height, height);
-  }
-
   setState(state){
     if (this.state.is("select")) {
       var str = "option[value=" + state + "]";
@@ -131,6 +108,16 @@ class MCModal extends AppFullModal{
     } else {
       this.state.text(state);
     }
+  }
+
+  setPreExam(preExam){
+    this.checkAndSet(this.bodyTemperature, preExam.bodyTemperature);
+    this.checkAndSet(this.heartRate, preExam.heartRate);
+    this.checkAndSet(this.highBloodPressure, preExam.highBloodPressure);
+    this.checkAndSet(this.lowBloodPressure, preExam.lowBloodPressure);
+    this.checkAndSet(this.weight, preExam.weight);
+    this.checkAndSet(this.height, preExam.height);
+    this.setState(preExam.state)
   }
 
   setDiagnosis(diagnosis){
@@ -165,13 +152,7 @@ class MCModal extends AppFullModal{
     const mcData = {"mcID": mcID, "type": "0"};
     var fillMCData = (res) => {
       if (res.ret == "0") {
-        this.setBodyTemperature(res.preExam.bodyTemperature);
-        this.setHeartRate(res.preExam.heartRate);
-        this.setHighBloodPressure(res.preExam.highBloodPressure);
-        this.setLowBloodPressure(res.preExam.lowBloodPressure);
-        this.setWeight(res.preExam.weight);
-        this.setHeight(res.preExam.height);
-        this.setState(res.preExam.state);
+        this.setPreExam(res.preExam);
         this.setDiagnosis(res.diagnosis);
         if (res.prescriptions)
           this.setPrescriptions(res.prescriptions);
@@ -188,10 +169,9 @@ class MCModal extends AppFullModal{
 /**
 * @desc page for application and medical record
 * @page doctorNurseViewAppt
-* @attribute medical record: appStatus, mcID,
-* preExam(bodyTemperature, heartRate, bloodPressure),
-* diagnosis, precriptions, labReports, labReportTypes
-* @method setMCID, setPreExam, setDiagnosis, setPrescriptions, setLabReports
+* @attribute labReportTypes, labReportReqs,
+patientBasicInfo(patientID, age, gender, bloodType, allergies, chronics, medications)
+* @method loadPatientInfo, setLbaReportAndReqs, setLabReportTypes, loadMCInfo(override)
 */
 class MCPage extends MCModal{
   constructor(){
@@ -206,25 +186,6 @@ class MCPage extends MCModal{
     this.chronics = $("#chronics");
     this.medications = $("#medications");
   }
-
-  loadPatientInfo(patientID) {
-    var fillInfoData = (res) => {
-      this.age.text(res.age);
-      this.gender.text(res.gender);
-      this.bloodType.text(res.bloodType);
-      this.allergies.text(res.allergies);
-      this.chronics.text(res.chronics);
-      this.medications.text(res.medications);
-    };
-    sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
-  }
-
-  // setLabReportReqs(labReportReqs){
-  //   this.labReportReqs.empty();
-  //   for (let i=0; i < labReportReqs.length; i++) {
-  //     this.labReportReqs.append(newLabReportReqCard(i+1, labReportReqs[i].id, labReportReqs[i].lr_type, labReportReqs[i].doctor_comments));
-  //   }
-  // }
 
   setLabReportAndReqs(labReportAndReqs){
     this.labReports.empty();
@@ -245,17 +206,23 @@ class MCPage extends MCModal{
     };
   }
 
+  loadPatientInfo(patientID) {
+    var fillInfoData = (res) => {
+      this.age.text(res.age);
+      this.gender.text(res.gender);
+      this.bloodType.text(res.bloodType);
+      this.allergies.text(res.allergies);
+      this.chronics.text(res.chronics);
+      this.medications.text(res.medications);
+    };
+    sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
+  }
+
   loadMCInfo(mcID, route, type) {
     const mcData = {"mcID": mcID, "type": type};
     var fillMCData = (res) => {
       if (res.ret == "0") {
-        this.setBodyTemperature(res.preExam.bodyTemperature);
-        this.setHeartRate(res.preExam.heartRate);
-        this.setHighBloodPressure(res.preExam.highBloodPressure);
-        this.setLowBloodPressure(res.preExam.lowBloodPressure);
-        this.setWeight(res.preExam.weight);
-        this.setHeight(res.preExam.height);
-        this.setState(res.preExam.state);
+        this.setPreExam(res.preExam);
         this.setDiagnosis(res.diagnosis);
         if (res.prescriptions)
           this.setPrescriptions(res.prescriptions);

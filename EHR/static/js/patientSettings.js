@@ -27,8 +27,8 @@ $("#healthInfo").on("submit", submitHealthInfo);
 
 // --------------------------event handlers----------------------------
 /**
-* @desc submit form
-* @param {string} route
+* @desc submit info form
+* @param {event} submit
 */
 function submitInfo(event){
   event.preventDefault();
@@ -43,10 +43,10 @@ function submitInfo(event){
 }
 
 /**
-* @desc submit form
-* @param {string} route
+* @desc submit health form
+* @param {event} submit
 */
-function submitHealthInfo(route, data){
+function submitHealthInfo(event){
   event.preventDefault();
   var data = jsonify($(this).serializeArray());
 
