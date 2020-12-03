@@ -162,7 +162,7 @@ class MCModal extends AppFullModal{
   }
 
   loadMCInfo(mcID) {
-    const mcData = {"mcID": mcID, "type": "False"};
+    const mcData = {"mcID": mcID, "type": "0"};
     var fillMCData = (res) => {
       if (res.ret == "0") {
         this.setBodyTemperature(res.preExam.bodyTemperature);

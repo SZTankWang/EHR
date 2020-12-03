@@ -47,20 +47,20 @@ def logout(client):
 #     res = json.loads(rv.data)
 #     assert res["ret"] == 1 and res['message'] == 'You already registered!'
 
-def test_login_logout(client):
-    """Make sure login and logout works."""
-
-    rv = login(client, "w", "w")
-    res = json.loads(rv.data)
-    assert res["ret"] == 0 and res["id"] == "w" and res["role"] == "doctor"
-
-    rv = logout(client)
-    assert rv.data
-
-    rv = login(client, "w" + 'x', "w")
-    res = json.loads(rv.data)
-    assert res["ret"] == 1 and res["message"] == 'Unregistered user'
-
-    rv = login(client, "w", "w" + 'x')
-    res = json.loads(rv.data)
-    assert res["ret"] == 1 and res["message"] == 'Incorrect password'
+# def test_login_logout(client):
+#     """Make sure login and logout works."""
+#
+#     rv = login(client, "w", "w")
+#     res = json.loads(rv.data)
+#     assert res["ret"] == 0 and res["id"] == "w" and res["role"] == "doctor"
+#
+#     rv = logout(client)
+#     assert rv.data
+#
+#     rv = login(client, "w" + 'x', "w")
+#     res = json.loads(rv.data)
+#     assert res["ret"] == 1 and res["message"] == 'Unregistered user'
+#
+#     rv = login(client, "w", "w" + 'x')
+#     res = json.loads(rv.data)
+#     assert res["ret"] == 1 and res["message"] == 'Incorrect password'

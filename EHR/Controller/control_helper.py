@@ -6,10 +6,21 @@ import math
 import datetime
 from operator import and_
 from enum import Enum
+from flask_login import current_user
 
 TIME_FORMAT = "%H:%M"
 DATE_FORMAT = "%Y-%m-%d"
 id_name_map = {}
+
+def check_doctor_privilege():
+	if current_user.role.value == "doctor":
+		return True
+	return False
+
+def check_nurse_privilege():
+	if current_user.role.value == "nurse":
+		return True
+	return False
 
 def StrOrNone(string):
 	if string == "":

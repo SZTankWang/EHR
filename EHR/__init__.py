@@ -23,6 +23,11 @@ from EHR.model import models
 
 from EHR.Controller import routes_general_patient, routes_doctor_nurse
 
+
+# db.create_all()
+# db.session.commit()
+
+
 # db = SQLAlchemy()
 # login = LoginManager()
 #
@@ -48,9 +53,6 @@ from EHR.Controller import routes_general_patient, routes_doctor_nurse
 #
 #         return app
 
-
-# db.create_all()
-# db.session.commit()
 
 # except:
 # 	app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:1234@127.0.0.1/wecare"

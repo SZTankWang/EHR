@@ -37,6 +37,7 @@ def gen_hospital_data():
 		try:
 			db.session.add(h)
 			db.session.commit()
+			print("gen_hospital_data DONE")
 		except:
 			continue
 def get_dept_list():
@@ -96,6 +97,7 @@ def gen_user_data():
 
 		db.session.add(new)
 	db.session.commit()
+	print("gen_user_data DONE")
 
 def gen_dept_data():
 	name_desc_df = pd.read_csv(mypath + "/dept_info.csv")
@@ -109,6 +111,7 @@ def gen_dept_data():
 
 		db.session.add(d)
 	db.session.commit()
+	print("gen_dept_data DONE")
 
 
 def gen_time_seg():
@@ -121,6 +124,7 @@ def gen_time_seg():
 					   t_seg_starttime="{:06}".format(office_hour_s))
 		db.session.add(ts)
 	db.session.commit()
+	print("gen_time_seg DONE")
 
 def gen_time_slot():
 
@@ -148,6 +152,7 @@ def gen_time_slot():
 					   doctor_id=random.choice(doctor_list).id)
 		db.session.add(ts)
 	db.session.commit()
+	print("gen_time_slot DONE")
 
 def get_single_column(db_obj, column_wanted) -> List:
 	return [res[0] for res in db_obj.query.with_entities(column_wanted).all()]
@@ -212,6 +217,7 @@ def gen_appt():
 			mc.appointment.append(appt)
 		db.session.add(appt)
 	db.session.commit()
+	print("gen_appt DONE")
 
 def gen_prescription():
 	mcid_list = [mc.id for mc in Medical_record.query.all()]
@@ -225,6 +231,7 @@ def gen_prescription():
 		)
 		db.session.add(prscrpt)
 	db.session.commit()
+	print("gen_prescription DONE")
 
 def gen_random_string(times, length):
 	letters = string.ascii_lowercase
@@ -244,6 +251,7 @@ def gen_report_type():
 		)
 		db.session.add(lrt)
 	db.session.commit()
+	print("gen_report_type DONE")
 
 def gen_lab_reports():
 	# rp_file = open("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities/sample_lab_report.pdf", "rb").read()
@@ -263,6 +271,7 @@ def gen_lab_reports():
 		)
 		db.session.add(lb)
 	db.session.commit()
+	print("gen_lab_reports DONE")
 
 def practice_query():
 	slot_id=15
@@ -274,14 +283,14 @@ def practice_query():
 def main():
 	# please do not change the following execution order
 	print("on it")
-	# gen_hospital_data()
-	# gen_dept_data()
-	# gen_user_data()
-	# gen_time_seg()
-	# gen_time_slot()
-	# gen_appt()
-	# gen_prescription()
-	# gen_report_type()
+	gen_hospital_data()
+	gen_dept_data()
+	gen_user_data()
+	gen_time_seg()
+	gen_time_slot()
+	gen_appt()
+	gen_prescription()
+	gen_report_type()
 	gen_lab_reports()
 
 main()

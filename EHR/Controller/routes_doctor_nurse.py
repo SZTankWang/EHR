@@ -375,6 +375,9 @@ def nurseGoViewAppt(appID):
 @app.route('/doctorNurseViewAppt', methods=['GET','POST'])
 @login_required
 def doctorNurseViewAppt():
+	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
+		return make_response({"ret": "Privilege not granted"})
+
 	if request.method == "POST":
 		mc_id = request.form['mcID']
 	elif request.method == "GET":
@@ -414,8 +417,10 @@ def doctorNurseViewAppt():
 			"file_path": lr.file_path} for lr in lab_reports]
 	}
 
-	getLabReportTypes = bool(request.form['type'])
-	if getLabReportTypes:
+	if request.form['type'] == "1":
+		if not helper.check_doctor_privilege():
+			return make_response({"ret": "Access to lab report types not granted"})
+
 		lab_r_types = Lab_report_type.query.all()
 
 		ret["labReportTypes"] = [{"type": lrt.type,
