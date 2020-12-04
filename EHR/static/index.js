@@ -29,10 +29,10 @@ function renderNotice(){
 		type:"GET",
 		success:function(data){
 			console.log(data);
-			for(var i=0;i<data.length;i++){
-				html = apptTemplate(data[i])
+			for(var i=0;i<data['apps'].length;i++){
+				html = apptTemplate(data['apps'][i])
 				$("#outer-container").append(html);
-				var id = data[i]['appID']
+				var id = data['apps'][i]['appID']
 			}
 		}
 	})
@@ -40,9 +40,9 @@ function renderNotice(){
 
 function apptTemplate(data){
 		var temp ='';
-		temp +='<div class="recent"><div class="time">'+data['time']+'</div>';
-		temp +='<div class="info"><div class="info-content">'+data['time']+'</div>';
-		temp += '<div class="info-content">'+data['dept']+'</div><div class="info-content">'+data['doctor']+'</div>';
+		temp +='<div class="recent"><div class="time">'+data['date']+'</div>';
+		temp +='<div class="info"><div class="info-content">'+data['hospital']+'</div>';
+		temp += '<div class="info-content">'+data['doctor']+'</div><div class="info-content">'+data['time']+'</div>';
 		return temp;
 }
 
