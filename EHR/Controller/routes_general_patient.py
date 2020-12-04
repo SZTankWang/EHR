@@ -340,7 +340,6 @@ def patientFutureAppt():
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
 		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
-
 	helper.load_id2name_map()
 	return make_response(
 		jsonify({'total_number': n_tot_records,
@@ -348,8 +347,10 @@ def patientFutureAppt():
 				{"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
 				"time": app.time.strftime(helper.TIME_FORMAT),
-				"nurse": helper.id2name(app.approver_id) if app.approver_id else "",
+				"hospital":Hospital.query.filter(Hopital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name
+				"nurse": helper.id2name(app.approver_id),
 				"patient": helper.id2name(app.patient_id),
+				"doctor": helper.id2name(app.doctor_id),
 				"symptoms": app.symptoms,
 			} for app in apps]
 			}))
