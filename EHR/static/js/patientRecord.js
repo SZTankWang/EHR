@@ -8,14 +8,19 @@ function goBackHome(){
 }
 
 function drawPagination(){
-	var data = [];
-	for (var i = 0; i<21; i++){
-		data.push(i);
-	}
+	// var data = $.ajax({
+	// 	url:'http://localhost:5000/getPatientRecord',
+	// 	data:''
+	// })
+
 
 	$('.pagination-container').pagination({
 		pageSize:5,
-		dataSource:'http://localhost:5000/getPatientRecord/', //replace this with url,
+		dataSource:'http://localhost:5000/getPatientRecord', 
+		locator:'apps',
+		totalNumberLocator:function(response){
+			return response.total_number;
+		},
 		showPrevious:true,
 		showNext:true,
 		ajax:{data:{type:'appointment'}},
@@ -24,8 +29,12 @@ function drawPagination(){
 		},
 		callback: function(data, pagination) {
         // template method of yourself
-        var html = renderCard(data);
-        $('.card-list.container').html(html);
+        	console.log(data);
+        	$('.card-list-container').empty();
+	        for(var i =0; i<data.length;i++){
+		        var html = renderCard(data[i]);
+		        $('.card-list-container').append(html);
+	        }
     }
 	})
 }

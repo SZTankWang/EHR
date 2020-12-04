@@ -17,24 +17,38 @@ function goToRecord(){
 
 
 //添加近期预约
-function renderNotice(data){
+function renderNotice(){
 	//测试数据
 	var arr = new Array();
 	var date = new Date();
 
 	//console.log(date);
-	arr.push({'id':1,'time':date,'hospital':'hospital','dept':'department','doctor':'doctor','state':'upcoming'});
-	arr.push({'id':2,'time':date,'hospital':'hospital','dept':'department','doctor':'doctor','state':'upcoming'});
-	arr.push({'id':3,'time':date,'hospital':'hospital','dept':'department','doctor':'doctor','state':'finished'});
+	$.ajax({
+		url:"http://localhost:5000/patientFutureAppt",
+		data:{'currPage':1,'pageSize':3},
+		type:"GET",
+		success:function(data){
+			console.log(data);
+			for(var i=0;i<data['apps'].length;i++){
+				html = apptTemplate(data['apps'][i])
+				$("#outer-container").append(html);
+				var id = data['apps'][i]['appID']
+			}
+		}
+	})
+
+
+function apptTemplate(data){
+		var temp ='';
+		temp +='<div class="recent"><div class="time">'+data['date']+'</div>';
+		temp +='<div class="info"><div class="info-content">'+data['hospital']+'</div>';
+		temp += '<div class="info-content">'+data['department']+'</div>'
+		temp += '<div class="info-content">'+data['doctor']+'</div><div class="info-content">'+data['time']+'</div>';
+		return temp;
+}
 
 	//拼接notice
 	for(var i=0;i<arr.length;i++){
-		var temp ='';
-		temp +='<div class="recent"><div class="time">'+arr[i].time+'</div>';
-		console.log(arr[i].time);
-		temp +='<div class="info"><div class="info-content">'+arr[i].hospital+'</div>';
-		temp += '<div class="info-content">'+arr[i].dept+'</div><div class="info-content">'+arr[i].doctor+'</div><div class="info-content" id='+arr[i].id+'>'+arr[i].state+'</div>';
-		$("#outer-container").append(temp);
 
 		var id=arr[i].id;
 		var state=arr[i].state;
