@@ -339,7 +339,7 @@ def patientFutureAppt():
 	patientID = current_user.get_id()
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
-		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
 
 	helper.load_id2name_map()
 	return make_response(
@@ -356,14 +356,14 @@ def patientFutureAppt():
 			} for app in apps
 		]))
 
-@app.route('/getPatientRecord/', methods=['GET'])
+@app.route('/getPatientRecord', methods=['GET'])
 @login_required
 def getPatientRecord():
 	type = request.args.get('type')
 	if type == "appointment":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 		patientID = current_user.get_id()
-		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
 		helper.load_id2name_map()
 		return make_response(
 			jsonify({'total_number': n_tot_records,
