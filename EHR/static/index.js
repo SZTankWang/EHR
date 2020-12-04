@@ -23,9 +23,14 @@ function renderNotice(data){
 	var date = new Date();
 
 	//console.log(date);
-	arr.push({'id':1,'time':date,'hospital':'hospital','dept':'department','doctor':'doctor','state':'upcoming'});
-	arr.push({'id':2,'time':date,'hospital':'hospital','dept':'department','doctor':'doctor','state':'upcoming'});
-	arr.push({'id':3,'time':date,'hospital':'hospital','dept':'department','doctor':'doctor','state':'finished'});
+	$.ajax({
+		url:"http://localhost:5000/patientFutureAppt",
+		type:"GET",
+		success:function(data){
+			console.log(data);
+		}
+	})
+
 
 	//拼接notice
 	for(var i=0;i<arr.length;i++){

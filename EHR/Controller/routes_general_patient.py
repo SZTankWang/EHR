@@ -360,10 +360,11 @@ def patientFutureAppt():
 @login_required
 def getPatientRecord():
 	type = request.args.get('type')
+	currPage = request.args.get('currPage')
 	if type == "appointment":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 		patientID = current_user.get_id()
-		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
 		helper.load_id2name_map()
 		return make_response(
 			jsonify([
@@ -371,15 +372,13 @@ def getPatientRecord():
 					"appID": app.id,
 					"date": app.date.strftime(helper.DATE_FORMAT),
 					"time": app.time.strftime(helper.TIME_FORMAT),
-					"nurse": helper.id2name(app.approver_id),
+					"nurse": helper.id2name(app.approver_id) if app.approver_id else "" ,
 					"patient": helper.id2name(app.patient_id),
 					"symptoms": app.symptoms,
 					"status": app.status.value,
 					"reject_reason":app.reject_reason,
-					'n_tot_page': n_tot_page,
-		  		  'n_tot_records': n_tot_records
 				} for app in apps
-			]))
+			],totalNumber=n_tot_records))
 	elif type == "medical_record":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
 		patientID = current_user.get_id()
