@@ -42,6 +42,7 @@ function apptTemplate(data){
 		var temp ='';
 		temp +='<div class="recent"><div class="time">'+data['date']+'</div>';
 		temp +='<div class="info"><div class="info-content">'+data['hospital']+'</div>';
+		temp += '<div class="info-content">'+data['department']+'</div>'
 		temp += '<div class="info-content">'+data['doctor']+'</div><div class="info-content">'+data['time']+'</div>';
 		return temp;
 }

@@ -30,9 +30,10 @@ function drawPagination(){
 		callback: function(data, pagination) {
         // template method of yourself
         	console.log(data);
+        	$('.card-list-container').empty();
 	        for(var i =0; i<data.length;i++){
 		        var html = renderCard(data[i]);
-		        $('.card-list.container').html(html);
+		        $('.card-list-container').append(html);
 	        }
     }
 	})
