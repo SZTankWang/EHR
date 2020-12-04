@@ -350,7 +350,7 @@ def patientFutureAppt():
 				{"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
 				"time": app.time.strftime(helper.TIME_FORMAT),
-				"hospital":Hospital.query.filter(Hopital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
+				"hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
 				"department":helper.user2dept_name(app.doctor_id, "doctor"),
 				"nurse": helper.id2name(app.approver_id),
 				"patient": helper.id2name(app.patient_id),
