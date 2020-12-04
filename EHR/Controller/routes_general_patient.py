@@ -339,22 +339,20 @@ def patientFutureAppt():
 	patientID = current_user.get_id()
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
-		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
 
 	helper.load_id2name_map()
 	return make_response(
-		jsonify([
-			{
-				"appID": app.id,
+		jsonify({'total_number': n_tot_records,
+				"apps":[
+				{"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
 				"time": app.time.strftime(helper.TIME_FORMAT),
-				"nurse": helper.id2name(app.approver_id),
+				"nurse": helper.id2name(app.approver_id) if app.approver_id else "",
 				"patient": helper.id2name(app.patient_id),
 				"symptoms": app.symptoms,
-				'n_tot_page': n_tot_page,
-	  		  'n_tot_records': n_tot_records
-			} for app in apps
-		]))
+			} for app in apps]
+			}))
 
 @app.route('/getPatientRecord/', methods=['GET'])
 @login_required
@@ -363,23 +361,21 @@ def getPatientRecord():
 	if type == "appointment":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 		patientID = current_user.get_id()
-		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
 		helper.load_id2name_map()
 		return make_response(
-			jsonify([
-				{
-					"appID": app.id,
+			jsonify({'total_number': n_tot_records,
+					"apps":[
+					{"appID": app.id,
 					"date": app.date.strftime(helper.DATE_FORMAT),
 					"time": app.time.strftime(helper.TIME_FORMAT),
-					"nurse": helper.id2name(app.approver_id),
+					"nurse": helper.id2name(app.approver_id) if app.approver_id else "",
 					"patient": helper.id2name(app.patient_id),
 					"symptoms": app.symptoms,
 					"status": app.status.value,
 					"reject_reason":app.reject_reason,
-					'n_tot_page': n_tot_page,
-		  		  'n_tot_records': n_tot_records
-				} for app in apps
-			]))
+				} for app in apps]
+				}))
 	elif type == "medical_record":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
 		patientID = current_user.get_id()
@@ -388,15 +384,13 @@ def getPatientRecord():
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 		helper.load_id2name_map()
 		return make_response(
-			jsonify([
-			{
-				"mcID": mcs[i].id,
-				"date": apps[i].date.strftime(helper.DATE_FORMAT),
-				"time": app[i].time.strftime(helper.TIME_FORMAT),
-				"diagnosis": mcs[i].diagnosis
-
-			} for i in range(len(mcs))
-			]))
+			jsonify({'total_number': n_tot_records,
+					"mcs":[
+					{"mcID": mcs[i].id,
+					"date": apps[i].date.strftime(helper.DATE_FORMAT),
+					"time": app[i].time.strftime(helper.TIME_FORMAT),
+					"diagnosis": mcs[i].diagnosis} for i in range(len(mcs))]
+					}))
 	elif type == "personal_record":
 		patientID = current_user.get_id()
 		patient = Patient.query.filter(Patient.id== patientID).first()
