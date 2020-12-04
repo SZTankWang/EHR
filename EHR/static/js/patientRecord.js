@@ -19,6 +19,9 @@ function drawPagination(){
 		showPrevious:true,
 		showNext:true,
 		ajax:{data:{type:'appointment'}},
+		alias:{
+			'pageNumber':'currPage'
+		},
 		callback: function(data, pagination) {
         // template method of yourself
         var html = renderCard(data);

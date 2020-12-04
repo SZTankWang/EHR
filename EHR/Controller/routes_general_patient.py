@@ -356,7 +356,7 @@ def patientFutureAppt():
 			} for app in apps
 		]))
 
-@app.route('/getPatientRecord', methods=['GET'])
+@app.route('/getPatientRecord/', methods=['GET'])
 @login_required
 def getPatientRecord():
 	type = request.args.get('type')
