@@ -343,20 +343,20 @@ def patientFutureAppt():
 
 	helper.load_id2name_map()
 	return make_response(
-		jsonify([
-			{
-				"appID": app.id,
+		jsonify({'total_number': n_tot_records,
+				"apps":[
+				{"appID": app.id,
 				"date": app.date.strftime(helper.DATE_FORMAT),
 				"time": app.time.strftime(helper.TIME_FORMAT),
+				"hospital":Hospital.query.filter(Hopital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
 				"nurse": helper.id2name(app.approver_id),
 				"patient": helper.id2name(app.patient_id),
+				"doctor": helper.id2name(app.doctor_id),
 				"symptoms": app.symptoms,
-				'n_tot_page': n_tot_page,
-	  		  'n_tot_records': n_tot_records
-			} for app in apps
-		]))
+			} for app in apps]
+			}))
 
-@app.route('/getPatientRecord', methods=['GET'])
+@app.route('/getPatientRecord/', methods=['GET'])
 @login_required
 def getPatientRecord():
 	type = request.args.get('type')
@@ -386,15 +386,13 @@ def getPatientRecord():
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 		helper.load_id2name_map()
 		return make_response(
-			jsonify([
-			{
-				"mcID": mcs[i].id,
-				"date": apps[i].date.strftime(helper.DATE_FORMAT),
-				"time": app[i].time.strftime(helper.TIME_FORMAT),
-				"diagnosis": mcs[i].diagnosis
-
-			} for i in range(len(mcs))
-			]))
+			jsonify({'total_number': n_tot_records,
+					"mcs":[
+					{"mcID": mcs[i].id,
+					"date": apps[i].date.strftime(helper.DATE_FORMAT),
+					"time": app[i].time.strftime(helper.TIME_FORMAT),
+					"diagnosis": mcs[i].diagnosis} for i in range(len(mcs))]
+					}))
 	elif type == "personal_record":
 		patientID = current_user.get_id()
 		patient = Patient.query.filter(Patient.id== patientID).first()
