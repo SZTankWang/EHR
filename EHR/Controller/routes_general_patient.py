@@ -330,3 +330,99 @@ def makeAppt():
 @app.route('/patientRecord',methods=['GET'])
 def patientRecord():
 	return render_template('/patientRecord.html')
+
+@app.route('/patientFutureAppt', methods=['GET'])
+@login_required
+def patientFutureAppt():
+	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
+	patientID = current_user.get_id()
+	total_number = len(Application.query.filter(Application.patient_id == patientID,
+		Application.status == StatusEnum.approved,
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).all())
+	apps = Application.query.filter(Application.patient_id == patientID,
+		Application.status == StatusEnum.approved,
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
+	helper.load_id2name_map()
+	return make_response(
+		jsonify({'total_number': total_number,
+				"apps":[
+				{"appID": app.id,
+				"date": app.date.strftime(helper.DATE_FORMAT),
+				"time": app.time.strftime(helper.TIME_FORMAT),
+				"hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
+				"department":helper.user2dept_name(app.doctor_id, "doctor"),
+				"nurse": helper.id2name(app.approver_id),
+				"patient": helper.id2name(app.patient_id),
+				"doctor": helper.id2name(app.doctor_id),
+				"symptoms": app.symptoms,
+			} for app in apps]
+			}))
+
+@app.route('/getPatientRecord/', methods=['GET'])
+@login_required
+def getPatientRecord():
+	type = request.args.get('type')
+	if type == "appointment":
+		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
+		patientID = current_user.get_id()
+		total_number = len(Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).all())
+		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
+		helper.load_id2name_map()
+		return make_response(
+			jsonify({'total_number': total_number,
+					"apps":[
+					{"appID": app.id,
+					"date": app.date.strftime(helper.DATE_FORMAT),
+					"time": app.time.strftime(helper.TIME_FORMAT),
+					"hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
+					"department":helper.user2dept_name(app.doctor_id, "doctor"),
+					"nurse": helper.id2name(app.approver_id) if app.approver_id else "",
+					"patient": helper.id2name(app.patient_id),
+					"symptoms": app.symptoms,
+					"doctor": helper.id2name(app.doctor_id),
+					"status": app.status.value,
+					"reject_reason":app.reject_reason,
+				} for app in apps]
+				}))
+	elif type == "medical_record":
+		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
+		patientID = current_user.get_id()
+		apps = Application.query.filter(Application.patient_id == patientID,
+							Application.Status == finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
+		helper.load_id2name_map()
+		return make_response(
+			jsonify({'total_number': n_tot_records,
+					"mcs":[
+					{"mcID": mcs[i].id,
+					"date": apps[i].date.strftime(helper.DATE_FORMAT),
+					"time": app[i].time.strftime(helper.TIME_FORMAT),
+					"diagnosis": mcs[i].diagnosis} for i in range(len(mcs))]
+					}))
+	elif type == "personal_record":
+		patientID = current_user.get_id()
+		patient = Patient.query.filter(Patient.id== patientID).first()
+		return make_response(
+			jsonify([
+			{
+				"age": patient.age,
+				"gender": patient.gender,
+				"blood_type": patient.blood_type,
+				"allergies": patient.allergies,
+				"chronics": patient.chronics,
+				"medications": patient.medications
+			}
+			]))
+
+
+'''
+@app.route('/patientGoViewMC', methods=['GET'])
+@login_required
+def patientGoViewMC():
+	return render_template('patientViewMC.html'）
+
+@app.route('/patientViewMC', methods=['POST'])
+@login_required
+def patientViewMC():
+	return render_template('patientViewMC.html'）
+'''

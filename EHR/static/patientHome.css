@@ -130,7 +130,7 @@ body{
 }
 
 #outer-container{
-	min-height: 80%;
+	height:fit-content;
 /*	border:1px solid blue;
 */	margin-bottom: 5%;
 }
@@ -140,12 +140,14 @@ body{
 	flex-direction: column;
 	align-items: center;
 	justify-content: space-between;
-	height:fit-content;
+	height:21rem;
+	width:38rem;
+	overflow-y: scroll;
 }
 
 .recent{
 /*	border:1px solid red;
-*/	width:23vw;
+*/	width:36rem;
 	height: 8vh;
 	margin-top: 1%;
 	background: #F2F2F2;
@@ -161,6 +163,7 @@ body{
 	height:35%;
 /*	border:1px solid red;
 */	font-size:0.1rem;
+	font-weight: 700;
 }
 
 .info{
@@ -185,12 +188,11 @@ body{
 }
 
 .info-content:nth-child(4){
-/*	margin-left: 3%;*/
-/*	background: #448E05;*/
+/*	background: #448E05;
 	margin-right:3%;
 	color:white;
 	border-radius: 3px;
-}
+*/}
 #appointment-btn-wrapper{
 	margin-bottom: 3%;
 }

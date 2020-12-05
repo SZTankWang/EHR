@@ -45,6 +45,8 @@
 		    }
 		  } );
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js" integrity="sha512-1zzZ0ynR2KXnFskJ1C2s+7TIEewmkB2y+5o/+ahF7mwNj9n3PnzARpqalvtjSbUETwx6yuxP5AJXZCpnjEJkQw==" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" integrity="sha512-QmxybGIvkSI8+CGxkt5JAcGOKIzHDqBMs/hdemwisj4EeGLMXxCm9h8YgoCwIvndnuN1NdZxT4pdsesLXSaKaA==" crossorigin="anonymous" />
 </head>
 <body>
 		<form id="pagination-counter" style="display: none;">
@@ -105,31 +107,17 @@
 
 
 		<!-- 列表 -->
-		<div class="my-container card-list-container">
-			<div class="my-container card">
-				<div class="my-container card-row card-title">
-					<div class="my-container text-wrapper"><h5>hospital</p></div>
-				</div>
-				<div class="my-container card-row">
-					<div class="my-container text-wrapper"><p>department</p></div>
-				</div>
-
-				<div class="my-container card-row">
-					<div class="my-container text-wrapper"><p>doctor</p></div>
-				</div>
-
-
-
-				<div class="my-container card-row">
-					<div class="my-container text-wrapper"><p>time</p></div>
-				</div>
-
-				<div class="my-container status pending">
-					<div class="my-container"><p>status</p></div>
-				</div>
+		<div class="my-container card-list-outer-wrapper">
+			<div class="my-container card-list-container">
 			</div>
+			
 		</div>
-
+		<div class="my-container footer">
+			<div class="my-container total-record-shower">
+				<div class="my-container text-wrapper total-record-text-wrapper"><p>total records:</p></div>
+			</div>
+			<div class="my-container pagination-container"></div>
+		</div>
 	</div>
 
 <script type="text/javascript" src="/static/js/patientRecord.js"></script>

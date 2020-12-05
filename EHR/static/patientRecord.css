@@ -4,7 +4,7 @@ a{
 
 .header{
 	width: 100%;
-	height:4rem;
+	height:3rem;
 /*	background: grey;
 */	padding-left:1rem;
 	flex-direction: row;
@@ -73,18 +73,17 @@ a{
 }
 
 .card-list-container{
-	min-height:60%;
-	width:60%;
+	height:fit-content;
+	width:fit-content;
 	min-width: 780px;
 	padding:1rem 1.5rem 1rem 1.5rem;
 	background:#f1f1f1;
 	flex-direction: column;
-	overflow-y: scroll;
 	margin-top:1rem;
 }
 
 .card{
-	width:100%;
+	width:770px;
 	height:7.5rem;
 	background:white;
 }
@@ -115,3 +114,30 @@ a{
 .pending{
 	background:#7BB85D;
 }
+
+.footer{
+	width:100%;
+	height:3rem;
+	background:#f1f1f1;
+	position:absolute;
+	bottom: 0;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+
+.pagination-container{
+	position:absolute;
+	right:0;
+	margin-right:1.5rem;
+
+}
+
+.card-list-outer-wrapper{
+	width:100%;
+	height:64%;
+	flex-direction: column;
+	overflow-y: scroll;
+	background:#f1f1f1;
+}
+

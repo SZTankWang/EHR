@@ -18,7 +18,6 @@ $(document).ready(function() {
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res.appts);
-    // $("#overlay").addClass("d-none");
   };
   var patientID = $("#patientID").text();
   var data = {"patientID": patientID};
@@ -53,10 +52,8 @@ function buttonAction(event) {
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
 }

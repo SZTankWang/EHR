@@ -18,7 +18,6 @@ $(document).ready(function() {
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest("nursePendingApp", "GET", null, initTable);
 });
@@ -30,7 +29,6 @@ $('#main-table tbody').on( 'click', 'button', buttonAction);
 // submit process application
 $(".processAppSubmit").on("click", goProcessApplication);
 
-// ----------switch table content-------------
 // view pending applications
 $("#pendingApp").on("click", () => goUpdateTable("nursePendingApp"));
 
@@ -86,10 +84,8 @@ function goProcessApplication(event){
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
 }

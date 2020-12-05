@@ -15,10 +15,9 @@ login = LoginManager(app)
 login.login_view = 'login' # force user to login
 login.login_message = "Please login first"
 
-# try:
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://SE:mysql@8.129.182.214:3306/wecare"
 db = SQLAlchemy(app)
 
 from EHR.model import models
 
-from EHR.Controller import routes_general_patient, routes_doctor_nurse
+from EHR.Controller import routes_general_patient, routes_doctor_nurse, routes_misc

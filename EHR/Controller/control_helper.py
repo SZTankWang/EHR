@@ -22,6 +22,11 @@ def check_nurse_privilege():
 		return True
 	return False
 
+def check_admin_privilege():
+	if current_user.role.value == "admin":
+		return True
+	return False
+
 def StrOrNone(string):
 	if string == "":
 		return None
@@ -181,3 +186,12 @@ def dept_to_doc(deptID):
 	load_id2name_map()
 	return [{"doctorID": doctor_list[i],
 			"doctorName": id2name(doctor_list[i])} for i in range(len(doctor_list))]
+
+def user2dept_name(id, role):
+	deptID = None
+	if role == "nurse":
+		deptID = Nurse.query.filter(Nurse.id == id).first().department_id
+	elif role == "doctor":
+		deptID = Nurse.query.filter(Doctor.id == id).first().department_id
+	dept_name = Department.query.filter(Department.id == deptID).first().title
+	return dept_name

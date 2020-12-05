@@ -16,7 +16,6 @@ $(document).ready(function() {
   // initialize table
   var initTable = (res) => {
     myTable.initTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest("doctorOnGoingAppt", "GET", null, initTable);
 });
@@ -24,11 +23,8 @@ $(document).ready(function() {
 // ---------------------capture user action--------------------------
 // click table button
 $('#main-table tbody').on( 'click', 'button', buttonAction);
-
-// ----------switch table content-------------
 // view pending applications
 $("#onGoingAppt").on("click", () => goUpdateTable("doctorOnGoingAppt"));
-
 // view today's appointments
 $("#todayAppt").on("click", () => goUpdateTable("doctorTodayAppt"));
 
@@ -53,10 +49,8 @@ function buttonAction(event) {
 */
 function goUpdateTable(route, data=null){
   var type = data ? 'POST' : 'GET';
-  // $("#overlay").removeClass("d-none");
   var updateTable = (res) => {
     myTable.updateTable(res);
-    // $("#overlay").addClass("d-none");
   };
   sendRequest(route, type, data, updateTable);
 }
