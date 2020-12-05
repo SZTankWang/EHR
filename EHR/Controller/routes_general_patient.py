@@ -30,7 +30,7 @@ def home():
 
 
 #---register---
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
 	"""
 		patient: register by (national)id
@@ -92,7 +92,6 @@ def login():
 			try:
 				user = User.query.get(id)
 				if not user:
-					# flash("Unregistered ID or wrong password")
 					return make_response(jsonify({"ret":1, "message": "Unregistered user"}))
 				if not user.check_password(password):
 					return make_response(jsonify({"ret":1, "message": "Incorrect password"}))
