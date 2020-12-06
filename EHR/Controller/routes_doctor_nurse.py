@@ -746,6 +746,13 @@ def doctorNewSlot():
 	total_slots = request.form['slotNumber']
 	t_seg = Time_segment.query.filter(Time_segment.t_seg_starttime==startTime).one()
 
+	exist_slot = Time_slot.query.filter(
+		Time_slot.doctor_id == doctor_id,
+		Time_slot.slot_seg_id == t_seg.t_seg_id,
+		Time_slot.slot_date == date
+	).first()
+	if exist_slot:
+		return make_response({'ret':1, 'msg':'Slot Already Created'})
 	time_slot = Time_slot(slot_date=date, n_total=total_slots, n_booked=0, slot_seg_id=t_seg.t_seg_id,  doctor_id=doctor_id)
 
 	db.session.add(time_slot)

@@ -117,18 +117,19 @@ def UpdateInfo():
 		if not role_user or not user:
 			return make_response(jsonify({'ret':"user not found"}))
 
-		user.id = new_id
+		if old_id != new_id:
+			user.id = new_id
 		user.first_name = f_name
 		user.last_name= l_name
 		user.email= email
 		user.phone = phone
 		db.session.commit()
 
-	# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
+		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
 		return make_response(jsonify({'ret':0}), 200)
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1}))
+		return make_response(jsonify({'ret':1, 'msg':'Please double check your License ID'}))
 
 
 

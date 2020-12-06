@@ -156,7 +156,7 @@ def hospitalData():
 
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
 
-	rawHospitals = Hospital.query.offset(n_offset-1).limit(page_count).all()
+	rawHospitals = Hospital.query.offset(n_offset).limit(page_count).all()
 
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
@@ -173,7 +173,7 @@ def hospitalData():
 
 
 @app.route('/hospitalListPage',methods=['GET'])
-def goToHospitalList():
+def hospitalListPage():
 	return render_template('hospitalListPage.html')
 
 @app.route('/searchHospital', methods=['GET'])
@@ -341,7 +341,7 @@ def patientFutureAppt():
 		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).all())
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
-		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 	helper.load_id2name_map()
 	return make_response(
 		jsonify({'total_number': total_number,
@@ -358,7 +358,7 @@ def patientFutureAppt():
 			} for app in apps]
 			}))
 
-@app.route('/getPatientRecord/', methods=['GET'])
+@app.route('/getPatientRecord', methods=['GET'])
 @login_required
 def getPatientRecord():
 	type = request.args.get('type')
@@ -366,7 +366,7 @@ def getPatientRecord():
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 		patientID = current_user.get_id()
 		total_number = len(Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).all())
-		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
+		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		helper.load_id2name_map()
 		return make_response(
 			jsonify({'total_number': total_number,
@@ -388,7 +388,7 @@ def getPatientRecord():
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
 		patientID = current_user.get_id()
 		apps = Application.query.filter(Application.patient_id == patientID,
-							Application.Status == finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+							Application.Status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 		helper.load_id2name_map()
 		return make_response(
