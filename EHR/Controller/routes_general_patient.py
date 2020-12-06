@@ -414,6 +414,26 @@ def getPatientRecord():
 			}
 			]))
 
+@app.route('/updateAffiliation', methods=['POST'])
+def updateAffiliation():
+	
+	license_id = request.form['licenceID']
+	hospital_id = request.form['hospitalID']
+	dept_id = request.form['deptID']
+
+	current_user.license_id = license_id
+	current_user.hospital_id = hospital_id
+	current_user.dept_id = dept_id
+
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':1}))
+
+
+
 
 '''
 @app.route('/patientGoViewMC', methods=['GET'])

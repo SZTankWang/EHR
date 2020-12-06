@@ -5,9 +5,10 @@ from sys import path_importer_cache
 from typing import Container, DefaultDict, List
 
 from sqlalchemy.orm.session import _state_session
-#sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
-sys.path.append("/Users/jenny/Desktop/EHR")
-mypath = "/Users/jenny/Desktop/EHR/EHR/utilities"
+sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
+mypath = "/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities"
+# sys.path.append("/Users/jenny/Desktop/EHR")
+# mypath = "/Users/jenny/Desktop/EHR/EHR/utilities"
 from EHR.model.models import *
 from EHR import db
 import random
@@ -26,6 +27,8 @@ TIME_SLOT_START_DATE = '2020-11-20'
 MEDICINE_LIST = [ 'Vicodin', 'Simvastatin', 'Lisinopril', 'Levothyroxine', \
 				  'Azithromycin', 'Metformin', 'Lipitor', 'Amlodipine', \
 				  'Amoxicillin', 'Hydrochlorothiazide']
+lab_report_types = ['Complete Blood Count', 'Basic Metabolic Panel', 'Lipid Panel', 'Liver Panel', 'Urinalysis']
+
 
 def gen_hospital_data():
 	hospital_df = pd.read_csv(mypath + "/hospital_info.csv")
@@ -37,9 +40,10 @@ def gen_hospital_data():
 		try:
 			db.session.add(h)
 			db.session.commit()
-			print("gen_hospital_data DONE")
 		except:
 			continue
+	print("gen_hospital_data DONE")
+	
 def get_dept_list():
 	res = requests.get("https://www.netdoctor.co.uk/health-services/nhs/a4502/a-to-z-of-hospital-departments/")
 	soup = BeautifulSoup(res.content, 'html.parser')
@@ -242,11 +246,11 @@ def gen_random_string(times, length):
 	return str_list
 
 def gen_report_type():
-	n_type = len(labReportTypeEnum)
+	n_type = len(lab_report_types)
 	descriptions = gen_random_string(n_type, 30)
 	for i in range(n_type):
 		lrt = Lab_report_type(
-			type=list(labReportTypeEnum)[i].value,
+			type=lab_report_types[i],
 			description=descriptions[i]
 		)
 		db.session.add(lrt)
@@ -261,7 +265,7 @@ def gen_lab_reports():
 
 	for i in range(N_RECORD):
 		lb = Lab_report(
-			lr_type = random.choice(list(labReportTypeEnum)).value,
+			lr_type = random.choice(lab_report_types),
 			doctor_comment = gen_random_string(1, 30),
 			nurse_comment = gen_random_string(1, 30),
 			mc_id = random.choice(mc_ids),
@@ -272,6 +276,8 @@ def gen_lab_reports():
 		db.session.add(lb)
 	db.session.commit()
 	print("gen_lab_reports DONE")
+
+
 
 def practice_query():
 	slot_id=15
