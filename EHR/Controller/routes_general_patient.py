@@ -442,10 +442,10 @@ def patientGetApp():
 		return make_response({"ret": "Appointment Not Found!"})
 	if current_user.get_id() != app.patient_id:
 		return redirect("/login")
-		
+
 	return make_response(jsonify({
 		"date": app.date.strftime(helper.DATE_FORMAT),
-		"time": app.time.strftime(helper.TIME_FORMAT),,
+		"time": app.time.strftime(helper.TIME_FORMAT),
 		"doctor": helper.id2name(app.doctor_id),
 		"symptoms": app.symptoms
 	}))
