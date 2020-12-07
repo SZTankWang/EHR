@@ -197,9 +197,13 @@ def updateAffiliation():
 	if hospital_id != str(dept_hospital):
 		return make_response(jsonify({'ret': "Department and hospital don't match."}))
 
-	current_user.license_id = license_id
-	current_user.hospital_id = hospital_id
-	current_user.dept_id = dept_id
+	user = User.query.get(license_id)
+	if not user:
+		return make_response(jsonify({'ret': "User doesn't exist."}))
+	if user.role != RoleEnum.doctor and user.role != RoleEnum.nurse:
+		return make_response(jsonify({'ret': "Invalid role."}))
+	user.hospital_id = hospital_id
+	user.dept_id = dept_id
 
 	try:
 		db.session.commit()
