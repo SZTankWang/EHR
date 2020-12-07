@@ -408,11 +408,9 @@ def nurseGoViewAppt(appID):
 @app.route('/nurseViewAppt', methods=['GET','POST'])
 @app.route('/doctorViewAppt', methods=['GET','POST'])
 @app.route('/doctorNurseViewAppt', methods=['GET','POST'])
+@app.route('/patientViewAppt', methods=['GET','POST'])
 @login_required
-def doctorNurseViewAppt():
-	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
-		return redirect("/login")
-
+def userViewAppt():
 	if request.method == "POST":
 		mc_id = request.form['mcID']
 	elif request.method == "GET":
@@ -420,6 +418,11 @@ def doctorNurseViewAppt():
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
 	if not mc:
 		return make_response({"ret": "Medical Record Not Found!"})
+
+	if helper.check_patient_privilege():
+		if current_user.get_id() != mc.patient_id:
+			return redirect(url_for("/login"))
+
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 	lab_reports = mc.lab_reports
 

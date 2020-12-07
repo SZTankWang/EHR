@@ -1,12 +1,13 @@
+/**
+* @global instance of MCModal
+*/
+var myModal;
 
 $(document).ready(function(){
 	$('#apply').button();
 	drawPagination();
+	myModal = new MCModal();
 })
-
-function goBackHome(){
-	window.location.replace('http://localhost:5000/loadHomePage');
-}
 
 function drawPagination(){
 	// var data = $.ajax({
@@ -56,7 +57,26 @@ function renderCard(data){
 	temp += '</p></div></div></div>';
 
 	return temp;
+}
 
 
+// ---------------------capture user action--------------------------
+// click table button
+$('#').on('click', buttonAction);
 
+// --------------------------event handlers----------------------------
+/**
+* @desc display modal
+* @param {event} event - click
+*/
+function buttonAction(event) {
+  var data = {}; //get app data from page
+	data['mcID'] = null;
+  data['patient'] = null;
+  myModal.setMCID(mcID);
+  myModal.setApp(data);
+  // request and fill in app status and comments
+  myModal.loadAppInfo(data['appID']);
+  // request and fill in medical record data
+  myModal.loadMCInfo(mcID, "patientViewAppt");
 }

@@ -1,12 +1,14 @@
 
+/**
+* @global instance of MyTable and MyModal
+*/
+var myModal;
+
 $(document).ready(function(){
 	$('#apply').button();
 	drawPagination();
+	myModal = new AppFullModal();
 })
-
-function goBackHome(){
-	window.location.replace('http://localhost:5000/loadHomePage');
-}
 
 function drawPagination(){
 	// var data = $.ajax({
@@ -56,7 +58,27 @@ function renderCard(data){
 	temp += '</p></div></div></div>';
 
 	return temp;
+}
 
 
+// ---------------------capture user action--------------------------
+// click table button
+$('#').on('click', buttonAction);
 
+
+// --------------------------event handlers----------------------------
+/**
+* @desc display modal or go to view appointment page
+* @param {event} event - click
+* @this event target element - view button
+*/
+function buttonAction(event) {
+  event.preventDefault();
+  var data = {}; //get data from page
+	data['appID'] = null;
+  myModal.setApp(data);
+  var reqData = {"appID": data['appID']};
+  var setComments = (res) => {myModal.setComments(res.comments)};
+  sendRequest("getComments", "POST", reqData, setComments);
+  myModal.show();
 }

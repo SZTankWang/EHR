@@ -57,7 +57,7 @@ class AppFullModal extends AppModal{
 
 /**
 * @desc modal for application and medical record
-* @page nurseViewMC
+* @page doctorNurseViewMC
 * @attribute medical record: appStatus, mcID,
 * preExam(bodyTemperature, heartRate, highBloodPressure, lowBloodPressure, weight, height, state),
 * diagnosis, precriptions, labReports
@@ -148,7 +148,7 @@ class MCModal extends AppFullModal{
     sendRequest("getComments", "POST", appData, fillAppData);
   }
 
-  loadMCInfo(mcID) {
+  loadMCInfo(mcID, route) {
     const mcData = {"mcID": mcID, "type": "0"};
     var fillMCData = (res) => {
       if (res.ret == "0") {
@@ -162,7 +162,7 @@ class MCModal extends AppFullModal{
         alert(res.ret);
       }
     };
-    sendRequest("doctorNurseViewAppt", "POST", mcData, fillMCData);
+    sendRequest(route, "POST", mcData, fillMCData);
   }
 }
 
