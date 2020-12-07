@@ -41,7 +41,7 @@ border:1px solid #f1f1f1;
 }
 
 .avatar-container{
-	background-image: url('/static/doctor.svg');
+	background-image: url('/static/icons/doctor.svg');
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 }
@@ -210,11 +210,11 @@ button.book-btn{
 }
 
 .success-icon{
-	background-image: url(/static/success.svg);
+	background-image: url(/static/icons/success.svg);
 }
 
 .failure-icon{
-	background-image: url(/static/failure.svg);
+	background-image: url(/static/icons/failure.svg);
 }
 
 /*.form-container{

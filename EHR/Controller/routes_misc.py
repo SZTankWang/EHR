@@ -93,8 +93,12 @@ def patientUpdateHealthInfo():
 
 			}, synchronize_session=False
 		)
-		db.session.commit()
-		return make_response(jsonify({"ret": 0}))
+		try:
+			db.session.commit()
+			return make_response(jsonify({"ret": 0}))
+		except:
+			db.session.rollback()
+			return make_response(jsonify({"ret": "Database error"}))
 
 @app.route('/doctorNurseUpdateInfo', methods=['POST'])
 @app.route('/patientUpdateInfo', methods=['POST'])
@@ -117,8 +121,8 @@ def UpdateInfo():
 		if not role_user or not user:
 			return make_response(jsonify({'ret':"user not found"}))
 
-		# user.id = new_id
-		# print("user.id", user.id)
+		if old_id != new_id:
+			user.id = new_id
 		user.first_name = f_name
 		user.last_name= l_name
 		user.email= email
@@ -129,7 +133,7 @@ def UpdateInfo():
 		return make_response(jsonify({'ret':0}), 200)
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':1}))
+		return make_response(jsonify({'ret':1, 'msg':'Please double check your License ID'}))
 
 
 
@@ -196,6 +200,7 @@ def addDepartment():
 
 	return make_response(jsonify({'ret':0}))
 
+
 @app.route('/addLabReportType', methods=['POST'])
 def addLabReportType():
 	if not helper.check_admin_privilege():
@@ -208,6 +213,35 @@ def addLabReportType():
 		description = lr_description
 	)
 	db.session.add(lr_type)
-	db.session.commit()
-	return make_response(jsonify({'ret':0}))
-	
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"Duplicate"}))
+
+
+@app.route('/updateAffiliation', methods=['POST'])
+def updateAffiliation():
+	if not helper.check_admin_privilege():
+		return redirect("/login")
+
+	license_id = request.form['licenseID']
+	hospital_id = request.form['hospitalID']
+	dept_id = request.form['deptID']
+
+	#check if dept belongs to hospital
+	dept_hospital = Department.query.filter(Department.id==dept_id).one().hospital_id
+	if hospital_id != str(dept_hospital):
+		return make_response(jsonify({'ret': "Department and hospital don't match."}))
+
+	current_user.license_id = license_id
+	current_user.hospital_id = hospital_id
+	current_user.dept_id = dept_id
+
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"Database error"}))

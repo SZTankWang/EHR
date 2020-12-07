@@ -1,3 +1,4 @@
+
 $(document).ready(function(){
 	$('#apply').button();
 	drawPagination();
@@ -16,7 +17,7 @@ function drawPagination(){
 
 	$('.pagination-container').pagination({
 		pageSize:5,
-		dataSource:'http://localhost:5000/getPatientRecord', 
+		dataSource:'http://localhost:5000/getPatientRecord',
 		locator:'apps',
 		totalNumberLocator:function(response){
 			return response.total_number;
@@ -58,15 +59,4 @@ function renderCard(data){
 
 
 
-
-
-
-
-
-
-
-
 }
-
-
-

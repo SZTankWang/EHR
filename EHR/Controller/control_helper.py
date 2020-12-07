@@ -27,6 +27,11 @@ def check_admin_privilege():
 		return True
 	return False
 
+def check_patient_privilege():
+	if current_user.role.value == "patient":
+		return True
+	return False
+
 def StrOrNone(string):
 	if string == "":
 		return None
@@ -46,7 +51,8 @@ def paginate(db_obj):
 		curr_page = int(request.args.get('currPage'))
 		page_size = int(request.args.get('pageSize'))
 
-	n_offset = (curr_page-1) * page_size + 1
+	# n_offset = (curr_page-1) * page_size + 1
+	n_offset = (curr_page-1) * page_size
 	n_tot_records = db_obj.query.count()
 	n_tot_page = n_tot_records // page_size + 1
 	page_count = math.ceil(n_tot_records / page_size)
@@ -102,14 +108,16 @@ def dept_appts(user, direction=None, period=None, start_date=datetime.date.today
 							join(Time_slot, Time_slot.id == Application.time_slot_id).\
 								filter(
 									Doctor.department_id == deptID,
-									Time_slot.slot_date >= start_date)
+									Time_slot.slot_date >= start_date,
+									Application.status == StatusEnum.approved)
 		elif direction == "past":
 			same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\
 							join(Time_slot, Time_slot.id == Application.time_slot_id).\
 								filter(
 									Doctor.department_id == deptID,
-									Time_slot.slot_date <= start_date)
+									Time_slot.slot_date <= start_date,
+									Application.status == StatusEnum.finished)
 		else:
 			same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\

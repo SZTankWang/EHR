@@ -2,4 +2,5 @@
 **/__pycache__
 .idea
 __pycache__
-*.orig
+venv/
+.vscode/

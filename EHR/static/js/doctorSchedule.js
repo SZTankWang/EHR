@@ -8,9 +8,9 @@ $(document).ready(function(){
 		$('.timepicker').timepicker({
 		    timeFormat: 'HH:mm',
 		    interval: 60,
-		    minTime: '10',
-		    maxTime: '18:00',
-		    startTime: '10:00',
+		    minTime: '09:00',
+		    maxTime: '17:00',
+		    startTime: '09:00',
 		    dynamic: false,
 		    dropdown: true,
 		    scrollbar: true,
@@ -130,7 +130,7 @@ function openInfoDialog(type){
 			}
 
 		})
-	
+
 
 	}
 

@@ -201,3 +201,17 @@ body{
 	margin-bottom:5%;
 
 }
+
+#welcome-container{
+	width:60vw;
+	position:fixed;
+	top:33%;
+	left:20%;
+	text-align: center;
+	font-size: 24pt;
+	background-color: rgba(255,255,255,0.8);
+	border-radius: 2%;
+	border-style: solid;
+	border-width: 2pt;
+	border-color: rgba(255,255,255,1);
+}

@@ -17,8 +17,9 @@ $(document).ready(function() {
   var initTable = (res) => {
     myTable.initTable(res);
   };
-  sendRequest("doctorFutureAppt", "GET", null, initTable);
-  setStartOrEndDate();
+  var dateRange = jsonifyDateRange(new Date(), new Date(), 7)
+  sendRequest("doctorFutureAppt", "POST", dateRange, initTable);
+  setStartOrEndDate(dateRange.startDate, dateRange.endDate);
 });
 
 // ---------------------capture user action--------------------------

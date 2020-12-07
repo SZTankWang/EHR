@@ -30,7 +30,7 @@ def home():
 
 
 #---register---
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
 	"""
 		patient: register by (national)id
@@ -92,7 +92,6 @@ def login():
 			try:
 				user = User.query.get(id)
 				if not user:
-					# flash("Unregistered ID or wrong password")
 					return make_response(jsonify({"ret":1, "message": "Unregistered user"}))
 				if not user.check_password(password):
 					return make_response(jsonify({"ret":1, "message": "Incorrect password"}))
@@ -103,7 +102,6 @@ def login():
 				# flash("Unknown error, sorry!")
 				return make_response(jsonify({"ret":1, "message": "Unknown error"}))
 		return make_response(jsonify({"ret":0, "role":current_user.role.value, "id": current_user.id}))
-		#redirect(url_for(f'{current_user.role.value}Home'))
 
 
 #---logout---
@@ -157,7 +155,7 @@ def hospitalData():
 
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Hospital)
 
-	rawHospitals = Hospital.query.offset(n_offset-1).limit(page_count).all()
+	rawHospitals = Hospital.query.offset(n_offset).limit(page_count).all()
 
 	hospital_ids = [res.id for res in rawHospitals]
 	hospital_names = [res.name for res in rawHospitals]
@@ -174,7 +172,7 @@ def hospitalData():
 
 
 @app.route('/hospitalListPage',methods=['GET'])
-def goToHospitalList():
+def hospitalListPage():
 	return render_template('hospitalListPage.html')
 
 @app.route('/searchHospital', methods=['GET'])
@@ -290,6 +288,9 @@ def querySlotInfo():
 @app.route('/makeAppt',methods=['GET','POST'])
 @login_required
 def makeAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
 	try:
 		patient_id = current_user.get_id()
 		symptom = request.form['symptom']
@@ -299,10 +300,7 @@ def makeAppt():
 		#doctor_id = slot.doctor_id
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
-		medical_record = Medical_record(patient_id=patient_id)
-		db.session.add(medical_record)
-		db.session.commit()
-		mc_id = medical_record.id
+
 		application = Application(
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 					symptoms=symptom,
@@ -313,9 +311,10 @@ def makeAppt():
 					time_slot_id=time_slot_id,
 					doctor_id=doctor_id,
 					patient_id=patient_id,
-					mc_id=mc_id)
-		# update corresponding table
+					mc_id=None)
 		db.session.add(application)
+
+		# update time slot
 		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		if timeslot.n_booked < timeslot.n_total:
 			timeslot.n_booked = timeslot.n_booked + 1
@@ -330,43 +329,61 @@ def makeAppt():
 
 @app.route('/patientRecord',methods=['GET'])
 def patientRecord():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
 	return render_template('/patientRecord.html')
+
+@app.route('/patientHealthInfo',methods=['GET'])
+def patientHealthInfo():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return render_template('/patientHealthInfo.html')
 
 @app.route('/patientFutureAppt', methods=['GET'])
 @login_required
 def patientFutureAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 	patientID = current_user.get_id()
+	total_number = len(Application.query.filter(Application.patient_id == patientID,
+		Application.status == StatusEnum.approved,
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).all())
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
-		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
+		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 	helper.load_id2name_map()
 	return make_response(
-		jsonify({'total_number': n_tot_records,
-				 "apps":[
-					 {"appID": app.id,
-					  "date": app.date.strftime(helper.DATE_FORMAT),
-					  "time": app.time.strftime(helper.TIME_FORMAT),
-					  "hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
-					  "department":helper.user2dept_name(app.doctor_id, "doctor"),
-					  "nurse": helper.id2name(app.approver_id),
-					  "patient": helper.id2name(app.patient_id),
-					  "doctor": helper.id2name(app.doctor_id),
-					  "symptoms": app.symptoms,
-					  } for app in apps]
-				 }))
+		jsonify({'total_number': total_number,
+				"apps":[
+				{"appID": app.id,
+				"date": app.date.strftime(helper.DATE_FORMAT),
+				"time": app.time.strftime(helper.TIME_FORMAT),
+				"hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
+				"department":helper.user2dept_name(app.doctor_id, "doctor"),
+				"nurse": helper.id2name(app.approver_id),
+				"patient": helper.id2name(app.patient_id),
+				"doctor": helper.id2name(app.doctor_id),
+				"symptoms": app.symptoms,
+			} for app in apps]
+			}))
 
-@app.route('/getPatientRecord/', methods=['GET'])
+@app.route('/getPatientRecord', methods=['GET'])
 @login_required
 def getPatientRecord():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
 	type = request.args.get('type')
 	if type == "appointment":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 		patientID = current_user.get_id()
-		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset-1).limit(page_count).all()
+		total_number = len(Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).all())
+		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		helper.load_id2name_map()
 		return make_response(
-			jsonify({'total_number': n_tot_records,
+			jsonify({'total_number': total_number,
 					"apps":[
 					{"appID": app.id,
 					"date": app.date.strftime(helper.DATE_FORMAT),
@@ -385,7 +402,7 @@ def getPatientRecord():
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
 		patientID = current_user.get_id()
 		apps = Application.query.filter(Application.patient_id == patientID,
-							Application.Status == finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+							Application.Status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 		helper.load_id2name_map()
 		return make_response(
@@ -412,14 +429,35 @@ def getPatientRecord():
 			]))
 
 
+
+
 '''
 @app.route('/patientGoViewMC', methods=['GET'])
 @login_required
 def patientGoViewMC():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
 	return render_template('patientViewMC.html'）
 
 @app.route('/patientViewMC', methods=['POST'])
 @login_required
 def patientViewMC():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
 	return render_template('patientViewMC.html'）
 '''
+
+
+@app.route('/patientGoViewAppt', methods=['GET'])
+@login_required
+def patientGoViewAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return render_template('patientViewRecord.html')
+
+@app.route('/patientViewAppt', methods=['POST'])
+@login_required
+def patientViewAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return make_response(jsonify({"ret": 1}))

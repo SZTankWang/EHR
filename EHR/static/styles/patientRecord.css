@@ -26,7 +26,7 @@ a{
 }
 
 .go-back{
-	background-image: url(/static/return.svg);
+	background-image: url(/static/icons/return.svg);
 
 }
 
@@ -44,7 +44,7 @@ a{
     justify-content: space-between;
     padding-bottom: 1rem;
     padding-top:1rem;
- } 
+ }
 
 .filter-row{
 	width:100%;
@@ -52,7 +52,7 @@ a{
 }
 
 .search-icon{
-	background-image: url(/static/search.svg);
+	background-image: url(/static/icons/search.svg);
     height: 1.5rem;
     width: 1.3rem;
     margin-left: 2rem;
@@ -141,3 +141,17 @@ a{
 	background:#f1f1f1;
 }
 
+.form-container{
+	padding:2em;
+}
+
+.edit-icon{
+	background-image: url(/static/icons/edit.svg);
+    height: 1.5rem;
+    width: 1.3rem;
+    margin-left: 2rem;
+}
+
+.edit-icon:hover{
+	cursor:pointer;
+}

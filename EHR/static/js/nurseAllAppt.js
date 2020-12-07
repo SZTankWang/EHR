@@ -32,15 +32,13 @@ $("#onGoingAppt").on('click', () => goUpdateTable("nurseOnGoingAppt"));
 
 // view future appointments
 $("#futureAppt").on('click', function(){
-  var today = new Date();
-  var dateRange = jsonifyDateRange(today, today, 7);
+  var dateRange = jsonifyDateRange(new Date(), new Date(), 7);
   goUpdateTable("nurseFutureAppt", dateRange);
 });
 
 // view past appointments
 $("#pastAppt").on('click', function(){
-  var today = new Date();
-  var dateRange = jsonifyDateRange(today, today, -7);
+  var dateRange = jsonifyDateRange(new Date(), new Date(), -7);
   goUpdateTable("nursePastAppt", dateRange);
 });
 
