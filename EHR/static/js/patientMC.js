@@ -62,6 +62,7 @@ function renderCard(data){
 
 // ---------------------capture user action--------------------------
 // click table button
+// TODO:
 $('#').on('click', buttonAction);
 
 // --------------------------event handlers----------------------------
@@ -70,13 +71,19 @@ $('#').on('click', buttonAction);
 * @param {event} event - click
 */
 function buttonAction(event) {
-  var data = {}; //get app data from page
+  var data = {};
+	// TODO: get app data from page
+	data['appID'] = null;
 	data['mcID'] = null;
   data['patient'] = null;
-  myModal.setMCID(mcID);
+	data['date'] = null;
+	data['time'] = null;
+	data['doctor'] = null;
+	data['symptoms'] = null;
+  myModal.setMCID(data['mcID']);
   myModal.setApp(data);
   // request and fill in app status and comments
   myModal.loadAppInfo(data['appID']);
   // request and fill in medical record data
-  myModal.loadMCInfo(mcID, "patientViewAppt");
+  myModal.loadMCInfo(data['mcID'], "patientViewAppt");
 }

@@ -63,6 +63,7 @@ function renderCard(data){
 
 // ---------------------capture user action--------------------------
 // click table button
+//TODO:
 $('#').on('click', buttonAction);
 
 
@@ -74,8 +75,14 @@ $('#').on('click', buttonAction);
 */
 function buttonAction(event) {
   event.preventDefault();
-  var data = {}; //get data from page
+  var data = {};
+	//TODO: get data from page
 	data['appID'] = null;
+  data['patient'] = null;
+	data['date'] = null;
+	data['time'] = null;
+	data['doctor'] = null;
+	data['symptoms'] = null;
   myModal.setApp(data);
   var reqData = {"appID": data['appID']};
   var setComments = (res) => {myModal.setComments(res.comments)};
