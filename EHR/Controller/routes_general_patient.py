@@ -300,10 +300,7 @@ def makeAppt():
 		#doctor_id = slot.doctor_id
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
-		medical_record = Medical_record(patient_id=patient_id)
-		db.session.add(medical_record)
-		db.session.commit()
-		mc_id = medical_record.id
+
 		application = Application(
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 					symptoms=symptom,
@@ -314,9 +311,10 @@ def makeAppt():
 					time_slot_id=time_slot_id,
 					doctor_id=doctor_id,
 					patient_id=patient_id,
-					mc_id=mc_id)
-		# update corresponding table
+					mc_id=None)
 		db.session.add(application)
+
+		# update time slot
 		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		if timeslot.n_booked < timeslot.n_total:
 			timeslot.n_booked = timeslot.n_booked + 1

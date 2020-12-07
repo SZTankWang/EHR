@@ -319,8 +319,9 @@ def nurseCreateAppt():
 					approver_id=nurseID,
 					patient_id=patient_id,
 					mc_id=mc_id)
-		# update corresponding table
 		db.session.add(application)
+
+		# update time slot
 		timeslot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		if timeslot.n_booked < timeslot.n_total:
 			timeslot.n_booked = timeslot.n_booked + 1
@@ -355,6 +356,9 @@ def nurseProcessApp():
 		app.reject_reason = request.form['comments']
 		if decision.lower() == 'reject':
 			app.status = StatusEnum.rejected
+			timeslot = Time_slot.query.filter(Time_slot.id == app.time_slot_id).first()
+			if timeslot.n_booked > 0:
+				timeslot.n_booked = timeslot.n_booked - 1
 		elif decision.lower() == 'approve':
 			app.status = StatusEnum.approved
 			medical_record = Medical_record(patient_id=app.patient_id)
@@ -364,6 +368,7 @@ def nurseProcessApp():
 			except:
 				db.session.rollback()
 				return make_response(jsonify({'ret':"error"}))
+			# link medical record to appointment
 			mc_id = medical_record.id
 			app.mc_id = mc_id
 

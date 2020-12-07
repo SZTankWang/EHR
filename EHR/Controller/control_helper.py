@@ -108,14 +108,16 @@ def dept_appts(user, direction=None, period=None, start_date=datetime.date.today
 							join(Time_slot, Time_slot.id == Application.time_slot_id).\
 								filter(
 									Doctor.department_id == deptID,
-									Time_slot.slot_date >= start_date)
+									Time_slot.slot_date >= start_date,
+									Application.status == StatusEnum.approved)
 		elif direction == "past":
 			same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\
 							join(Time_slot, Time_slot.id == Application.time_slot_id).\
 								filter(
 									Doctor.department_id == deptID,
-									Time_slot.slot_date <= start_date)
+									Time_slot.slot_date <= start_date,
+									Application.status == StatusEnum.finished)
 		else:
 			same_dept_appts = Application.query.\
 							join(Doctor, Doctor.id == Application.doctor_id).\
