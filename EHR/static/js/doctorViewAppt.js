@@ -61,6 +61,8 @@ function editDiagnosis(event){
   var callBack = function(res) {
     if (res.ret) {
       alert(res.ret);
+    } else {
+      toggleForm();
     }
   }
   sendRequest("doctorEditDiag", "POST", data, callBack);
@@ -86,7 +88,8 @@ function addPrescription(event){
           myPage.setPrescriptions(res.prescriptions);
           $("#medicine").val(null);
           $("#dose").val(null);
-          $("#comments").val(null);
+          console.log($("#commentsPre").val());
+          $("#commentsPre").val(null);
         } else {
           alert(res.ret);
         }
@@ -130,4 +133,10 @@ function refreshOnSuccess(res){
    if (res.ret == "0") {
      goToPage("doctorGoViewAppt/" + myPage.appID.text(), 0)
    }
+ }
+
+ function toggleForm(){
+   $("#diagnosisForm-controller").attr("disabled", function(index, attr){
+     return attr == "disabled" ? null : "disabled";
+   });
  }

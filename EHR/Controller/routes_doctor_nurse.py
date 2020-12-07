@@ -953,7 +953,7 @@ def doctorFinishAppt():
 #---------------------------Util--------------------------------
 @app.route('/getPatientInfo', methods=['POST'])
 def getPatientInfo():
-	if not (helper.check_doctor_privilege() or helper.check_doctor_privilege()):
+	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
 		return redirect("/login")
 
 	p_id = request.form['patientID']

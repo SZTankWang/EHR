@@ -402,7 +402,7 @@ def getPatientRecord():
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
 		patientID = current_user.get_id()
 		apps = Application.query.filter(Application.patient_id == patientID,
-							Application.Status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+							Application.status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 		helper.load_id2name_map()
 		return make_response(

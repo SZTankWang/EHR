@@ -58,6 +58,21 @@ body{
 *//*	align-items: center;
 */	/*border:1px solid red;*/
 	position:fixed;
+	top:30%;
+	left:10%;
+	width:80vw;
+	min-height:30vh;
+
+}
+
+#functions-container{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+/*	background: white;
+*//*	align-items: center;
+*/	/*border:1px solid red;*/
+	position:fixed;
 	top:50%;
 	left:10%;
 	width:80vw;

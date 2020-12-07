@@ -41,7 +41,14 @@ function editPreExam(event){
   var data = jsonify($(this).serializeArray());
   data.mcID = mcID;
 
-  sendRequest("nurseEditPreExam", "POST", data, ()=>{});
+  var callBack = function(res) {
+    if (res.ret) {
+      alert(res.ret);
+    } else {
+      toggleForm();
+    }
+  }
+  sendRequest("nurseEditPreExam", "POST", data, callBack);
 }
 
 /**
@@ -90,4 +97,10 @@ function sendFileRequest(route, type, data, successHandler){
     processData: false,
     contentType: false
   })
+}
+
+function toggleForm(){
+  $("#preExamForm-controller").attr("disabled", function(index, attr){
+    return attr == "disabled" ? null : "disabled";
+  });
 }
