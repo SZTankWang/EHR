@@ -78,7 +78,6 @@ function buttonAction(event) {
   var data = {};
 	//TODO: get data from page
 	data['appID'] = null;
-  data['patient'] = null;
 	data['date'] = null;
 	data['time'] = null;
 	data['doctor'] = null;

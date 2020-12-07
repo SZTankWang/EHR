@@ -25,7 +25,7 @@ function drawPagination(){
 		},
 		showPrevious:true,
 		showNext:true,
-		ajax:{data:{type:'appointment'}},
+		ajax:{data:{type:'medical_record'}},
 		alias:{
 			'pageNumber':'currPage'
 		},
@@ -73,15 +73,10 @@ $('#').on('click', buttonAction);
 function buttonAction(event) {
   var data = {};
 	// TODO: get app data from page
-	data['appID'] = null;
 	data['mcID'] = null;
-  data['patient'] = null;
-	data['date'] = null;
-	data['time'] = null;
-	data['doctor'] = null;
-	data['symptoms'] = null;
+	data['appID'] = null;
   myModal.setMCID(data['mcID']);
-  myModal.setApp(data);
+	sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
   // request and fill in app status and comments
   myModal.loadAppInfo(data['appID']);
   // request and fill in medical record data

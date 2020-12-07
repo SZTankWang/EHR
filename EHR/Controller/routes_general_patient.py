@@ -410,7 +410,7 @@ def getPatientRecord():
 					"mcs":[
 					{"mcID": mcs[i].id,
 					"date": apps[i].date.strftime(helper.DATE_FORMAT),
-					"time": app[i].time.strftime(helper.TIME_FORMAT),
+					"time": apps[i].time.strftime(helper.TIME_FORMAT),
 					"diagnosis": mcs[i].diagnosis} for i in range(len(mcs))]
 					}))
 
@@ -421,23 +421,35 @@ def getPatientRecord():
 def patientGoViewMC():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return render_template('patientMC.html'）
+	return render_template('patientMC.html')
 
-app.route('/patientGoViewAppt', methods=['GET'])
+@app.route('/patientGoViewAppt', methods=['GET'])
 @login_required
 def patientGoViewAppt():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return render_template('patientRecord.html'）
+	return render_template('patientRecord.html')
 
-'''
-@app.route('/patientViewMC', methods=['POST'])
+@app.route('/patientGetApp', methods=['POST'])
 @login_required
-def patientViewMC():
+def patientGetApp():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return render_template('patientViewMC.html'）
-'''
+
+	app_id = request.form['appID']
+	app = Application.query.get(app_id)
+	if not app:
+		return make_response({"ret": "Appointment Not Found!"})
+	if current_user.get_id() != app.patient_id:
+		return redirect("/login")
+		
+	return make_response(jsonify({
+		"date": app.date.strftime(helper.DATE_FORMAT),
+		"time": app.time.strftime(helper.TIME_FORMAT),,
+		"doctor": helper.id2name(app.doctor_id),
+		"symptoms": app.symptoms
+	}))
+
 
 
 @app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
