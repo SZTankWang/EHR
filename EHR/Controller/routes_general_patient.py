@@ -329,7 +329,11 @@ def makeAppt():
 
 @app.route('/patientRecord',methods=['GET'])
 def patientRecord():
-	return render_template('/patientRecord.html')
+	return render_template('/patientRecord.html', healthInfo=False)
+
+@app.route('/patientHealthInfo',methods=['GET'])
+def patientHealthInfo():
+	return render_template('/patientRecord.html', healthInfo=True)
 
 @app.route('/patientFutureAppt', methods=['GET'])
 @login_required
@@ -416,7 +420,7 @@ def getPatientRecord():
 
 @app.route('/updateAffiliation', methods=['POST'])
 def updateAffiliation():
-	
+
 	license_id = request.form['licenceID']
 	hospital_id = request.form['hospitalID']
 	dept_id = request.form['deptID']

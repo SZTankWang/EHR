@@ -46,3 +46,38 @@ class HealthInfo {
     this.state = $("#gender option:selected");
   }
 }
+
+class DynamicHealthInfo extends HealthInfo {
+  constructor() {
+    super();
+    this.button = $("#submitHealthInfo");
+  }
+
+  toggle(){
+    this.toggleTarget(this.age);
+    this.toggleTarget(this.bloodType);
+    this.toggleTarget(this.allergies);
+    this.toggleTarget(this.chronics);
+    this.toggleTarget(this.medications);
+    this.toggleTargetSelect(this.gender);
+    this.toggleTargetDisable(this.button);
+  }
+
+  toggleTarget(target){
+    target.toggleClass("form-control");
+    target.toggleClass("form-control-plaintext");
+    target.attr("readonly", function(index, attr){
+      return attr == "readonly" ? null : "readonly";
+    });
+  }
+  toggleTargetSelect(target){
+    target.toggleClass("form-control");
+    target.toggleClass("form-control-plaintext");
+    this.toggleTargetDisable(target);
+  }
+  toggleTargetDisable(target){
+    target.attr("disabled", function(index, attr){
+      return attr == "disabled" ? null : "disabled";
+    });
+  }
+}

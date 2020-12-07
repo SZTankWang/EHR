@@ -210,4 +210,3 @@ def addLabReportType():
 	db.session.add(lr_type)
 	db.session.commit()
 	return make_response(jsonify({'ret':0}))
-	
