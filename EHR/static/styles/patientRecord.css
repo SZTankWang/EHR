@@ -26,7 +26,7 @@ a{
 }
 
 .go-back{
-	background-image: url(/static/return.svg);
+	background-image: url(/static/icons/return.svg);
 
 }
 
@@ -52,7 +52,7 @@ a{
 }
 
 .search-icon{
-	background-image: url(/static/search.svg);
+	background-image: url(/static/icons/search.svg);
     height: 1.5rem;
     width: 1.3rem;
     margin-left: 2rem;
@@ -146,7 +146,7 @@ a{
 }
 
 .edit-icon{
-	background-image: url(/static/edit_icon.svg);
+	background-image: url(/static/icons/edit.svg);
     height: 1.5rem;
     width: 1.3rem;
     margin-left: 2rem;

@@ -460,4 +460,4 @@ def patientGoViewAppt():
 def patientViewAppt():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return render_template('patientViewMC.html')
+	return make_response(jsonify({"ret": 1}))
