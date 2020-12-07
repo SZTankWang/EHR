@@ -44,7 +44,7 @@ def gen_hospital_data():
 		except:
 			continue
 	print("gen_hospital_data DONE")
-	
+
 def get_dept_list():
 	res = requests.get("https://www.netdoctor.co.uk/health-services/nhs/a4502/a-to-z-of-hospital-departments/")
 	soup = BeautifulSoup(res.content, 'html.parser')
@@ -122,7 +122,7 @@ def gen_time_seg():
 	office_hour_s = 80000
 	# doctor_id_list = get_single_column(Doctor, Doctor.id)
 
-	for i in range(17-9):
+	for i in range(18-9):
 		office_hour_s += 10000
 		ts = Time_segment(
 					   t_seg_starttime="{:06}".format(office_hour_s))
@@ -150,7 +150,7 @@ def gen_time_slot():
 		n_total = random.randint(1,3)
 		doctor_id = random.choice(doctor_list).id
 		slot_seg_id = random.randint(1,n_tot_slot)
-		
+
 		check_exist = Time_slot.query.filter(
 			Time_slot.doctor_id==doctor_id,
 			Time_slot.slot_seg_id == slot_seg_id

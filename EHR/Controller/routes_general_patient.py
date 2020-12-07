@@ -102,7 +102,6 @@ def login():
 				# flash("Unknown error, sorry!")
 				return make_response(jsonify({"ret":1, "message": "Unknown error"}))
 		return make_response(jsonify({"ret":0, "role":current_user.role.value, "id": current_user.id}))
-		#redirect(url_for(f'{current_user.role.value}Home'))
 
 
 #---logout---
@@ -289,6 +288,9 @@ def querySlotInfo():
 @app.route('/makeAppt',methods=['GET','POST'])
 @login_required
 def makeAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
 	try:
 		patient_id = current_user.get_id()
 		symptom = request.form['symptom']
@@ -329,15 +331,22 @@ def makeAppt():
 
 @app.route('/patientRecord',methods=['GET'])
 def patientRecord():
-	return render_template('/patientRecord.html', healthInfo=False)
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return render_template('/patientRecord.html')
 
 @app.route('/patientHealthInfo',methods=['GET'])
 def patientHealthInfo():
-	return render_template('/patientRecord.html', healthInfo=True)
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return render_template('/patientHealthInfo.html')
 
 @app.route('/patientFutureAppt', methods=['GET'])
 @login_required
 def patientFutureAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
 	n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
 	patientID = current_user.get_id()
 	total_number = len(Application.query.filter(Application.patient_id == patientID,
@@ -365,6 +374,9 @@ def patientFutureAppt():
 @app.route('/getPatientRecord', methods=['GET'])
 @login_required
 def getPatientRecord():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
 	type = request.args.get('type')
 	if type == "appointment":
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Application)
@@ -418,24 +430,6 @@ def getPatientRecord():
 			}
 			]))
 
-@app.route('/updateAffiliation', methods=['POST'])
-def updateAffiliation():
-
-	license_id = request.form['licenceID']
-	hospital_id = request.form['hospitalID']
-	dept_id = request.form['deptID']
-
-	current_user.license_id = license_id
-	current_user.hospital_id = hospital_id
-	current_user.dept_id = dept_id
-
-	try:
-		db.session.commit()
-		return make_response(jsonify({'ret':0}))
-	except:
-		db.session.rollback()
-		return make_response(jsonify({'ret':1}))
-
 
 
 
@@ -443,10 +437,29 @@ def updateAffiliation():
 @app.route('/patientGoViewMC', methods=['GET'])
 @login_required
 def patientGoViewMC():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
 	return render_template('patientViewMC.html'）
 
 @app.route('/patientViewMC', methods=['POST'])
 @login_required
 def patientViewMC():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
 	return render_template('patientViewMC.html'）
 '''
+
+
+@app.route('/patientGoViewAppt', methods=['GET'])
+@login_required
+def patientGoViewAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return render_template('patientViewRecord.html')
+
+@app.route('/patientViewAppt', methods=['POST'])
+@login_required
+def patientViewAppt():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+	return render_template('patientViewMC.html')

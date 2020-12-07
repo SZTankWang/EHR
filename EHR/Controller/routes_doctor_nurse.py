@@ -63,7 +63,7 @@ def nursePendingApp():
 									filter(
 										Application.status==StatusEnum.pending,
 										Application.time_slot_id.in_(next7d_slotid)).all()
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	def response_generator(app):
 		return {"appID": app.id,
 			"date": app.date.strftime(helper.DATE_FORMAT),
@@ -85,7 +85,7 @@ def nurseTodayAppt():
 	# department ID of current nurse
 	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	def response_generator(app):
 		return {"appID": app.id,
 			"date": app.date.strftime(helper.DATE_FORMAT),
@@ -104,7 +104,7 @@ def nurseOnGoingAppt():
 	if not helper.check_nurse_privilege():
 		return redirect("/login")
 
-	helper.load_id2name_map() # save this, only for development use
+	# helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
 
@@ -146,7 +146,7 @@ def nurseFutureAppt():
 	else:
 		future_appts = helper.dept_appts(user=current_user, direction="future", start_date=start_date).all()
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	def response_generator(app):
 		return {"appID": app.id,
 			"date": app.date.strftime(helper.DATE_FORMAT),
@@ -173,7 +173,7 @@ def nursePastAppt():
 		apps = helper.dept_appts(user=current_user, direction="past",\
 			 start_date=end_date).filter(Application.status==StatusEnum.finished)
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -215,7 +215,7 @@ def nurseRejectedApp():
 		else:
 			apps = helper.dept_appts(user=current_user).filter(Application.status==StatusEnum.rejected)
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -256,6 +256,8 @@ def nurseGetDepartmentsForNurse():
 @app.route('/nurseGetDoctorsForDepartment',methods=['POST'])
 @login_required
 def nurseGetDoctorsForDepartment():
+	if not helper.check_nurse_privilege():
+		return redirect("/login")
 	deptID = request.form['deptID']
 	return make_response(jsonify(helper.dept_to_doc(deptID)), 200)
 
@@ -277,6 +279,7 @@ def nurseGetSlotsForDoctor():
 			 for i in range(len(slot_list))]),200)
 
 
+# nurse create a new appointment for in-person patients
 @app.route('/nurseCreateAppt', methods=['POST'])
 @login_required
 def nurseCreateAppt():
@@ -292,6 +295,8 @@ def nurseCreateAppt():
 		slot = Time_slot.query.filter(Time_slot.id == time_slot_id).first()
 		date = slot.slot_date
 		time = Time_segment.query.filter(Time_segment.t_seg_id == slot.slot_seg_id).first().t_seg_starttime
+
+		# create an empty medical record for the to-be-created appointment
 		medical_record = Medical_record(patient_id=patient_id)
 		try:
 			db.session.add(medical_record)
@@ -300,6 +305,8 @@ def nurseCreateAppt():
 			db.session.rollback()
 			return make_response(jsonify({'ret':"error"}))
 		mc_id = medical_record.id
+
+		# create the appointment (approved application)
 		application = Application(
 					app_timestamp=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 					symptoms=symptom,
@@ -326,10 +333,10 @@ def nurseCreateAppt():
 		return make_response(jsonify({"ret":0}), 200)
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':"error"}))
+		return make_response(jsonify({'ret':"Database error"}))
 
 
-#---nurse process application---
+# nurse process application
 @app.route('/nurseProcessApp', methods=['POST'])
 def nurseProcessApp():
 	if not helper.check_nurse_privilege():
@@ -364,10 +371,10 @@ def nurseProcessApp():
 		return make_response({'ret':0})
 	except:
 		db.session.rollback()
-		return make_response(jsonify({'ret':"error"}))
+		return make_response(jsonify({'ret':"Database error"}))
 
 
-#---nurse view appointment---
+# nurse view appointment
 @app.route('/nurseGoViewAppt/<string:appID>', methods=['GET', 'POST'])
 @login_required
 def nurseGoViewAppt(appID):
@@ -379,7 +386,7 @@ def nurseGoViewAppt(appID):
 	if appt_res.status.value == "finished":
 		finished = True
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return render_template('nurseViewAppt.html',
 		appID=appt_res.id,
 		date=appt_res.date.strftime(helper.DATE_FORMAT),
@@ -440,6 +447,7 @@ def doctorNurseViewAppt():
 			"file_path": lr.file_path} for lr in lab_reports]
 	}
 
+	# get the lab report types for doctor for lab report request creation
 	if request.form['type'] == "1":
 		if not helper.check_doctor_privilege():
 			return make_response({"ret": "Access to lab report types not granted"})
@@ -452,7 +460,7 @@ def doctorNurseViewAppt():
 
 	return make_response(jsonify(ret))
 
-#JZ
+# get lab report metadata
 @app.route('/nurseGetLabReports', methods=['POST'])
 @app.route('/doctorGetLabReports', methods=['POST'])
 def getLabReports():
@@ -473,13 +481,13 @@ def getLabReports():
 			"file_path": lr.file_path} for lr in mc.lab_reports]
 		}))
 
-
+# open lab report in a new tab
 @app.route('/previewOneLR/<path:filename>')
 def previewLR(filename):
 	return send_from_directory(app.config["UPLOAD_FOLDER"],filename)
 
 
-#---nurse edit appointment/medical record---
+# nurse edit appointment/medical record
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
 def nurseEditPreExam():
 	if not helper.check_nurse_privilege():
@@ -503,9 +511,12 @@ def nurseEditPreExam():
 	mc.height = height
 	mc.state = state
 
-	db.session.commit()
-
-	return make_response(jsonify({'ret':0}))
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"Database error"}))
 
 #JZ
 @app.route('/nurseUploadLabReport', methods=['GET', 'POST'])
@@ -538,17 +549,23 @@ def nurseUploadLabReport():
 	lab_report.uploader_id = nurse_id
 	lab_report.file_path = lr_fname
 
-	db.session.commit()
-
-	return make_response(jsonify({"ret": 0}))
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"Database error"}))
 
 
 #---view medical record---
 @app.route('/doctorNurseGoViewMC', methods=['GET', 'POST'])
 @login_required
 def goViewMC():
+	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
+		return redirect("/login")
+
 	patient_id = request.form['patientID']
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return render_template('doctorNurseViewMC.html',
 				patientID=patient_id,
 				patientName=helper.id2name(patient_id))
@@ -557,8 +574,11 @@ def goViewMC():
 @app.route('/doctorNurseViewMC', methods=['GET', 'POST'])
 @login_required
 def viewMC():
+	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
+		return redirect("/login")
+
 	patient_id = request.form['patientID']
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	table = Application.query.filter(Application.patient_id==patient_id,Application.status==StatusEnum.finished).all()
 	return make_response(
 		jsonify({'patientID':str(patient_id),
@@ -593,7 +613,7 @@ def doctorOnGoingAppt():
 	if not helper.check_doctor_privilege():
 		return redirect("/login")
 
-	helper.load_id2name_map() # save this, only for development use
+	# elper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
 	nowtime = datetime.datetime.now()
 	appt_list = helper.doc2appts(doctorID,0)
@@ -624,7 +644,7 @@ def doctorTodayAppt():
 	doctorID = current_user.get_id()
 	appt_list = helper.doc2appts(doctorID,0)
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return make_response(
 		jsonify([{"appID":str(appt_list[i].id),
 				"date":appt_list[i].date.strftime(helper.DATE_FORMAT),
@@ -632,8 +652,7 @@ def doctorTodayAppt():
 				"nurse":helper.id2name(appt_list[i].approver_id),
 				"patient":helper.id2name(appt_list[i].patient_id),
 				"symptoms":appt_list[i].symptoms}
-		for i in range(len(appt_list))]
-		       )
+		for i in range(len(appt_list))])
 	)
 
 
@@ -672,7 +691,7 @@ def doctorFutureAppt():
 	else:
 		apps = helper.doc2appts(doctorID,start_date = start_date,limit = 'no')
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -711,7 +730,7 @@ def doctorPastAppt():
 	else:
 		apps = helper.doc2appts(doctorID,start_date = start_date, direction = 'past',limit = 'no')
 
-	helper.load_id2name_map()
+	# helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -753,10 +772,15 @@ def doctorNewSlot():
 	).first()
 	if exist_slot:
 		return make_response({'ret':1, 'msg':'Slot Already Created'})
-	time_slot = Time_slot(slot_date=date, n_total=total_slots, n_booked=0, slot_seg_id=t_seg.t_seg_id,  doctor_id=doctor_id)
 
+	time_slot = Time_slot(slot_date=date, n_total=total_slots, n_booked=0, slot_seg_id=t_seg.t_seg_id,  doctor_id=doctor_id)
 	db.session.add(time_slot)
-	db.session.commit()
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret':"Database error"}))
 
 	return make_response({"ret": 0})
 
@@ -827,6 +851,7 @@ def doctorGetPrescrip():
 			  "comments": pres.comments} for pres in prescription_list]
 		}))
 
+
 @app.route('/doctorEditDiag', methods=['POST'])
 def doctorEditDiag():
 	if not helper.check_doctor_privilege():
@@ -845,6 +870,7 @@ def doctorEditDiag():
 		return make_response(jsonify({'ret': "Database error"}))
 	return make_response(jsonify({'ret':0}))
 
+
 @app.route('/doctorAddPrescrip', methods=['POST'])
 def doctorAddPrescrip():
 	if not helper.check_doctor_privilege():
@@ -860,13 +886,15 @@ def doctorAddPrescrip():
 				comments = comments,
 				mc_id = mc_id
 	)
+	db.session.add(prescription)
+
 	try:
-		db.session.add(prescription)
 		db.session.commit()
+		return make_response(jsonify({'ret':0}))
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret': "Database error"}))
-	return make_response(jsonify({'ret':0}))
+
 
 @app.route('/doctorReqLabReport', methods=['POST'])
 def doctorReqLabReport():
@@ -884,13 +912,16 @@ def doctorReqLabReport():
 				mc_id = mc_id,
 				patient_id = patient_id
 	)
+
+	db.session.add(lab_report)
+
 	try:
-		db.session.add(lab_report)
 		db.session.commit()
+		return make_response(jsonify({'ret':0}))
 	except:
 		db.session.rollback()
 		return make_response(jsonify({'ret': "Database error"}))
-	return make_response(jsonify({'ret':0}))
+
 
 @app.route('/doctorFinishAppt', methods=['POST'])
 def doctorFinishAppt():
@@ -900,8 +931,13 @@ def doctorFinishAppt():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).first()
 	appt.status = StatusEnum.finished
-	db.session.commit()
-	return make_response(jsonify({'ret':0}))
+	try:
+		db.session.commit()
+		return make_response(jsonify({'ret':0}))
+	except:
+		db.session.rollback()
+		return make_response(jsonify({'ret': "Database error"}))
+
 
 
 #---------------------------Util--------------------------------

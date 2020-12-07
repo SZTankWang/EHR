@@ -1,11 +1,7 @@
 
-var myHealthInfo;
-
 $(document).ready(function(){
 	$('#apply').button();
-	// drawPagination();
-	myHealthInfo = new DynamicHealthInfo();
-	sendRequest("patientUpdateHealthInfo", "GET", null, (res) => myHealthInfo.update(res));
+	drawPagination();
 })
 
 function goBackHome(){
@@ -63,30 +59,4 @@ function renderCard(data){
 
 
 
-}
-
-// update health info
-$("#healthInfo").on("submit", submitHealthInfo);
-
-/**
-* @desc submit health form
-* @param {event} submit
-*/
-function submitHealthInfo(event){
-  event.preventDefault();
-  var data = jsonify($(this).serializeArray());
-
-  var callBack = (res) => {
-    if (!res.ret) {
-			myHealthInfo.updateHidden();
-			toggleForm();
-    } else {
-			alert("Failed to submit");
-		}
-  };
-  sendRequest("patientUpdateHealthInfo", "POST", data, callBack);
-}
-
-function toggleForm(){
-	myHealthInfo.toggle();
 }
