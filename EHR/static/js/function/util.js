@@ -61,9 +61,11 @@ function getRoute(role){
   }
 }
 
-function switchInputAttr (start, end, startDate, endDate, minDate, maxDate, submit) {
+function switchInputAttr (start, end, startRequired, endRequired, startDate, endDate, minDate, maxDate, submit) {
   $("#startDate").prop("readonly", start);
   $("#endDate").prop("readonly", end);
+  $("#startDate").prop("required", startRequired);
+  $("#endDate").prop("required", endRequired);
   $("#startDate").prop("value", startDate);
   $("#endDate").prop("value", endDate);
   $("#startDate").attr('min', minDate);
@@ -79,13 +81,13 @@ function setStartOrEndDate(startDate=null, endDate=null) {
     startDate = today;
   }
   if ($(".nav-table.active").text() == "Ongoing appointments") {
-    switchInputAttr (true, true, startDate, startDate, "", "", true);
+    switchInputAttr (true, true, false, false, startDate, startDate, "", "", true);
   } else if ($(".nav-table.active").text() == "Future appointments") {
-    switchInputAttr (false, false, startDate, endDate, today, "", false);
+    switchInputAttr (false, false, true, false, startDate, endDate, today, "", false);
   } else if ($(".nav-table.active").text() == "Past appointments") {
-    switchInputAttr (false, false, startDate, endDate, "", today, false);
+    switchInputAttr (false, false, false, true, startDate, endDate, "", today, false);
   } else {
-    switchInputAttr (false, false, startDate, endDate, "", "", false);
+    switchInputAttr (false, false, false, false, startDate, endDate, "", "", false);
   }
 }
 
