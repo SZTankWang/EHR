@@ -63,8 +63,8 @@ def nursePendingApp():
 									filter(
 										Application.status==StatusEnum.pending,
 										Application.time_slot_id.in_(next7d_slotid)).all()
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	def response_generator(app):
 		return {"appID": app.id,
 			"date": app.date.strftime(helper.DATE_FORMAT),
@@ -86,8 +86,8 @@ def nurseTodayAppt():
 	# department ID of current nurse
 	today_depts_appts = helper.dept_appts(user=current_user, period=0).filter(Application.status==StatusEnum.approved).all()
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	def response_generator(app):
 		return {"appID": app.id,
 			"date": app.date.strftime(helper.DATE_FORMAT),
@@ -106,8 +106,8 @@ def nurseOnGoingAppt():
 	if not helper.check_nurse_privilege():
 		return redirect("/login")
 
-	if not helper.id_name_map:
-		helper.load_id2name_map() # save this, only for development use
+
+	helper.load_id2name_map() # save this, only for development use
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
 
@@ -143,14 +143,27 @@ def nurseFutureAppt():
 
 	nurse_id = current_user.get_id()
 	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
+	start_date_str = request.form['startDate']
+	today_str = datetime.datetime.strftime(datetime.datetime.now(), helper.DATE_FORMAT)
+
 	if request.form['endDate']:
 		end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
-		future_appts = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days, start_date=start_date).filter(Application.status==StatusEnum.approved).all()
+		future_appt_filter = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days, start_date=start_date).filter(Application.status==StatusEnum.approved)
+		if start_date_str == today_str:
+			nowTime = datetime.datetime.strftime(datetime.datetime.today(), helper.TIME_FORMAT)
+			future_appts = future_appt_filter.filter(Application.time>=nowTime).all()
+		else:
+			future_appts = future_appt_filter.all()
 	else:
-		future_appts = helper.dept_appts(user=current_user, direction="future", start_date=start_date).filter(Application.status==StatusEnum.approved).all()
+		future_appt_filter = helper.dept_appts(user=current_user, direction="future", start_date=start_date).filter(Application.status==StatusEnum.approved)
+		if start_date_str == today_str:
+			nowTime = datetime.datetime.strftime(datetime.datetime.today(), helper.TIME_FORMAT)
+			future_appts = future_appt_filter.filter(Application.time>=nowTime).all()
+		else:
+			future_appt_filter.all()
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	def response_generator(app):
 		return {"appID": app.id,
 			"date": app.date.strftime(helper.DATE_FORMAT),
@@ -177,8 +190,8 @@ def nursePastAppt():
 		apps = helper.dept_appts(user=current_user, direction="past",\
 			 start_date=end_date).filter(Application.status==StatusEnum.finished)
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -220,8 +233,8 @@ def nurseRejectedApp():
 		else:
 			apps = helper.dept_appts(user=current_user).filter(Application.status==StatusEnum.rejected)
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -397,8 +410,8 @@ def nurseGoViewAppt(appID):
 	if appt_res.status.value == "finished":
 		finished = True
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	return render_template('nurseViewAppt.html',
 		appID=appt_res.id,
 		date=appt_res.date.strftime(helper.DATE_FORMAT),
@@ -580,8 +593,8 @@ def goViewMC():
 		return redirect("/login")
 
 	patient_id = request.form['patientID']
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	return render_template('doctorNurseViewMC.html',
 				patientID=patient_id,
 				patientName=helper.id2name(patient_id))
@@ -594,8 +607,8 @@ def viewMC():
 		return redirect("/login")
 
 	patient_id = request.form['patientID']
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	table = Application.query.filter(Application.patient_id==patient_id,Application.status==StatusEnum.finished).all()
 	return make_response(
 		jsonify({'patientID':str(patient_id),
@@ -661,8 +674,8 @@ def doctorTodayAppt():
 	doctorID = current_user.get_id()
 	appt_list = helper.doc2appts(doctorID,0)
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	return make_response(
 		jsonify([{"appID":str(appt_list[i].id),
 				"date":appt_list[i].date.strftime(helper.DATE_FORMAT),
@@ -714,8 +727,8 @@ def doctorFutureAppt():
 		for i in range(len(apps)):
 			if datetime.datetime.combine(apps[i].date,apps[i].time) < datetime.datetime.now()-timedelta(minutes = 30):
 				apps.pop(i)
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 	return make_response(
 		jsonify([
 			{
@@ -754,8 +767,8 @@ def doctorPastAppt():
 	else:
 		apps = helper.doc2appts(doctorID,start_date = start_date, direction = 'past',limit = 'no')
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 
 	return make_response(
 		jsonify([

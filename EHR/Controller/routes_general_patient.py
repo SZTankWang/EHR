@@ -83,8 +83,7 @@ def login():
 	"""
 	if request.method == 'GET':
 		if current_user.is_authenticated:
-			if not helper.id_name_map:
-				helper.load_id2name_map()
+			helper.load_id2name_map()
 			return redirect(url_for('loadHomePage'))
 		return render_template('login.html')
 	if request.method == 'POST':
@@ -250,8 +249,8 @@ def getDoctorByDept():
 def viewDoctorByID(doctorID):
 	doctor = Doctor.query.join(Department, Doctor.department_id == Department.id).\
 					join(Hospital,Department.hospital_id == Hospital.id).filter(Doctor.id == doctorID).first()
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+
+	helper.load_id2name_map()
 
 	doctorName = id2name(doctorID)
 	hospital = doctor.department.hospital.name
@@ -358,8 +357,7 @@ def patientFutureAppt():
 		Application.status == StatusEnum.approved,
 		Application.date+Application.date>= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 
-	if not helper.id_name_map:
-		helper.load_id2name_map()
+	helper.load_id2name_map()
 
 	return make_response(
 		jsonify({'total_number': total_number,
@@ -389,8 +387,7 @@ def getPatientRecord():
 		total_number = len(Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).all())
 		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 
-		if not helper.id_name_map:
-			helper.load_id2name_map()
+		helper.load_id2name_map()
 
 		return make_response(
 			jsonify({'total_number': total_number,
@@ -415,8 +412,7 @@ def getPatientRecord():
 							Application.status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 
-		if not helper.id_name_map:
-			helper.load_id2name_map()
+		helper.load_id2name_map()
 
 		return make_response(
 			jsonify({'total_number': len(mcs),

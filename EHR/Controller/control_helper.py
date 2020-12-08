@@ -71,6 +71,9 @@ def segid2time(t_seg_id):
 	return Time_segment.query.filter(Time_segment.t_seg_id==t_seg_id).one().t_seg_starttime
 
 def load_id2name_map():
+	if id_name_map:
+		return
+	print("load")
 	users = User.query.with_entities(User.id, User.first_name, User.last_name)
 	for u in users:
 		id_name_map[u.id] = u.first_name + " " + u.last_name
