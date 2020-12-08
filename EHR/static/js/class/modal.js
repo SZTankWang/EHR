@@ -67,6 +67,7 @@ loadAppInfo, loadMCInfo
 class MCModal extends AppFullModal{
   constructor(){
     super();
+    this.myself = $("#mc");
     this.appStatus = $("#appStatus");
     this.mcID = $("#mcID");
     this.bodyTemperature = $("#bodyTemperature");

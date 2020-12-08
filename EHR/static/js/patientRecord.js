@@ -50,7 +50,8 @@ function drawPagination(){
 
 function renderCard(data){
 	var temp = '';
-	temp += '<div class="my-container card">';
+	temp += '<div class="my-container card" onclick="buttonAction(this)">';
+	temp += '<div class="my-container card-row"><form class="d-none"><input type="text" name="getAppID" value=' + data['appID'] + '></form></div>';
 	temp += '<div class="my-container card-row card-title">';
 	temp += '<div class="my-container text-wrapper"><h5>';
 	temp += data['hospital'];
@@ -67,25 +68,18 @@ function renderCard(data){
 }
 
 
-// ---------------------capture user action--------------------------
-// click table button
-//TODO:
-
-
 // --------------------------event handlers----------------------------
 /**
 * @desc display modal or go to view appointment page
 * @param {event} event - click
 * @this event target element - view button
 */
-function buttonAction(event) {
-  event.preventDefault();
-  var data = {};
-	data['appID'] = event.target.attr("id");
+function buttonAction(e) {
+  var data = jsonify($(e).find("form").serializeArray());
 
 	//get appointment data
-  sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
-  var reqData = {"appID": data['appID']};
+  sendRequest("/patientGetApp", "POST", {"appID": data['getAppID']}, (res) => myModal.setApp(res));
+  var reqData = {"appID": data['getAppID']};
   var setComments = (res) => {myModal.setComments(res.comments)};
   sendRequest("getComments", "POST", reqData, setComments);
   myModal.show();

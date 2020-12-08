@@ -46,9 +46,9 @@ function drawPagination(){
 
 function renderCard(data){
 	var temp = '';
-	temp += '<div class="my-container card">';
+	temp += '<div class="my-container card" onclick="buttonAction(this)">';
+	temp += '<div class="my-container card-row"><form class="d-none"><input type="text" name="getAppID" value=' + data['appID'] + '><input type="text" name="getMCID" value=' + data['mcID'] + '></form></div>';
 	temp += '<div class="my-container card-row card-title">';
-	temp += '<div class="my-container"><form id="getIDs" style="display:none;"><input type="text" name="getAppID" id="getAppID" value=' + data['appID'] + '><input type="text" name="getMCID" id="getMCID" value=' + data['mcID'] + '><button type="submit" class="btn" value="View"/></form></div>';
 	temp += '<div class="my-container text-wrapper"><h5>';
 	temp += data['hospital'];
 	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>';
@@ -73,14 +73,15 @@ function renderCard(data){
 * @desc display modal
 * @param {event} event - click
 */
-function buttonAction(event) {
-  var data = jsonfy(event.target.children("form").serializeArray());
+function buttonAction(e) {
+  var data = jsonify($(e).find("form").serializeArray());
 
-  myModal.setMCID(data['mcID']);
+  myModal.setMCID(data['getMCID']);
 	//get appointment data
-	sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
+	sendRequest("/patientGetApp", "POST", {"appID": data['getAppID']}, (res) => myModal.setApp(res));
   // request and fill in app status and comments
-  myModal.loadAppInfo(data['appID']);
+  myModal.loadAppInfo(data['getAppID']);
   // request and fill in medical record data
-  myModal.loadMCInfo(data['mcID'], "patientViewAppt");
+  myModal.loadMCInfo(data['getMCID'], "patientViewAppt");
+	myModal.show();
 }
