@@ -1,10 +1,10 @@
-
 /**
 * @global instance of AppFullModal
 */
 var myModal;
 
 $(document).ready(function(){
+
 	$('#apply').button();
 	drawPagination();
 	myModal = new AppFullModal();
