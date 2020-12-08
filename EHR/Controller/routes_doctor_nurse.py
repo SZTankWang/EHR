@@ -84,7 +84,7 @@ def nurseTodayAppt():
 
 	nurseID = current_user.get_id()
 	# department ID of current nurse
-	today_depts_appts = helper.dept_appts(user=current_user, period=0).all()
+	today_depts_appts = helper.dept_appts(user=current_user, period=0).filter(Application.status==StatusEnum.approved).all()
 
 	if not helper.id_name_map:
 		helper.load_id2name_map()
@@ -145,9 +145,9 @@ def nurseFutureAppt():
 	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
 	if request.form['endDate']:
 		end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
-		future_appts = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days, start_date=start_date).all()
+		future_appts = helper.dept_appts(user=current_user, direction="future", period=(end_date-start_date).days, start_date=start_date).filter(Application.status==StatusEnum.approved).all()
 	else:
-		future_appts = helper.dept_appts(user=current_user, direction="future", start_date=start_date).all()
+		future_appts = helper.dept_appts(user=current_user, direction="future", start_date=start_date).filter(Application.status==StatusEnum.approved).all()
 
 	if not helper.id_name_map:
 		helper.load_id2name_map()
