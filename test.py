@@ -1,5 +1,8 @@
 from EHR import app
 import unittest 
+from unittest import mock 
+from flask_testing import TestCase
+
 
 class FlaskTestCases(unittest.TestCase):
 
@@ -25,13 +28,15 @@ class FlaskTestCases(unittest.TestCase):
             data=dict(id='hello',password='world'), follow_redirects=True)
         self.assertIn(b'Unregistered', response.data)
 
-    # test login with empty credential 
-    def test_empty_login(self):
-        tester = app.test_client(self)
-        response = tester.post(
-            '/register',
-            data=dict(role='nurse'), follow_redirects=True)
-        print(response.data)
+    # test patientA trying to check patientB's documents
+    # @mock.patch('flask_login.utils._get_user')
+    def test_privacy(self):
+        with self.client:
+            # user = mock.MagicMock()
+            response = self.client.post(
+                '/login',
+                data=dict(id='p', password='p'), follow_redirects=True)
+            print(response.data)
         # self.assertIn(b'Unregistered', response.data)
 
     # test register
