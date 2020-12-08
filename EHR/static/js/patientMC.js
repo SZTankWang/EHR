@@ -19,7 +19,7 @@ function drawPagination(){
 	$('.pagination-container').pagination({
 		pageSize:5,
 		dataSource:'http://localhost:5000/getPatientRecord',
-		locator:'apps',
+		locator:'mcs',
 		totalNumberLocator:function(response){
 			return response.total_number;
 		},
@@ -63,7 +63,6 @@ function renderCard(data){
 // ---------------------capture user action--------------------------
 // click table button
 // TODO:
-$('#').on('click', buttonAction);
 
 // --------------------------event handlers----------------------------
 /**
