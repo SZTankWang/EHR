@@ -20,7 +20,7 @@
 	</nav>
 	<div id="content-container">
 		<div id="background-container">
-			<div id="search-bar-container">
+			<!-- <div id="search-bar-container">
 				<div class="input-group input-group-lg">
 					  <input type="text" class="form-control" placeholder="search for hospitals, doctors" >
 					  <div class="input-group-append" id='serach-btn-container'>
@@ -32,7 +32,7 @@
 					</button>
 					  </div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 		<div id="function-container">
 			<div class='function'id="card-container">
@@ -68,7 +68,7 @@
 				<p class="function-title" id='title2'>upcoming appointments</p>
 				<div id="outer-container"></div>
 				<div id="appointment-btn-wrapper">
-					<button type="button" class="btn btn-secondary">appointment records</button>
+					<button type="button" class="btn btn-primary" onclick="goToPage('patientRecord', 0)">appointment records</button>
 				</div>
 			</div>
 		</div>
@@ -80,5 +80,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
+	<script type="text/javascript" src="/static/js/function/util.js"></script>
 </body>
 </html>

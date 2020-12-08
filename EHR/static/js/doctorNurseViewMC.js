@@ -5,7 +5,7 @@
 */
 
 /**
-* @global instance of MCModal
+* @global instance of MCModal and table
 */
 var myModal;
 var myTable;
@@ -42,7 +42,7 @@ function buttonAction(event) {
   // request and fill in app status and comments
   myModal.loadAppInfo(data['appID']);
   // request and fill in medical record data
-  myModal.loadMCInfo(mcID);
+  myModal.loadMCInfo(mcID, "doctorNurseViewAppt");
 }
 
 /**

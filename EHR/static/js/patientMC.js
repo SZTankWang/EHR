@@ -1,23 +1,13 @@
-
-
-
-
-
-
-
-
-
+/**
+* @global instance of MCModal
+*/
+var myModal;
 
 $(document).ready(function(){
-
 	$('#apply').button();
 	drawPagination();
-	myModal = new AppFullModal();
+	myModal = new MCModal();
 })
-
-function goBackHome(){
-	window.location.replace('http://localhost:5000/loadHomePage');
-}
 
 function drawPagination(){
 	// var data = $.ajax({
@@ -35,7 +25,7 @@ function drawPagination(){
 		},
 		showPrevious:true,
 		showNext:true,
-		ajax:{data:{type:'appointment'}},
+		ajax:{data:{type:'medical_record'}},
 		alias:{
 			'pageNumber':'currPage'
 		},
@@ -72,27 +62,23 @@ function renderCard(data){
 
 // ---------------------capture user action--------------------------
 // click table button
-//TODO:
-
+// TODO:
+$('#').on('click', buttonAction);
 
 // --------------------------event handlers----------------------------
 /**
-* @desc display modal or go to view appointment page
+* @desc display modal
 * @param {event} event - click
-* @this event target element - view button
 */
 function buttonAction(event) {
-  event.preventDefault();
   var data = {};
-	//TODO: get data from page
+	// TODO: get app data from page
+	data['mcID'] = null;
 	data['appID'] = null;
-	data['date'] = null;
-	data['time'] = null;
-	data['doctor'] = null;
-	data['symptoms'] = null;
-  myModal.setApp(data);
-  var reqData = {"appID": data['appID']};
-  var setComments = (res) => {myModal.setComments(res.comments)};
-  sendRequest("getComments", "POST", reqData, setComments);
-  myModal.show();
+  myModal.setMCID(data['mcID']);
+	sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
+  // request and fill in app status and comments
+  myModal.loadAppInfo(data['appID']);
+  // request and fill in medical record data
+  myModal.loadMCInfo(data['mcID'], "patientViewAppt");
 }

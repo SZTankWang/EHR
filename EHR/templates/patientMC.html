@@ -123,12 +123,12 @@
 
 	</div>
 
-	<!-- application modal -->
-	<div class="modal fade" id="application" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="application" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-scrollable modal-lg">
+	<!-- medical record modal -->
+	<div class="modal fade" id="mc" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="mc" aria-hidden="false">
+		<div class="modal-dialog modal-dialog-scrollable modal-xl">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="applicationLabel">Rejected Appointment Application</h5>
+					<h5 class="modal-title" id="mcLabel">Medical Record</h5>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
@@ -136,28 +136,91 @@
 				<div class="modal-body">
 					<div class="container-fluid">
 						<div class="row">
-							<div class="col-md-4"><span><b>Application ID: </b></span><span id="appID"></span></div>
-							<div class="col-md-4"><span><b>Date: </b></span><span id="date"></span></div>
-							<div class="col-md-4"><span><b>Time: </b></span><span id="time"></span></div>
+							<div class="col-md-3"><span><b>Application ID: </b></span><span id="appID"></span></div>
+							<div class="col-md-3"><span><b>Date: </b></span><span id="date"></span></div>
+							<div class="col-md-3"><span><b>Time: </b></span><span id="time"></span></div>
 						</div>
 						<div class="row">
-							<div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor"></span></div>
+							<div class="col-md-4"><span><b>Medical Record ID: </b></span><span id="mcID"></span></div>
 							<div class="col-md-4"><span><b>Patient: </b></span><span id="patient"></span></div>
+							<div class="col-md-4"><span><b>Doctor: </b></span><span id="doctor"></span></div>
 						</div>
 						<div class="row">
-							<div class="col-md-6"><span><b>Symptoms: </b></span><span id="symptoms"></span></div>
+							<div class="col-md"><span><b>Symptoms: </b></span><span id="symptoms"></span></div>
 						</div>
 						<div class="row">
-							<div class="col"><span><b>Comments: </b></span><span id="comments"></span></div>
+							<div class="col-md"><span><b>Comments: </b></span><span id="comments"></span></div>
 						</div>
+						<div class="row">
+							<div class="col-md"><span><b>Application/Appointment Status: </b></span><span id="appStatus"></span></div>
+						</div>
+						<hr>
+						<h5>Pre-examination</h5>
+						<div class="row">
+							<div class="col-md-3"><b>Body temperature</b></div>
+							<div class="col-md-auto" id="bodyTemperature">
+							</div>
+							<div class="col-md-auto">&#8451;</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3"><b>Heart rate</b></div>
+							<div class="col-md-auto" id="heartRate">
+							</div>
+							<div class="col-md-auto">BPM</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3"><b>High blood pressure</b></div>
+							<div class="col-md-auto" id="highBloodPressure">
+							</div>
+							<div class="col-md-auto">mmHg</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3"><b>Low blood pressure</b></div>
+							<div class="col-md-auto" id="lowBloodPressure">
+							</div>
+							<div class="col-md-auto">mmHg</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3"><b>Weight</b></div>
+							<div class="col-md-auto" id="weight">
+							</div>
+							<div class="col-md-auto">g</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3"><b>Height</b></div>
+							<div class="col-md-auto" id="height">
+							</div>
+							<div class="col-md-auto">cm</div>
+						</div>
+						<div class="row">
+							<div class="col-md-3"><b>State</b></div>
+							<div class="col-md-auto" id="state">
+							</div>
+						</div>
+						<hr>
+						<h5>Diagnosis</h5>
+						<p id="diagnosis"></p>
+						<hr>
+						<h5>
+							Prescriptions
+							<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#prescriptions" aria-expanded="false" aria-controls="prescriptions">Show</button>
+						</h5>
+						<div id="prescriptions" class="collapse"></div>
+						<hr>
+						<h5>
+							Lab reports
+							<button class="btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#labReports" aria-expanded="false" aria-controls="labReports">Show</button>
+						</h5>
+						<div id="labReports" class="collapse"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-<script type="text/javascript" src="/static/js/patientRecord.js"></script>
+<script type="text/javascript" src="/static/js/patientMC.js"></script>
 <script type="text/javascript" src="/static/js/function/util.js"></script>
+<script type="text/javascript" src="/static/js/function/apptMC.js"></script>
 <script type="text/javascript" src="/static/js/class/modal.js"></script>
 </body>
 </html>

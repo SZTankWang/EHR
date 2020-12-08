@@ -62,44 +62,6 @@ def Settings():
 					phone=user.phone)
 
 
-@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
-def patientUpdateHealthInfo():
-	if not helper.check_patient_privilege():
-		return redirect("/login")
-
-	p_id = current_user.get_id()
-	if request.method == "GET":
-		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
-		gender = role_user.gender
-		if gender:
-			gender = gender.value
-		return make_response(jsonify({"ret": 0, "age": role_user.age, "gender": gender, "bloodType": role_user.blood_type, "allergies": role_user.allergies, "chronics": role_user.chronics, "medications": role_user.medications}))
-	if request.method == "POST":
-		age = helper.StrOrNone(request.form['age'])
-		gender = request.form['gender']
-		blood_type = request.form['bloodType']
-		allergies = request.form['allergies']
-		chronics = request.form['chronics']
-		medications = request.form['medications']
-		db.session.query(Patient).filter(Patient.id==p_id).update(
-			{
-				Patient.id: p_id,
-				Patient.gender: gender,
-				Patient.allergies: allergies,
-				Patient.age: age,
-				Patient.blood_type: blood_type,
-				Patient.chronics: chronics,
-				Patient.medications: medications
-
-			}, synchronize_session=False
-		)
-		try:
-			db.session.commit()
-			return make_response(jsonify({"ret": 0}))
-		except:
-			db.session.rollback()
-			return make_response(jsonify({"ret": "Database error"}))
-
 @app.route('/doctorNurseUpdateInfo', methods=['POST'])
 @app.route('/patientUpdateInfo', methods=['POST'])
 def UpdateInfo():
@@ -235,9 +197,13 @@ def updateAffiliation():
 	if hospital_id != str(dept_hospital):
 		return make_response(jsonify({'ret': "Department and hospital don't match."}))
 
-	current_user.license_id = license_id
-	current_user.hospital_id = hospital_id
-	current_user.dept_id = dept_id
+	user = User.query.get(license_id)
+	if not user:
+		return make_response(jsonify({'ret': "User doesn't exist."}))
+	if user.role != RoleEnum.doctor and user.role != RoleEnum.nurse:
+		return make_response(jsonify({'ret': "Invalid role."}))
+	user.hospital_id = hospital_id
+	user.dept_id = dept_id
 
 	try:
 		db.session.commit()

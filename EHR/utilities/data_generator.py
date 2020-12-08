@@ -5,10 +5,10 @@ from sys import path_importer_cache
 from typing import Container, DefaultDict, List
 
 from sqlalchemy.orm.session import _state_session
-sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
-mypath = "/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities"
-# sys.path.append("/Users/jenny/Desktop/EHR")
-# mypath = "/Users/jenny/Desktop/EHR/EHR/utilities"
+# sys.path.append("/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR")
+# mypath = "/Users/qing/School_Study/2020_Fall/SE/PROJECT/EHR/EHR/utilities"
+sys.path.append("/Users/jenny/Desktop/EHR")
+mypath = "/Users/jenny/Desktop/EHR/EHR/utilities"
 from EHR.model.models import *
 from EHR import db
 import random
@@ -67,7 +67,7 @@ def get_dept_list():
 def gen_user_data():
 	#  hospital info
 	user_df = pd.read_csv(mypath + "/user_info.csv")
-	id_list = list(set(['{:8}'.format(random.randint(10000000,99999999)) for _ in range(USER_N_RECORD)  ]))
+	# id_list = list(set(['{:8}'.format(random.randint(10000000,99999999)) for _ in range(USER_N_RECORD)  ]))
 	roles = ['doctor', 'nurse', 'patient']
 
 	firstname_list, lastname_list, email_list, password_list = \
@@ -76,8 +76,8 @@ def gen_user_data():
 	num_dept = Department.query.count()
 	print("num_dept==================", num_dept)
 
-	for i in range(USER_N_RECORD):
-		u = User(id=id_list[i],
+	for i in range(1, USER_N_RECORD):
+		u = User(id=i,
 				 first_name=firstname_list[i],
 				 last_name=lastname_list[i],
 				 role=roles[i%3],
@@ -88,18 +88,18 @@ def gen_user_data():
 		db.session.add(u)
 
 		if u.role=='doctor':
-			new = Doctor(id=id_list[i],
+			new = Doctor(id=i,
 					   department_id=1+(i%num_dept))
 		elif u.role=='patient':
-			new = Patient(id=id_list[i],
+			new = Patient(id=i,
 						  age=random.randint(1,100),
 						  gender=random.choice(list(GenderEnum)),
 						  blood_type=random.choice(BLOOD_TYPE))
 		elif u.role=='nurse':
-			new = Nurse(id=id_list[i],
+			new = Nurse(id=i,
 						department_id=1+(i%num_dept))
-		elif u.role=='admin':
-			new = Admin(id=id_list[i])
+		# elif u.role=='admin':
+		# 	new = Admin(id=0)
 
 		db.session.add(new)
 	db.session.commit()
@@ -300,14 +300,14 @@ def practice_query():
 def main():
 	# please do not change the following execution order
 	print("on it")
-	# gen_hospital_data()
-	# gen_dept_data()
-	# gen_user_data()
-	# gen_time_seg()
+	gen_hospital_data()
+	gen_dept_data()
+	gen_user_data()
+	gen_time_seg()
 	gen_time_slot()
-	# gen_appt()
-	# gen_prescription()
-	# gen_report_type()
+	gen_appt()
+	gen_prescription()
+	gen_report_type()
 	# gen_lab_reports()
 
 main()

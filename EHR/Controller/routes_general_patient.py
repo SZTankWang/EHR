@@ -402,7 +402,7 @@ def getPatientRecord():
 		n_offset, n_tot_records, n_tot_page, page_count = helper.paginate(Medical_record)
 		patientID = current_user.get_id()
 		apps = Application.query.filter(Application.patient_id == patientID,
-							Application.Status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+							Application.status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
 		helper.load_id2name_map()
 		return make_response(
@@ -410,54 +410,85 @@ def getPatientRecord():
 					"mcs":[
 					{"mcID": mcs[i].id,
 					"date": apps[i].date.strftime(helper.DATE_FORMAT),
-					"time": app[i].time.strftime(helper.TIME_FORMAT),
+					"time": apps[i].time.strftime(helper.TIME_FORMAT),
 					"diagnosis": mcs[i].diagnosis} for i in range(len(mcs))]
 					}))
-	elif type == "personal_record":
-		patientID = current_user.get_id()
-		patient = Patient.query.filter(Patient.id== patientID).first()
-		return make_response(
-			jsonify([
-			{
-				"age": patient.age,
-				"gender": patient.gender,
-				"blood_type": patient.blood_type,
-				"allergies": patient.allergies,
-				"chronics": patient.chronics,
-				"medications": patient.medications
-			}
-			]))
 
 
 
-
-'''
 @app.route('/patientGoViewMC', methods=['GET'])
 @login_required
 def patientGoViewMC():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return render_template('patientViewMC.html'）
-
-@app.route('/patientViewMC', methods=['POST'])
-@login_required
-def patientViewMC():
-	if not helper.check_patient_privilege():
-		return redirect("/login")
-	return render_template('patientViewMC.html'）
-'''
-
+	return render_template('patientMC.html')
 
 @app.route('/patientGoViewAppt', methods=['GET'])
 @login_required
 def patientGoViewAppt():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return render_template('patientViewRecord.html')
+	return render_template('patientRecord.html')
 
-@app.route('/patientViewAppt', methods=['POST'])
+@app.route('/patientGetApp', methods=['POST'])
 @login_required
-def patientViewAppt():
+def patientGetApp():
 	if not helper.check_patient_privilege():
 		return redirect("/login")
-	return make_response(jsonify({"ret": 1}))
+
+	app_id = request.form['appID']
+	app = Application.query.get(app_id)
+	if not app:
+		return make_response({"ret": "Appointment Not Found!"})
+	if current_user.get_id() != app.patient_id:
+		return redirect("/login")
+
+	return make_response(jsonify({
+		"date": app.date.strftime(helper.DATE_FORMAT),
+		"time": app.time.strftime(helper.TIME_FORMAT),
+		"doctor": helper.id2name(app.doctor_id),
+		"symptoms": app.symptoms
+	}))
+
+
+
+@app.route('/patientUpdateHealthInfo', methods=['GET', 'POST'])
+def patientUpdateHealthInfo():
+	if not helper.check_patient_privilege():
+		return redirect("/login")
+
+	p_id = current_user.get_id()
+	if request.method == "GET":
+		role_user = db.session.query(Patient).filter(Patient.id==p_id).first()
+		gender = role_user.gender
+		if gender:
+			gender = gender.value
+		return make_response(jsonify({"ret": 0, "age": role_user.age,
+		"gender": gender, "bloodType": role_user.blood_type,
+		"allergies": role_user.allergies, "chronics": role_user.chronics,
+		"medications": role_user.medications}))
+	if request.method == "POST":
+		age = helper.StrOrNone(request.form['age'])
+		gender = request.form['gender']
+		blood_type = request.form['bloodType']
+		allergies = request.form['allergies']
+		chronics = request.form['chronics']
+		medications = request.form['medications']
+		db.session.query(Patient).filter(Patient.id==p_id).update(
+			{
+				Patient.id: p_id,
+				Patient.gender: gender,
+				Patient.allergies: allergies,
+				Patient.age: age,
+				Patient.blood_type: blood_type,
+				Patient.chronics: chronics,
+				Patient.medications: medications
+
+			}, synchronize_session=False
+		)
+		try:
+			db.session.commit()
+			return make_response(jsonify({"ret": 0}))
+		except:
+			db.session.rollback()
+			return make_response(jsonify({"ret": "Database error"}))
