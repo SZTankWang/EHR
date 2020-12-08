@@ -353,10 +353,10 @@ def patientFutureAppt():
 	patientID = current_user.get_id()
 	total_number = len(Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
-		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).all())
+		Application.date+Application.time >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).all())
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
-		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
+		Application.date+Application.date>= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 
 	if not helper.id_name_map:
 		helper.load_id2name_map()
