@@ -1,6 +1,6 @@
 
 /**
-* @global instance of MyTable and MyModal
+* @global instance of AppFullModal
 */
 var myModal;
 
@@ -61,12 +61,6 @@ function renderCard(data){
 }
 
 
-// ---------------------capture user action--------------------------
-// click table button
-//TODO:
-$('#').on('click', buttonAction);
-
-
 // --------------------------event handlers----------------------------
 /**
 * @desc display modal or go to view appointment page
@@ -76,13 +70,10 @@ $('#').on('click', buttonAction);
 function buttonAction(event) {
   event.preventDefault();
   var data = {};
-	//TODO: get data from page
-	data['appID'] = null;
-	data['date'] = null;
-	data['time'] = null;
-	data['doctor'] = null;
-	data['symptoms'] = null;
-  myModal.setApp(data);
+	data['appID'] = event.target.attr("id");
+
+	//get appointment data
+  sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
   var reqData = {"appID": data['appID']};
   var setComments = (res) => {myModal.setComments(res.comments)};
   sendRequest("getComments", "POST", reqData, setComments);

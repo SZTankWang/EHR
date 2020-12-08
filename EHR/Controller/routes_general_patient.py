@@ -83,6 +83,8 @@ def login():
 	"""
 	if request.method == 'GET':
 		if current_user.is_authenticated:
+			if not helper.id_name_map:
+				helper.load_id2name_map()
 			return redirect(url_for('loadHomePage'))
 		return render_template('login.html')
 	if request.method == 'POST':
@@ -248,7 +250,9 @@ def getDoctorByDept():
 def viewDoctorByID(doctorID):
 	doctor = Doctor.query.join(Department, Doctor.department_id == Department.id).\
 					join(Hospital,Department.hospital_id == Hospital.id).filter(Doctor.id == doctorID).first()
-	helper.load_id2name_map()
+	if not helper.id_name_map:
+		helper.load_id2name_map()
+
 	doctorName = id2name(doctorID)
 	hospital = doctor.department.hospital.name
 	department = doctor.department.title
@@ -353,7 +357,10 @@ def patientFutureAppt():
 	apps = Application.query.filter(Application.patient_id == patientID,
 		Application.status == StatusEnum.approved,
 		Application.date >= datetime.datetime.today()).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
-	helper.load_id2name_map()
+
+	if not helper.id_name_map:
+		helper.load_id2name_map()
+
 	return make_response(
 		jsonify({'total_number': total_number,
 				"apps":[
@@ -381,7 +388,10 @@ def getPatientRecord():
 		patientID = current_user.get_id()
 		total_number = len(Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).all())
 		apps = Application.query.filter(Application.patient_id == patientID).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
-		helper.load_id2name_map()
+
+		if not helper.id_name_map:
+			helper.load_id2name_map()
+
 		return make_response(
 			jsonify({'total_number': total_number,
 					"apps":[
@@ -390,12 +400,12 @@ def getPatientRecord():
 					"time": app.time.strftime(helper.TIME_FORMAT),
 					"hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(app.doctor_id, "doctor")).first().name,
 					"department":helper.user2dept_name(app.doctor_id, "doctor"),
-					"nurse": helper.id2name(app.approver_id) if app.approver_id else "",
-					"patient": helper.id2name(app.patient_id),
-					"symptoms": app.symptoms,
 					"doctor": helper.id2name(app.doctor_id),
 					"status": app.status.value,
-					"reject_reason":app.reject_reason,
+					# "nurse": helper.id2name(app.approver_id) if app.approver_id else "",
+					# "patient": helper.id2name(app.patient_id),
+					# "symptoms": app.symptoms,
+					# "reject_reason":app.reject_reason,
 				} for app in apps]
 				}))
 	elif type == "medical_record":
@@ -404,14 +414,20 @@ def getPatientRecord():
 		apps = Application.query.filter(Application.patient_id == patientID,
 							Application.status == StatusEnum.finished).order_by(Application.date.desc(),Application.time.desc()).offset(n_offset).limit(page_count).all()
 		mcs = [Medical_record.query.filter(Medical_record.id==app.mc_id).first() for app in apps]
-		helper.load_id2name_map()
+
+		if not helper.id_name_map:
+			helper.load_id2name_map()
+
 		return make_response(
 			jsonify({'total_number': n_tot_records,
 					"mcs":[
 					{"mcID": mcs[i].id,
+					"appID": apps[i].id,
 					"date": apps[i].date.strftime(helper.DATE_FORMAT),
 					"time": apps[i].time.strftime(helper.TIME_FORMAT),
-					"diagnosis": mcs[i].diagnosis} for i in range(len(mcs))]
+					"doctor": helper.id2name(apps[i].doctor_id),
+					"hospital":Hospital.query.filter(Hospital.id == helper.user2hosp(apps[i].doctor_id, "doctor")).first().name,
+					"department":helper.user2dept_name(apps[i].doctor_id, "doctor"),} for i in range(len(mcs))]
 					}))
 
 

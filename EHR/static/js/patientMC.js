@@ -60,22 +60,16 @@ function renderCard(data){
 }
 
 
-// ---------------------capture user action--------------------------
-// click table button
-// TODO:
-$('#').on('click', buttonAction);
-
 // --------------------------event handlers----------------------------
 /**
 * @desc display modal
 * @param {event} event - click
 */
 function buttonAction(event) {
-  var data = {};
-	// TODO: get app data from page
-	data['mcID'] = null;
-	data['appID'] = null;
+  var data = jsonfy(event.target.children("form").serializeArray());
+
   myModal.setMCID(data['mcID']);
+	//get appointment data
 	sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
   // request and fill in app status and comments
   myModal.loadAppInfo(data['appID']);
