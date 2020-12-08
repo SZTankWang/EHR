@@ -155,3 +155,14 @@ a{
 .edit-icon:hover{
 	cursor:pointer;
 }
+
+.card:hover{
+	cursor: pointer;
+    -webkit-transform: translateY(-3px);
+    -ms-transform: translateY(-3px);
+    transform: translateY(-3px);
+    -webkit-box-shadow: 0 0 6px #999;
+    box-shadow: 0 0 6px #999;
+    -webkit-transition: all 0s ease-out;
+    transition: all 0s ease-out;
+}
