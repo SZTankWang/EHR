@@ -2,6 +2,10 @@
 $(document).ready(function(){
 	$('#apply').button();
 	drawPagination();
+
+	$('.link').click(function(){
+		console.log('hi');
+	});
 })
 
 function goBackHome(){
@@ -14,6 +18,7 @@ function drawPagination(){
 	// 	data:''
 	// })
 
+	var pageType = $('#pageType');
 
 	$('.pagination-container').pagination({
 		pageSize:5,
@@ -24,13 +29,16 @@ function drawPagination(){
 		},
 		showPrevious:true,
 		showNext:true,
-		ajax:{data:{type:'appointment'}},
+		ajax:{data:{type:pageType}},
 		alias:{
 			'pageNumber':'currPage'
 		},
 		callback: function(data, pagination) {
         // template method of yourself
         	console.log(data);
+        	//set total number
+        	$('#total_count').empty();
+        	$('#total_count').html(data.length);
         	$('.card-list-container').empty();
 	        for(var i =0; i<data.length;i++){
 		        var html = renderCard(data[i]);
@@ -50,7 +58,9 @@ function renderCard(data){
 	temp += data['department'];
 	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>';
 	temp += data['doctor'];
-	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>time</p></div></div>';
+	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>time&nbsp&nbsp';
+	temp += data['date']+'  ' +data['time'];
+	temp += '</p></div></div>';
 	temp += '<div class="my-container status pending"><div class="my-container"><p>';
 	temp += data['status'];
 	temp += '</p></div></div></div>';
