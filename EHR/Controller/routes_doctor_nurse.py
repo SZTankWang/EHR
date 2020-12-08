@@ -697,6 +697,8 @@ def doctorFutureAppt():
 		start_date = 0
 		end_date = 0
 	doctorID = current_user.get_id()
+	if start_date == datetime.datetime.today().strftime(helper.DATE_FORMAT):
+		filter = True
 	if start_date:
 		start_date = datetime.datetime.strptime(start_date, helper.DATE_FORMAT)
 	else:
@@ -708,7 +710,10 @@ def doctorFutureAppt():
 		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,start_date = start_date)
 	else:
 		apps = helper.doc2appts(doctorID,start_date = start_date,limit = 'no')
-
+	if filter:
+		for i in range(len(apps)):
+			if datetime.datetime.combine(apps[i].date,apps[i].time) < datetime.datetime.now()-timedelta(minutes = 30):
+				apps.pop(i)
 	if not helper.id_name_map:
 		helper.load_id2name_map()
 	return make_response(
@@ -751,6 +756,7 @@ def doctorPastAppt():
 
 	if not helper.id_name_map:
 		helper.load_id2name_map()
+
 	return make_response(
 		jsonify([
 			{

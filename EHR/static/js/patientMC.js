@@ -83,5 +83,6 @@ function buttonAction(e) {
   myModal.loadAppInfo(data['getAppID']);
   // request and fill in medical record data
   myModal.loadMCInfo(data['getMCID'], "patientViewAppt");
+  console.log(myModal.myself);
 	myModal.show();
 }

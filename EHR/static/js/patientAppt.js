@@ -61,6 +61,7 @@
 
 	*/
 	function loadDoctorByDept(deptID){
+		$('#card-list').LoadingOverlay('show');
 		$.ajax({
 			url:"http://localhost:5000/getDoctorByDept",
 			data:{'deptID':deptID},
@@ -73,6 +74,9 @@
 				for(var i=0;i<data.length;i++){
 					$('#card-list').append(renderDoctor(data[i]));
 				}
+				$('#card-list').LoadingOverlay('hide');
+
+
 			}
 
 		})
