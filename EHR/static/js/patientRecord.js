@@ -38,6 +38,8 @@ function drawPagination(){
         // template method of yourself
         	console.log(data);
         	$('.card-list-container').empty();
+        	$('#total_count').empty();
+        	$('#total_count').html(data.length);
 	        for(var i =0; i<data.length;i++){
 		        var html = renderCard(data[i]);
 		        $('.card-list-container').append(html);
