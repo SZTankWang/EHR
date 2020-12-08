@@ -419,7 +419,7 @@ def getPatientRecord():
 			helper.load_id2name_map()
 
 		return make_response(
-			jsonify({'total_number': n_tot_records,
+			jsonify({'total_number': len(mcs),
 					"mcs":[
 					{"mcID": mcs[i].id,
 					"appID": apps[i].id,
