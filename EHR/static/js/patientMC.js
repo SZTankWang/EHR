@@ -48,7 +48,7 @@ function renderCard(data){
 	var temp = '';
 	temp += '<div class="my-container card">';
 	temp += '<div class="my-container card-row card-title">';
-	temp += '<div class="my-container"><form id="getIDs"><input type="text" name="getAppID" value=' + data['appID'] + '><input type="text" name="getMCID" value=' + data['mcID'] + '><button type="submit" class="btn" value="View"/></form></div>';
+	temp += '<div class="my-container"><form id="getIDs" style="display:none;"><input type="text" name="getAppID" id="getAppID" value=' + data['appID'] + '><input type="text" name="getMCID" id="getMCID" value=' + data['mcID'] + '><button type="submit" class="btn" value="View"/></form></div>';
 	temp += '<div class="my-container text-wrapper"><h5>';
 	temp += data['hospital'];
 	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>';
