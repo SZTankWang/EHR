@@ -573,7 +573,7 @@ def nurseUploadLabReport():
 
 
 #---view medical record---
-@app.route('/doctorNurseGoViewMC', methods=['GET', 'POST'])
+@app.route('/doctorNurseGoViewMC', methods=['POST'])
 @login_required
 def goViewMC():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
@@ -587,7 +587,7 @@ def goViewMC():
 				patientName=helper.id2name(patient_id))
 
 
-@app.route('/doctorNurseViewMC', methods=['GET', 'POST'])
+@app.route('/doctorNurseViewMC', methods=['POST'])
 @login_required
 def viewMC():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
@@ -616,7 +616,7 @@ def viewMC():
 #---------------------------Doctor--------------------------------
 
 #---doctor home page---
-@app.route('/doctorHome', methods=['GET', 'POST'])
+@app.route('/doctorHome', methods=['GET'])
 @login_required
 def doctorHome():
 	if not helper.check_doctor_privilege():

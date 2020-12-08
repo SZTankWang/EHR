@@ -1,4 +1,7 @@
-
+/**
+* @global instance of AppFullModal
+*/
+var myModal;
 
 $(document).ready(function(){
 
@@ -35,9 +38,6 @@ function drawPagination(){
         // template method of yourself
         	console.log(data);
         	$('.card-list-container').empty();
-        	$('#total_count').empty();
-        	$('#total_count').html(data.length);
-
 	        for(var i =0; i<data.length;i++){
 		        var html = renderCard(data[i]);
 		        $('.card-list-container').append(html);
@@ -79,13 +79,10 @@ function renderCard(data){
 function buttonAction(event) {
   event.preventDefault();
   var data = {};
-	//TODO: get data from page
-	data['appID'] = null;
-	data['date'] = null;
-	data['time'] = null;
-	data['doctor'] = null;
-	data['symptoms'] = null;
-  myModal.setApp(data);
+	data['appID'] = event.target.attr("id");
+
+	//get appointment data
+  sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
   var reqData = {"appID": data['appID']};
   var setComments = (res) => {myModal.setComments(res.comments)};
   sendRequest("getComments", "POST", reqData, setComments);

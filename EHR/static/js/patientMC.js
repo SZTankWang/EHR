@@ -45,15 +45,15 @@ function renderCard(data){
 	var temp = '';
 	temp += '<div class="my-container card">';
 	temp += '<div class="my-container card-row card-title">';
+	temp += '<div class="my-container"><form id="getIDs"><input type="text" name="getAppID" value=' + data['appID'] + '><input type="text" name="getMCID" value=' + data['mcID'] + '><button type="submit" class="btn" value="View"/></form></div>';
 	temp += '<div class="my-container text-wrapper"><h5>';
 	temp += data['hospital'];
 	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>';
 	temp += data['department'];
 	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>';
-	temp += data['doctor'];
-	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>time</p></div></div>';
-	temp += '<div class="my-container status pending"><div class="my-container"><p>';
-	temp += data['status'];
+	temp += "Doctor: " + data['doctor'];
+	temp += '</p></div></div><div class="my-container card-row"><div class="my-container text-wrapper"><p>';
+	temp += data['date'] + " " + data['time'];
 	temp += '</p></div></div></div>';
 
 	return temp;
@@ -64,17 +64,17 @@ function renderCard(data){
 // click table button
 // TODO:
 
+
 // --------------------------event handlers----------------------------
 /**
 * @desc display modal
 * @param {event} event - click
 */
 function buttonAction(event) {
-  var data = {};
-	// TODO: get app data from page
-	data['mcID'] = null;
-	data['appID'] = null;
+  var data = jsonfy(event.target.children("form").serializeArray());
+
   myModal.setMCID(data['mcID']);
+	//get appointment data
 	sendRequest("/patientGetApp", "POST", {"appID": data['appID']}, (res) => myModal.setApp(res));
   // request and fill in app status and comments
   myModal.loadAppInfo(data['appID']);
