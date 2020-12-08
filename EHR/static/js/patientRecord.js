@@ -10,6 +10,10 @@ $(document).ready(function(){
 	myModal = new AppFullModal();
 })
 
+function goBackHome(){
+	window.location.replace('http://localhost:5000/loadHomePage');
+}
+
 function drawPagination(){
 	// var data = $.ajax({
 	// 	url:'http://localhost:5000/getPatientRecord',
@@ -34,6 +38,8 @@ function drawPagination(){
         // template method of yourself
         	console.log(data);
         	$('.card-list-container').empty();
+        	$('#total_count').empty();
+        	$('#total_count').html(data.length);
 	        for(var i =0; i<data.length;i++){
 		        var html = renderCard(data[i]);
 		        $('.card-list-container').append(html);
@@ -44,7 +50,7 @@ function drawPagination(){
 
 function renderCard(data){
 	var temp = '';
-	temp += '<div class="my-container card">';
+	temp += '<div class="my-container card" onclick="buttonAction(this)">';
 	temp += '<div class="my-container card-row"><form class="d-none"><input type="text" name="getAppID" value=' + data['appID'] + '></form></div>';
 	temp += '<div class="my-container card-row card-title">';
 	temp += '<div class="my-container text-wrapper"><h5>';
