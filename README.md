@@ -20,7 +20,7 @@ Doctors and nurses can view the medical record history and basic health informat
 |  | doctor | Ren Sheng |
 |  | nurse | Jingyi Zhu |
 | Database design |  | Qing Deng, Jingyi Zhu |
-| Frontend development | patient | Zhenming Wang |
+| Frontend development | patient | Zhenming Wang, Jingyi Zhu |
 |  | doctor | Jingyi Zhu, Zhenming Wang |
 |  | nurse | Jingyi Zhu |
 | Backend development |  | Qing Deng, Ren Sheng, Jingyi Zhu |
