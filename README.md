@@ -38,4 +38,4 @@ In the terminal, go into the folder `EHR` (outer layer).</br>
 
 ### Check it out
 Go to your browser. </br>
-Go to <p>http://localhost:5000</p>.
+Go to http<span>:/</span>/localhost:5000.
