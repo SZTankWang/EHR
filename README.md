@@ -1,5 +1,5 @@
 # EHR System -- WeCare
-### Fall 2020 Software Engineering
+Fall 2020 Software Engineering
 ##Description
 The WeCare electronic health record system is an integrated platform for healthcare appointment management, medical record management and workspace for healthcare providers. <br>
 We define electronic health record by three parts: <br>
