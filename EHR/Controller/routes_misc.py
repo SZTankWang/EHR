@@ -26,9 +26,105 @@ from EHR.Controller.control_helper import DATE_FORMAT, TIME_FORMAT, id2name
 import datetime
 
 
+
+#---------------------------Util--------------------------------
+#---------------------------Util--------------------------------
+#---------------------------Util--------------------------------
+@app.route('/getPatientInfo', methods=['POST'])
+def getPatientInfo():
+	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
+		return redirect("/login")
+
+	p_id = request.form['patientID']
+	patient = db.session.query(Patient).filter(Patient.id==p_id).first()
+	gender = patient.gender
+	if gender:
+		gender = gender.value
+	return make_response(jsonify({"ret": 0, "age": patient.age, "gender": gender, "bloodType": patient.blood_type, "allergies": patient.allergies, "chronics": patient.chronics, "medications": patient.medications}), 200)
+
+
+#---get comments util---
+@app.route('/getComments', methods=['GET','POST'])
+def getComments():
+	app_id = request.form['appID']
+	appt = Application.query.filter(Application.id==app_id).one()
+	return make_response(jsonify({"comments":appt.reject_reason, "status":appt.status.value}))
+
+# open lab report in a new tab
+@app.route('/previewOneLR/<path:filename>')
+def previewLR(filename):
+	return send_from_directory(app.config["UPLOAD_FOLDER"],filename)
+
+
 #------------------------------common functionalities-------------------------------
 #------------------------------common functionalities-------------------------------
 #------------------------------common functionalities-------------------------------
+
+@app.route('/nurseViewAppt', methods=['GET','POST'])
+@app.route('/doctorViewAppt', methods=['GET','POST'])
+@app.route('/doctorNurseViewAppt', methods=['GET','POST'])
+@app.route('/patientViewAppt', methods=['GET','POST'])
+@login_required
+def userViewAppt():
+	if request.method == "POST":
+		mc_id = request.form['mcID']
+	elif request.method == "GET":
+		mc_id = request.args.get('mcID')
+	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
+	if not mc:
+		return make_response({"ret": "Medical Record Not Found!"})
+
+	if helper.check_patient_privilege():
+		if current_user.get_id() != mc.patient_id:
+			return redirect(url_for("/login"))
+
+	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
+	lab_reports = mc.lab_reports
+
+	ret = {
+		"ret": "0",
+
+		"preExam":
+			{"bodyTemperature": str(mc.body_temperature),
+			"heartRate": str(mc.heart_rate),
+			"lowBloodPressure": str(mc.low_blood_pressure),
+			"highBloodPressure": str(mc.high_blood_pressure),
+			"weight": str(mc.weight),
+			"height": str(mc.height),
+			"state": mc.state.value},
+
+		"diagnosis":
+			mc.diagnosis,
+
+		"prescriptions":
+			[{"id": pres.id,
+			  "medicine": pres.medicine,
+			  "dose": pres.dose,
+			  "comments": pres.comments} for pres in prescription_list],
+
+		"labReports":
+			[{"lr_type": lr.lr_type,
+			"id": lr.id,
+			"doctor_comments": lr.doctor_comment,
+			"nurse_comments": lr.nurse_comment,
+			"file_path": lr.file_path} for lr in lab_reports]
+	}
+
+	# get the lab report types for doctor for lab report request creation
+	if request.form['type'] == "1":
+		if not helper.check_doctor_privilege():
+			return make_response({"ret": "Access to lab report types not granted"})
+
+		lab_r_types = Lab_report_type.query.all()
+
+		ret["labReportTypes"] = [{"type": lrt.type,
+		  "description": lrt.description
+		} for lrt in lab_r_types]
+
+	return make_response(jsonify(ret))
+
+
+
 #--- edit personal information ---
 @app.route('/nurseSettings', methods=['GET'])
 @app.route('/doctorSettings', methods=['GET'])

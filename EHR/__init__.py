@@ -20,8 +20,8 @@ db = SQLAlchemy(app)
 
 from EHR.model import models
 
-from EHR.Controller import routes_general_patient, routes_doctor_nurse, routes_misc
-# 
+from EHR.Controller import routes_general, routes_patient, routes_doctor, routes_nurse, routes_misc
+#
 # db.drop_all()
 # db.create_all()
 # db.session.commit()
