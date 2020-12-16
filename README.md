@@ -26,7 +26,8 @@ Doctors and nurses can view the medical record history and basic health informat
 | Backend development |  | Qing Deng, Ren Sheng, Jingyi Zhu |
 | Testing |  | Qing Deng, Ren Sheng, Jingyi Zhu |
 ## Run the project
-Download this github repository as a folder.</br>
-In the terminal, go into the folder.</br>
-Make sure you have installed all the dependencies: Flask, Flask_SQLAlchemy (dialect), pymysql (connector), cryptography, flask-login </br>
-Run `$python run.py`.
+Download this github repository as a folder `EHR`.</br>
+In the terminal, go into the folder `EHR`.</br>
+`$ export FLASK_APP=EHR` </br>
+`$ pip install -e .` </br>
+`$ flask run`
