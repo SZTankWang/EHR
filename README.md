@@ -19,15 +19,11 @@ Doctors and nurses can view the medical record history and basic health informat
 | UI design | patient | Zhenming Wang |
 |  | doctor | Ren Sheng |
 |  | nurse | Jingyi Zhu |
-| :---: | :---: | :---: |
 | Database design |  | Qing Deng, Jingyi Zhu |
-| :---: | :---: | :---: |
 | Frontend development | patient | Zhenming Wang |
 |  | doctor | Jingyi Zhu, Zhenming Wang |
 |  | nurse | Jingyi Zhu |
-| :---: | :---: | :---: |
 | Backend development |  | Qing Deng, Ren Sheng, Jingyi Zhu |
-| :---: | :---: | :---: |
 | Testing |  | Qing Deng, Ren Sheng, Jingyi Zhu |
 ## Run the project
 Download this github repository as a folder.</br>
