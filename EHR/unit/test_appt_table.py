@@ -20,12 +20,6 @@ def getApptsData(client, route):
         })
     return response
 
-# def login(client, id, password):
-#     return client.post('/login', data=dict(
-#         id=id,
-#         password=password
-#     ), follow_redirects=False)
-
 def test_apptRole(client):
     login(client, "d", "d")
     rv = getApptsData(client, "/doctorAllAppt")
