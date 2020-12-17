@@ -25,7 +25,7 @@ def test_apptRole(client):
     rv = getApptsData(client, "/doctorAllAppt")
     logout(client)
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = getApptsData(client, "/doctorAllAppt")
     logout(client)
 
@@ -33,7 +33,7 @@ def test_apptRole(client):
     rv = getApptsData(client, "/doctorAllAppt")
     logout(client)
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = getApptsData(client, "/nurseAllAppt")
     logout(client)
 
@@ -56,7 +56,7 @@ def test_todayAppt(client):
         assert res==[] or ("appID" in res[0] and res[0]["date"] == today and "time" in res[0] and "nurse" in res[0] and "patient" in res[0] and "symptoms" in res[0])
     logout(client)
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = getApptsData(client, "/nurseTodayAppt")
     if rv.status_code == 200:
         res = json.loads(rv.data)
@@ -75,7 +75,7 @@ def test_ongoingAppt(client):
         assert res==[] or ("appID" in res[0] and res[0]["date"] == today and res[0]["now"] == now and "nurse" in res[0] and "patient" in res[0] and "symptoms" in res[0])
     logout(client)
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = getApptsData(client, "/nurseOnGoingAppt")
     if rv.status_code == 200:
         res = json.loads(rv.data)
@@ -86,21 +86,21 @@ def test_ongoingAppt(client):
 def test_apptDirection(client):
     today = datetime.datetime.today()
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = getApptsData(client, "/nursePendingApp")
     if rv.status_code == 200:
         res = json.loads(rv.data)
         assert res==[] or ("appID" in res[0] and datetime.datetime.strptime(res[0]["date"], helper.DATE_FORMAT) >= today and "time" in res[0] and "doctor" in res[0] and "patient" in res[0] and "symptoms" in res[0])
     logout(client)
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = postApptsData(client, "/nursePastAppt", "", datetime.datetime.strftime(datetime.datetime.now(), helper.DATE_FORMAT))
     if rv.status_code == 200:
         res = json.loads(rv.data)
         assert res==[] or ("appID" in res[0] and datetime.datetime.strptime(res[0]["date"], helper.DATE_FORMAT) <= today and "time" in res[0] and "doctor" in res[0] and "patient" in res[0] and "symptoms" in res[0])
     logout(client)
 
-    login(client, "n1", "n1")
+    login(client, "n", "n")
     rv = postApptsData(client, "/nurseFutureAppt", datetime.datetime.strftime(datetime.datetime.now(), helper.DATE_FORMAT), "")
     if rv.status_code == 200:
         res = json.loads(rv.data)
