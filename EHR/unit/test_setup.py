@@ -44,33 +44,33 @@ def logout(client):
 
 def test_add_hospital(client):
     login(client, "0", "0")
-    rv = add_hospital(client, "1", "1", "1", "1")
+    rv = add_hospital(client, "11", "11", "11", "11")
     assert json.loads(rv.data)["ret"] == 0
 
     login(client, "d", "d")
-    rv = add_hospital_exception(client, "2", "2", "2", "2")
+    rv = add_hospital_exception(client, "21", "21", "21", "21")
 
 def test_add_department(client):
     login(client, "0", "0")
-    rv = add_department(client, "1", "1", "1", "1")
+    rv = add_department(client, "11", "11", "11", "11")
     assert json.loads(rv.data)["ret"] == 0
 
     login(client, "d", "d")
-    rv = add_department_exception(client, "1", "2", "2", "2")
+    rv = add_department_exception(client, "11", "21", "21", "21")
 
 def test_add_lab_report_type(client):
     login(client, "0", "0")
-    rv = add_lab_report_type(client, "a", "a")
+    rv = add_lab_report_type(client, "b", "b")
     assert json.loads(rv.data)["ret"] == 0
 
     rv = add_lab_report_type(client, "a", "a")
     assert json.loads(rv.data)["ret"] == "Duplicate"
 
 def test_register(client):
-    rv = register(client, "n", "n", "nurse", "n", 'n', "n", "n", "1")
+    rv = register(client, "x", "x", "nurse", "x", 'x', "x", "x", "1")
     assert json.loads(rv.data)["ret"] == 0
 
-    rv = register(client, "w", "m", "doctor", "m", 'm', "w", "w", "1")
+    rv = register(client, "d", "d", "doctor", "d", 'd', "d", "d", "1")
     res = json.loads(rv.data)
     assert res["ret"] == 1 and res['message'] == 'You already registered!'
 
@@ -84,10 +84,10 @@ def test_login_logout(client):
     rv = logout(client)
     assert rv.data
 
-    rv = login(client, "w" + 'x', "w")
+    rv = login(client, "p" + 'x', "p")
     res = json.loads(rv.data)
     assert res["ret"] == 1 and res["message"] == 'Unregistered user'
 
-    rv = login(client, "w", "w" + 'x')
+    rv = login(client, "p", "p" + 'x')
     res = json.loads(rv.data)
     assert res["ret"] == 1 and res["message"] == 'Incorrect password'
