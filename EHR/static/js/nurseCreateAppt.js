@@ -13,6 +13,7 @@ $(document).ready(function() {
     getAndDisplay("hospital");
 });
 
+
 // ---------------------capture user action--------------------------
 // display doctor options for the department
 $("#department").on("change", () => getAndDisplay("dept"));
@@ -93,6 +94,7 @@ function createAppt(event){
     } else {
       $("#ret span").text("Error: failed to create the appointment");
     }
+    // automatically go back to home page
     $("#ret span").removeClass("invisible");
     $("#ret span").addClass("visible");
     goToPage("nurseHome", 1000);

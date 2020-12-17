@@ -10,59 +10,16 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha512-aOG0c6nPNzGk+5zjwyJaoRUgCdOrfSDhmMID2u4+OIslr0GjpLKo7Xm0Ao3xmpM4T8AmIouRkqwj1nrdVsLKEQ==" crossorigin="anonymous" />
-	  <script>
-		  $( function() {
-		    var dateFormat = "mm/dd/yy",
-		      from = $( "#from" )
-		        .datepicker({
-		          defaultDate: "+1w",
-		          changeMonth: true,
-		          changeYear:true,
-		          numberOfMonths: 1
-		        })
-		        .on( "change", function() {
-		          to.datepicker( "option", "minDate", getDate( this ) );
-		        }),
-		      to = $( "#to" ).datepicker({
-		        defaultDate: "+1w",
-		        changeMonth: true,
-		        changeYear:true,
-		        numberOfMonths: 1
-		      })
-		      .on( "change", function() {
-		        from.datepicker( "option", "maxDate", getDate( this ) );
-		      });
-
-		    function getDate( element ) {
-		      var date;
-		      try {
-		        date = $.datepicker.parseDate( dateFormat, element.value );
-		      } catch( error ) {
-		        date = null;
-		      }
-
-		      return date;
-		    }
-		  } );
-  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.min.js" integrity="sha512-1zzZ0ynR2KXnFskJ1C2s+7TIEewmkB2y+5o/+ahF7mwNj9n3PnzARpqalvtjSbUETwx6yuxP5AJXZCpnjEJkQw==" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.1.5/pagination.css" integrity="sha512-QmxybGIvkSI8+CGxkt5JAcGOKIzHDqBMs/hdemwisj4EeGLMXxCm9h8YgoCwIvndnuN1NdZxT4pdsesLXSaKaA==" crossorigin="anonymous" />
 </head>
 <body>
-		<form id="pagination-counter" style="display: none;">
-		<input id="currPage" name='currPage'value=1></input>
-		<input id="pageSize" name='pageSize' value=10></input>
-		<input id="pageCount" name='pageCount' value=0></input>
-		<input id="searchKey" name='searchKey' value=''></input>
-	</form>
+	<!-- Navbar -->
 	<nav class="navbar navbar-light" style="background-color: #2D79D6;">
-	  <!-- Navbar content -->
 	  <span class="navbar-brand mb-0 h1" style="color:white;">WeCare</span>
-
 	  <div id="user-link-wrapper">
 		  <a href="/patientSettings" class="navbar-link navbar-right" style="color:white;">User</a>
 			<a class="navbar-link navbar-right" style="color:white;" href="/logout">Logout</a>
-
 	  </div>
 	</nav>
 
@@ -76,9 +33,10 @@
 			<div class="href-container"><a href="/patientRecord">medical records</a></div>
 			<div class="href-container"><a href="/patientRecord">appointment records</a></div>
 			<div class="href-container"></div>
-
 		</div>
 
+		<!-- Health info -->
+		<!-- author: Jingyi Zhu -->
 		<div class="my-container form-container">
 
 			<form id="healthInfo" action="/patientUpdateHealthInfo" method="POST">

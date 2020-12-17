@@ -36,7 +36,7 @@ import datetime
 @login_required
 def nurseHome():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 	return render_template('nurseHome.html')
 
 
@@ -45,7 +45,7 @@ def nurseHome():
 @login_required
 def nurseAllAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 	return render_template('nurseAllAppt.html')
 
 
@@ -54,7 +54,7 @@ def nurseAllAppt():
 # @login_required
 def nursePendingApp():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	# look up Time_slot table for next 7 days time_slot id
 	next7d_slotid = helper.day2slotid(period=7)
@@ -80,7 +80,7 @@ def nursePendingApp():
 @login_required # Otherwise, we cannot get current_user's id
 def nurseTodayAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	nurseID = current_user.get_id()
 	# department ID of current nurse
@@ -104,10 +104,9 @@ def nurseTodayAppt():
 @app.route('/nurseOnGoingAppt', methods=['GET'])
 def nurseOnGoingAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
-
-	helper.load_id2name_map() # save this, only for development use
+	helper.load_id2name_map()
 	nurse_id = current_user.get_id()
 	nowtime = datetime.datetime.now()
 
@@ -117,7 +116,7 @@ def nurseOnGoingAppt():
 			Application.status == StatusEnum.approved
 			).all()
 
-	# filter3: now() in timeslot
+	# filter2: now() in timeslot
 	now_approved_appts = []
 	for appt in today_approved_appts:
 		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
@@ -139,7 +138,7 @@ def nurseOnGoingAppt():
 @login_required
 def nurseFutureAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	nurse_id = current_user.get_id()
 	start_date = datetime.datetime.strptime(request.form['startDate'], helper.DATE_FORMAT)
@@ -178,7 +177,7 @@ def nurseFutureAppt():
 @app.route('/nursePastAppt', methods=['POST'])
 def nursePastAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	end_date = datetime.datetime.strptime(request.form['endDate'], helper.DATE_FORMAT)
 	nurse_id = current_user.get_id()
@@ -209,7 +208,7 @@ def nursePastAppt():
 @app.route('/nurseRejectedApp', methods=['POST'])
 def nurseRejectedApp():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	nurse_id = current_user.get_id()
 	start_date = request.form['startDate']
@@ -254,7 +253,7 @@ def nurseRejectedApp():
 @login_required
 def nurseGoCreateAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 	return render_template('nurseCreateAppt.html')
 
 
@@ -262,7 +261,7 @@ def nurseGoCreateAppt():
 @login_required
 def nurseGetDepartmentsForNurse():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	nurseID = current_user.get_id()
 	dept_list,dept_name = helper.nurse_hosp2dept(nurseID)
@@ -276,7 +275,7 @@ def nurseGetDepartmentsForNurse():
 @login_required
 def nurseGetDoctorsForDepartment():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 	deptID = request.form['deptID']
 	return make_response(jsonify(helper.dept_to_doc(deptID)), 200)
 
@@ -286,7 +285,7 @@ def nurseGetDoctorsForDepartment():
 @login_required
 def nurseGetSlotsForDoctor():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	doctorID = request.form['doctorID']
 	slot_list = helper.doc2slots_available(doctorID, 0, start_date=datetime.date.today())
@@ -303,7 +302,7 @@ def nurseGetSlotsForDoctor():
 @login_required
 def nurseCreateAppt():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	try:
 		nurseID = current_user.get_id()
@@ -360,7 +359,7 @@ def nurseCreateAppt():
 @app.route('/nurseProcessApp', methods=['POST'])
 def nurseProcessApp():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	try:
 		nurseID = current_user.get_id()
@@ -403,7 +402,7 @@ def nurseProcessApp():
 @login_required
 def nurseGoViewAppt(appID):
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	appt_res = Application.query.filter(Application.id==appID).first()
 	finished = False
@@ -430,7 +429,7 @@ def nurseGoViewAppt(appID):
 @app.route('/doctorGetLabReports', methods=['POST'])
 def getLabReports():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	mc_id = request.form['mcID']
 	mc = Medical_record.query.filter(Medical_record.id==mc_id).first()
@@ -451,7 +450,7 @@ def getLabReports():
 @app.route('/nurseEditPreExam', methods=['GET','POST'])
 def nurseEditPreExam():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	mc_id = request.form['mcID']
 	body_temperature = helper.StrOrNone(request.form['bodyTemperature'])
@@ -483,7 +482,7 @@ def nurseEditPreExam():
 @login_required
 def nurseUploadLabReport():
 	if not helper.check_nurse_privilege():
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	nurse_id = current_user.get_id()
 
@@ -522,7 +521,7 @@ def nurseUploadLabReport():
 @login_required
 def goViewMC():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	patient_id = request.form['patientID']
 
@@ -536,7 +535,7 @@ def goViewMC():
 @login_required
 def viewMC():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
-		return redirect("/login")
+		return redirect("/loadHomePage")
 
 	patient_id = request.form['patientID']
 

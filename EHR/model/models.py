@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from inspect import indentsize
 from sqlalchemy.sql.schema import ForeignKey
-# from sqlalchemy.sql.schema import ForeignKey
 from werkzeug.security import check_password_hash, generate_password_hash
 from EHR import db, login
 from flask_login import UserMixin # UserMixin conains four useful login function
@@ -58,7 +57,7 @@ class User(UserMixin, db.Model):
 	id = db.Column(db.String(100), primary_key=True)
 	first_name = db.Column(db.String(100), nullable=False)
 	last_name = db.Column(db.String(100), nullable=False)
-	role = db.Column(db.Enum(RoleEnum), nullable=False) # should we set a default role? default=RoleEnum.patient
+	role = db.Column(db.Enum(RoleEnum), nullable=False)
 	email = db.Column(db.String(100))
 	phone = db.Column(db.String(20))
 	password_hash = db.Column(db.String(100), nullable=False)
@@ -78,12 +77,8 @@ class Admin(db.Model):
 	def __repr__(self):
 		return f'Admin < id: {self.id} >'
 
-
-
 class Doctor(db.Model):
 	id = db.Column(db.String(100), db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-	#foreign key
-	# user_id = db.Column(db.String(100), db.ForeignKey('user.user_id'), nullable=False, unique=True, onupdate="CASCADE")
 	department_id = db.Column(db.Integer(),\
 		db.ForeignKey('department.id'), nullable=False, onupdate="CASCADE")
 
@@ -98,14 +93,12 @@ class Doctor(db.Model):
 
 class Nurse(db.Model):
 	id = db.Column(db.String(100), db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-	#foreign key
-	# user_id = db.Column(db.String(100), db.ForeignKey('user.user_id'), nullable=False, unique=True, onupdate="CASCADE")
 	department_id = db.Column(db.Integer(), \
 		db.ForeignKey('department.id', onupdate="CASCADE"), nullable=False)
 
 	#one-to-many relationship
 	applications = db.relationship('Application', backref='nurse', lazy=True)
-	
+
 	# medical_records = db.relationship('Medical_record', backref='nurse', lazy=True)
 	lab_reports = db.relationship('Lab_report', backref='nurse', lazy=True)
 
@@ -125,14 +118,11 @@ class GenderEnum(enum.Enum):
 
 class Patient(db.Model):
     id = db.Column(db.String(100), db.ForeignKey('user.id', onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
-    #foreign key
-    # user_id = db.Column(db.String(100), db.ForeignKey('user.user_id'), nullable=False, unique=True, onupdate="CASCADE")
 
     age = db.Column(db.SmallInteger())
     gender = db.Column(db.Enum(GenderEnum))
     blood_type = db.Column(db.String(10))
     allergies = db.Column(db.Text())
-    #JZ: 增加下面两行
     chronics = db.Column(db.Text())
     medications = db.Column(db.Text())
 
@@ -210,7 +200,6 @@ class Application(db.Model):
 				time: {self.time} >'
 
 class stateEnum(enum.Enum):
-    #JZ：增加下面这行
     undefined = "undefined"
     conscious = "conscious"
     coma = "coma"
@@ -254,19 +243,7 @@ class Prescription(db.Model):
 	def __repr__(self):
 		return f'Prescription < id: {self.id}, mc_id: {self.mc_id} >'
 
-# #JZ：把这个Enum去掉
-# class labReportTypeEnum(enum.Enum):
-# 	urine_test = "Urine Test"
-# 	blood_test = "Blood Test"
-# 	tumor_markers = "Tumor Marker"
-# 	metabolic_panel = "Metabolic Panel"
-# 	lipid_panel = "Lipid Panel"
-# 	liver_panel = "Liver Panel"
-# 	thyroid_stimulating_hormone = "Thyroid Stimulating Hormone"
-
 class Lab_report_type(db.Model):
-    #type = db.Column(db.Enum(labReportTypeEnum), primary_key=True)
-    #JZ：把type换成下面这行
     type = db.Column(db.String(255), primary_key=True)
     description = db.Column(db.Text())
 

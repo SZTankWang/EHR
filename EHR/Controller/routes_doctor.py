@@ -44,7 +44,6 @@ def doctorOnGoingAppt():
 	if not helper.check_doctor_privilege():
 		return redirect("/login")
 
-	# elper.load_id2name_map() # save this, only for development use
 	doctorID = current_user.get_id()
 	nowtime = datetime.datetime.now()
 	appt_list = helper.doc2appts(doctorID,0)
@@ -54,13 +53,15 @@ def doctorOnGoingAppt():
 		appt_date_time = datetime.datetime.combine(appt.date, appt.time)
 		if appt_date_time <= nowtime <= appt_date_time + timedelta(minutes=30):
 			now_approved_appts.append(appt)
+
+	helper.load_id2name_map()
 	return make_response(
 		jsonify(
 			[{
 				"appID": appt.id,
 				"date": appt.date.strftime(helper.DATE_FORMAT),
 				"time": appt.time.strftime(helper.TIME_FORMAT),
-				"patient": helper.id2name(appt.approver_id),
+				"nurse": helper.id2name(appt.approver_id),
 				"patient": helper.id2name(appt.patient_id),
 				"symptoms": appt.symptoms} for appt in now_approved_appts]
 	))
@@ -111,15 +112,18 @@ def doctorFutureAppt():
 		start_date = 0
 		end_date = 0
 	doctorID = current_user.get_id()
+
+	# if start date is given, use it directly; o.w. set it to today
 	if start_date == datetime.datetime.today().strftime(helper.DATE_FORMAT):
 		filter = True
 	if start_date:
 		start_date = datetime.datetime.strptime(start_date, helper.DATE_FORMAT)
 	else:
 		start_date = datetime.datetime.today()
+
+	# similar to start date
 	if end_date:
 		end_date = datetime.datetime.strptime(end_date, helper.DATE_FORMAT)
-
 	if end_date:
 		apps = helper.doc2appts(doctorID,period=(end_date-start_date).days,start_date = start_date)
 	else:
@@ -170,7 +174,6 @@ def doctorPastAppt():
 
 
 	helper.load_id2name_map()
-
 	return make_response(
 		jsonify([
 			{
@@ -205,6 +208,7 @@ def doctorNewSlot():
 	total_slots = request.form['slotNumber']
 	t_seg = Time_segment.query.filter(Time_segment.t_seg_starttime==startTime).one()
 
+	# check if a time slot exists for the datetime
 	exist_slot = Time_slot.query.filter(
 		Time_slot.doctor_id == doctor_id,
 		Time_slot.slot_seg_id == t_seg.t_seg_id,
@@ -259,6 +263,7 @@ def doctorGoViewAppt(appID):
 	if appt_res.status.value == "finished":
 		finished = True
 
+	helper.load_id2name_map()
 	return render_template('doctorViewAppt.html',
 		appID=appt_res.id,
 		date=appt_res.date.strftime(helper.DATE_FORMAT),
@@ -344,7 +349,6 @@ def doctorReqLabReport():
 	mc_id = request.form['mcID']
 	patient_id = Medical_record.query.filter(Medical_record.id==mc_id).first().patient_id
 	lr_type = request.form['type']
-	# lr_type = labReportTypeEnum[lr_type_str.lower().replace(" ", "_")]
 	comments = request.form['comments']
 	lab_report = Lab_report(
 				doctor_comment = comments,

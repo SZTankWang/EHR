@@ -24,7 +24,8 @@ Doctors and nurses can view the medical record history and basic health informat
 |  | doctor | Jingyi Zhu, Zhenming Wang |
 |  | nurse | Jingyi Zhu |
 | Backend development |  | Qing Deng, Ren Sheng, Jingyi Zhu |
-| Testing |  | Qing Deng, Ren Sheng, Jingyi Zhu |
+| Testing |  | Ren Sheng, Jingyi Zhu, Qing Deng |
+| Documentation |  | Jingyi Zhu, Ren Sheng |
 ## Install and run the project
 Create a Python virtural environment. (Strongly recommend)</br>
 Download this github repository as a folder `EHR`.</br>

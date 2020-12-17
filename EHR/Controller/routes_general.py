@@ -40,12 +40,12 @@ def register():
 		return redirect(url_for('loadHomePage'))
 	id = request.form['id']
 
+	# check if the user exists
 	if User.query.filter_by(id=id).first() != None:
 		return make_response(jsonify({'ret':1,'message':'You already registered!'}))
 	role = request.form['role']
 	first_name = request.form['firstName']
 	last_name = request.form['lastName']
-
 	phone = request.form['phone']
 	email = request.form['email']
 	password = request.form['password']
@@ -68,6 +68,7 @@ def register():
 			db.session.add(nurse)
 		db.session.commit()
 
+		# update roster cache
 		helper.load_id2name_map(True)
 		return make_response(jsonify({"ret":0, 'message':""}), 200)
 	except:
@@ -101,7 +102,6 @@ def login():
 				# update roster
 				helper.load_id2name_map(True)
 			except:
-				# flash("Unknown error, sorry!")
 				return make_response(jsonify({"ret":1, "message": "Unknown error"}))
 		return make_response(jsonify({"ret":0, "role":current_user.role.value, "id": current_user.id}))
 
@@ -117,7 +117,6 @@ def logout():
 @app.route('/loadHomePage', methods=['GET'])
 @login_required
 def loadHomePage():
-	# return render_template(f'{current_user.role.value}Home.html')
 	if current_user.role.value == "patient":
 		return render_template('patientHome.html')
 	if current_user.role.value == "nurse":
@@ -128,11 +127,10 @@ def loadHomePage():
 		return render_template('admin.html')
 
 
-#---go to home---
+#---go to all appointments page---
 @app.route('/loadAllAppt', methods=['GET'])
 @login_required
 def loadAllAppt():
-	# return render_template(f'{current_user.role.value}Home.html')
 	if current_user.role.value == "patient":
 		return render_template('patientHome.html')
 	if current_user.role.value == "nurse":

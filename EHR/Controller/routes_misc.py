@@ -31,6 +31,7 @@ import datetime
 #---------------------------Util--------------------------------
 #---------------------------Util--------------------------------
 @app.route('/getPatientInfo', methods=['POST'])
+@login_required
 def getPatientInfo():
 	if not (helper.check_doctor_privilege() or helper.check_nurse_privilege()):
 		return redirect("/login")
@@ -45,6 +46,7 @@ def getPatientInfo():
 
 #---get comments util---
 @app.route('/getComments', methods=['GET','POST'])
+@login_required
 def getComments():
 	app_id = request.form['appID']
 	appt = Application.query.filter(Application.id==app_id).one()
@@ -52,6 +54,7 @@ def getComments():
 
 # open lab report in a new tab
 @app.route('/previewOneLR/<path:filename>')
+@login_required
 def previewLR(filename):
 	return send_from_directory(app.config["UPLOAD_FOLDER"],filename)
 
@@ -78,6 +81,7 @@ def userViewAppt():
 		if current_user.get_id() != mc.patient_id:
 			return redirect(url_for("/login"))
 
+	# passed medical record existence check and user privilege check
 	prescription_list = Prescription.query.filter(Prescription.mc_id==mc_id).all()
 	lab_reports = mc.lab_reports
 
@@ -129,6 +133,7 @@ def userViewAppt():
 @app.route('/nurseSettings', methods=['GET'])
 @app.route('/doctorSettings', methods=['GET'])
 @app.route('/patientSettings', methods=['GET'])
+@login_required
 def Settings():
 	id = current_user.get_id()
 	user, role_user = None, None
@@ -160,6 +165,7 @@ def Settings():
 
 @app.route('/doctorNurseUpdateInfo', methods=['POST'])
 @app.route('/patientUpdateInfo', methods=['POST'])
+@login_required
 def UpdateInfo():
 	try:
 		f_name = request.form['firstName']
@@ -187,7 +193,6 @@ def UpdateInfo():
 		user.phone = phone
 		db.session.commit()
 
-		# return make_response(jsonify({'ret':0, 'firstName': f_name, "lastName": l_name, "id": new_id, "email": email, "phone": phone}), 200)
 		return make_response(jsonify({'ret':0}), 200)
 	except:
 		db.session.rollback()
@@ -199,6 +204,7 @@ def UpdateInfo():
 #------------------------------Admin-------------------------------
 #------------------------------Admin-------------------------------
 @app.route('/addHospital',methods=['POST'])
+@login_required
 def addHospital():
 	if not helper.check_admin_privilege():
 		return redirect("/login")
@@ -229,6 +235,7 @@ def addHospital():
 	return make_response(jsonify({'ret':0}))
 
 @app.route('/addDepartment',methods=['POST'])
+@login_required
 def addDepartment():
 	if not helper.check_admin_privilege():
 		return redirect("/login")
@@ -237,11 +244,6 @@ def addDepartment():
 	title = helper.get_from_form(request, 'title')
 	phone = helper.get_from_form(request, 'phone')
 	description = helper.get_from_form(request, 'description')
-
-	# check for duplicated hospital name
-	res = Department.query.filter(Department.title == title).all()
-	if res != []:
-		return make_response(jsonify({'ret':'Duplicated Department Name'}))
 
 	dept = Department(
 		hospital_id=hospital_id,
@@ -260,6 +262,7 @@ def addDepartment():
 
 
 @app.route('/addLabReportType', methods=['POST'])
+@login_required
 def addLabReportType():
 	if not helper.check_admin_privilege():
 		return redirect("/login")
@@ -280,6 +283,7 @@ def addLabReportType():
 
 
 @app.route('/updateAffiliation', methods=['POST'])
+@login_required
 def updateAffiliation():
 	if not helper.check_admin_privilege():
 		return redirect("/login")
@@ -293,11 +297,13 @@ def updateAffiliation():
 	if hospital_id != str(dept_hospital):
 		return make_response(jsonify({'ret': "Department and hospital don't match."}))
 
+	# check is the user id links with a valid user
 	user = User.query.get(license_id)
 	if not user:
 		return make_response(jsonify({'ret': "User doesn't exist."}))
 	if user.role != RoleEnum.doctor and user.role != RoleEnum.nurse:
 		return make_response(jsonify({'ret': "Invalid role."}))
+
 	user.hospital_id = hospital_id
 	user.dept_id = dept_id
 

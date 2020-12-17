@@ -3,7 +3,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from EHR import app as flask_app
 from EHR import db, login
-# from EHR import create_app
 
 @pytest.fixture
 def client():

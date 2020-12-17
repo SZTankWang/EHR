@@ -2,6 +2,7 @@
 * @author Jingyi Zhu
 * @desc utilities
 */
+
 function jsonify(data) {
   var obj = {};
   for(var i=0;i<data.length;i++){
@@ -15,7 +16,7 @@ function goToPage(route, delay) {
 }
 
 function goBackHome(){
-	window.location.replace('http://localhost:5000/loadHomePage');
+  goToPage("loadHomePage", 0);
 }
 
 function goToPageNewTab(route, delay) {

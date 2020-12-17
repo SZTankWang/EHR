@@ -135,8 +135,8 @@ function refreshOnSuccess(res){
    }
  }
 
- function toggleForm(){
-   $("#diagnosisForm-controller").attr("disabled", function(index, attr){
-     return attr == "disabled" ? null : "disabled";
-   });
- }
+function toggleForm(){
+ $("#diagnosisForm-controller").attr("disabled", function(index, attr){
+   return attr == "disabled" ? null : "disabled";
+ });
+}

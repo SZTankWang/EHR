@@ -5,9 +5,9 @@
 
 /**
 * @desc modal for pending application
-* @page nursePendingApp
+* @page nursePendingApp, patientRecord
 * @attribute basic info: appID, date, time, doctor, patient, symptoms
-* @method setApp - set basic info
+* @method setApp, show, hide
 */
 class AppModal {
   constructor(){
@@ -20,6 +20,7 @@ class AppModal {
     this.symptoms = $("#symptoms");
   }
 
+  // set basic application info
   setApp(data){
     this.appID.text(data['appID']);
     this.date.text(data['date']);
@@ -82,11 +83,9 @@ class MCModal extends AppFullModal{
     this.labReports = $("#labReports");
   }
 
+  // check if the element is an input box and set the value accordingly
   checkAndSet(element, data) {
     if (element.is("input")) {
-      // if (element != "") {
-      //   element.attr("disabled", true);
-      // }
       element.val(data);
     } else {
       element.text(data);
@@ -101,6 +100,7 @@ class MCModal extends AppFullModal{
     this.mcID.text(mcID);
   }
 
+  // set "state" (conscious/coma) in pre exam
   setState(state){
     if (this.state.is("select")) {
       var str = "option[value=" + state + "]";
@@ -140,6 +140,7 @@ class MCModal extends AppFullModal{
     };
   }
 
+  // load additional info for application
   loadAppInfo(appID){
     const appData = {"appID": appID};
     var fillAppData = (res) => {
@@ -149,6 +150,7 @@ class MCModal extends AppFullModal{
     sendRequest("getComments", "POST", appData, fillAppData);
   }
 
+  // load the entire medical record
   loadMCInfo(mcID, route) {
     const mcData = {"mcID": mcID, "type": "0"};
     var fillMCData = (res) => {
@@ -172,7 +174,7 @@ class MCModal extends AppFullModal{
 * @page doctorNurseViewAppt
 * @attribute labReportTypes, labReportReqs,
 patientBasicInfo(patientID, age, gender, bloodType, allergies, chronics, medications)
-* @method loadPatientInfo, setLbaReportAndReqs, setLabReportTypes, loadMCInfo(override)
+* @method loadPatientInfo, setLbaReportAndReqs, setLabReportTypes, loadPatientInfo, loadMCInfo(override)
 */
 class MCPage extends MCModal{
   constructor(){
@@ -188,6 +190,7 @@ class MCPage extends MCModal{
     this.medications = $("#medications");
   }
 
+  // For nurses, separate unfulfilled lab report requests (empty lab reports) from uploaded lab reports
   setLabReportAndReqs(labReportAndReqs){
     this.labReports.empty();
     this.labReportReqs.empty();
@@ -207,6 +210,7 @@ class MCPage extends MCModal{
     };
   }
 
+  // load patient basic health info
   loadPatientInfo(patientID) {
     var fillInfoData = (res) => {
       this.age.text(res.age);
@@ -219,6 +223,7 @@ class MCPage extends MCModal{
     sendRequest("getPatientInfo", "POST", {"patientID": patientID}, fillInfoData);
   }
 
+  // load the entire medical record
   loadMCInfo(mcID, route, type) {
     const mcData = {"mcID": mcID, "type": type};
     var fillMCData = (res) => {

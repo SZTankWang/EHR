@@ -62,16 +62,11 @@ function renderCard(data){
 	return temp;
 }
 
-
-// ---------------------capture user action--------------------------
-// click table button
-// TODO:
-
-
 // --------------------------event handlers----------------------------
 /**
+* @author Jingyi Zhu
 * @desc display modal
-* @param {event} event - click
+* @param {element} e - card
 */
 function buttonAction(e) {
   var data = jsonify($(e).find("form").serializeArray());

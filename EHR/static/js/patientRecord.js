@@ -4,15 +4,10 @@
 var myModal;
 
 $(document).ready(function(){
-
 	$('#apply').button();
 	drawPagination();
 	myModal = new AppFullModal();
 })
-
-function goBackHome(){
-	window.location.replace('http://localhost:5000/loadHomePage');
-}
 
 function drawPagination(){
 	// var data = $.ajax({
@@ -67,12 +62,11 @@ function renderCard(data){
 	return temp;
 }
 
-
 // --------------------------event handlers----------------------------
 /**
+* @author Jingyi Zhu
 * @desc display modal or go to view appointment page
-* @param {event} event - click
-* @this event target element - view button
+* @param {element} e - card
 */
 function buttonAction(e) {
   var data = jsonify($(e).find("form").serializeArray());

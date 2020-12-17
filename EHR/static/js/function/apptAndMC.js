@@ -6,7 +6,7 @@
 // --------------------------event handlers----------------------------
 /**
 * @desc load lab report if the lab report card is clicked
-* @this event target element - lab report card
+* @param {element} e - lab report card
 */
 function loadLabReport(e) {
   const filename = $(e).attr('href');
@@ -17,7 +17,7 @@ function loadLabReport(e) {
   }
 }
 
-//--------------------prescription and lab report card def---------------------
+//--------------------card definitions---------------------
 function newPrescriptionCard(index, id, medicine, dose, comments){
   var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#pre" + id + "' aria-expanded='true' aria-controls='pre" + id + "'>" + index + ": " + medicine + "</button> </h5> <div id='pre" + id + "' class='collapse' aria-labelledby='pre" + id + "' data-parent='#prescriptions'> <div class='card-body'><span><b>Dose: </b>" + dose + "</span></div> <div class='card-body'><span><b>Comments: </b>" + comments + "</span></div> </div> </div>";
   return card;
@@ -28,7 +28,6 @@ function newLabReportCard(index, id, type, doctor_comments, nurse_comments, link
   return card;
 }
 
-//--------------------lab report request card def---------------------
 function newLabReportReqCard(index, id, type, comments){
   var card = "<div class='card card-body'> <h5 class='mb-0'> <button class='btn btn-link' data-toggle='collapse' data-target='#req" + id + "' aria-expanded='true' aria-controls='req" + id + "'>" + "id " + id + ": " + type + "</button> </h5> <div id='req" + id + "' class='collapse' aria-labelledby='req" + id + "' data-parent='#labReportReqs'> <div class='card-body'> <form class='labReportForm' id='labReportForm" + id + "' enctype='multipart/form-data' onsubmit='return uploadLabReport(event)'> <div class='form-group row'> <label for='id' class='col-2 col-form-label'><b>Lab Report ID</b></label> <div class='col-5'> <input type='text' class='form-control-plaintext' id='labReportID" + index + "' name='id' value='" + id + "' readonly/> </div> </div> <div class='form-group row'> <span><b>Doctor's comments: </b>" + comments + "</span> </div> <div class='form-group row'> <label class='col-10 col-form-label' for='labReportInput'><b>Browse</b></label> <input class='form-control' type='file' id='labReportInput" + id + "' name='labReportInput' required> <label class='col-form-label' for='labReportInput'>supported file formats: .jpg, .png, .pdf</label> </div> <div class='form-group row'> <label class='col-10 col-form-label' for='commentsInput'><b>Comments</b></label> <textarea class='form-control' id='commentsInput" + id + "' name='commentsInput'></textarea> </div> <input type='submit' id='uploadReport" + id + "' class='btn btn-primary' value='Upload'/> </form> </div> </div> </div>";
   return card;

@@ -144,7 +144,6 @@ function setCalendar(res) {
 		eventClick: function() {
 			// alert('an event has been clicked!');
 		},
-
 		slotMinTime: "07:00:00",
 		slotMaxTime: "20:00:00",
 		initialView: 'timeGridWeek',

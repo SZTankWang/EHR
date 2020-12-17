@@ -58,7 +58,7 @@ function buttonAction(event) {
 /**
 * @desc request data and update table
 * @param {string} route
-* @param {array} data - default null or jsonified date range
+* @param {array} dateRange - default null or jsonified date range
 */
 function goUpdateTable(route, dateRange=null){
   var type = dateRange ? 'POST' : 'GET';

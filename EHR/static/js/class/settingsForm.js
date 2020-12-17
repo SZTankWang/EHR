@@ -3,6 +3,9 @@
 * @desc settings form wrappers
 */
 
+/**
+* @desc settings form for doctor, nurse and patient
+*/
 class Settings {
   constructor() {
     this.firstName = $("#firstName");
@@ -21,6 +24,9 @@ class Settings {
   }
 }
 
+/**
+* @desc patient health info form
+*/
 class HealthInfo {
   constructor() {
     this.age = $("#age");
@@ -47,6 +53,10 @@ class HealthInfo {
   }
 }
 
+/**
+* @desc patient health info form that can switch between readonly and editable
+* @page patientHealthInfo
+*/
 class DynamicHealthInfo extends HealthInfo {
   constructor() {
     super();
@@ -70,11 +80,13 @@ class DynamicHealthInfo extends HealthInfo {
       return attr == "readonly" ? null : "readonly";
     });
   }
+
   toggleTargetSelect(target){
     target.toggleClass("form-control");
     target.toggleClass("form-control-plaintext");
     this.toggleTargetDisable(target);
   }
+  
   toggleTargetDisable(target){
     target.attr("disabled", function(index, attr){
       return attr == "disabled" ? null : "disabled";
